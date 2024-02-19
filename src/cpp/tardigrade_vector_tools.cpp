@@ -524,9 +524,9 @@ namespace tardigradeVectorTools{
 
         for (unsigned int I=0; I<rows; I++){
 
-            for (unsigned int J=0; J<cols; J++){
+            for (unsigned int K=0; K<inner; K++){
 
-                for (unsigned int K=0; K<inner; K++){
+                for (unsigned int J=0; J<cols; J++){
 
                     C[I][J] += A[I][K] * B[K][J];
                 }
