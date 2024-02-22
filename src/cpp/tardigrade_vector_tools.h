@@ -236,6 +236,9 @@ namespace tardigradeVectorTools{
     int getValuesByIndex(const std::vector< T > &v, const std::vector< size_type > &indices,
         std::vector< T > &subv);
 
+    template <typename T>
+    std::vector< T > getRow( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int row );
+
     //Appending utilities
     template<typename T>
     std::vector< T > appendVectors(const std::vector< std::vector< T > > &A);
