@@ -1284,6 +1284,40 @@ namespace tardigradeVectorTools{
         return v;
     }
 
+    template <typename T>
+    std::vector< T > getCol(const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int col){
+        /*!
+         * Get the column from the row-major storage matrix A
+         *
+         * \param &A: The row-major storage of matrix A
+         * \param &rows: The number of rows in A
+         * \param &cols: The number of columns in A
+         * \param &col: The column to extract indexed from 0
+         */
+
+        TARDIGRADE_ERROR_TOOLS_CATCH(
+            if ( rows * cols != A.size( ) ){
+                throw std::length_error( "Row-major matrix A's size is not consistent with the number of rows and columns" );
+            }
+        )
+
+        TARDIGRADE_ERROR_TOOLS_CATCH(
+            if ( col >= cols ){
+                throw std::length_error( "column cannot be greater than or equal to the number of columns" );
+            }
+        )
+
+        std::vector< T > v( rows, 0 );
+
+        for ( unsigned int i = 0; i < rows; i++ ){
+
+            v[ i ] += A[ cols * i + col ];
+
+        }
+
+        return v;
+    }
+
     //Appending Utilities
     template<typename T>
     std::vector< T > appendVectors(const std::vector< std::vector< T > > &A){
