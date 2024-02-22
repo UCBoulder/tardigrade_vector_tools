@@ -580,6 +580,27 @@ BOOST_AUTO_TEST_CASE( test_getValuesByIndex ){
 
 }
 
+BOOST_AUTO_TEST_CASE( test_getRow ){
+    /*!
+     * Test the retrieval of values of a row of the matrix
+     */
+
+    vectorType m = { 1,  2,   3,
+                     4,  5,   6,
+                     7,  8,   9,
+                     10, 11, 12,
+                     13, 14, 15 };
+
+    unsigned int row = 2;
+
+    vectorType answer = { 7, 8, 9 };
+
+    vectorType result = tardigradeVectorTools::getRow( m, 5, 3, row );
+
+    BOOST_CHECK( tardigradeVectorTools::getRow( m, 5, 3, row ) == answer );
+
+}
+
 BOOST_AUTO_TEST_CASE( test_appendVectors ){
     /*!
      * Test the utility to append a vector of vectors into a row-major vector.
