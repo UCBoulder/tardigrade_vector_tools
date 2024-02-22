@@ -595,9 +595,28 @@ BOOST_AUTO_TEST_CASE( test_getRow ){
 
     vectorType answer = { 7, 8, 9 };
 
-    vectorType result = tardigradeVectorTools::getRow( m, 5, 3, row );
-
     BOOST_CHECK( tardigradeVectorTools::getRow( m, 5, 3, row ) == answer );
+
+}
+
+BOOST_AUTO_TEST_CASE( test_getCol ){
+    /*!
+     * Test the retrieval of values of a column of the matrix
+     */
+
+    vectorType m = { 1,  2,   3,
+                     4,  5,   6,
+                     7,  8,   9,
+                     10, 11, 12,
+                     13, 14, 15 };
+
+    unsigned int col = 1;
+
+    vectorType answer = { 2, 5, 8, 11, 14 };
+
+    vectorType result = tardigradeVectorTools::getCol( m, 5, 3, col );
+
+    BOOST_CHECK( tardigradeVectorTools::getCol( m, 5, 3, col ) == answer );
 
 }
 

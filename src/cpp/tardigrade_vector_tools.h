@@ -239,6 +239,9 @@ namespace tardigradeVectorTools{
     template <typename T>
     std::vector< T > getRow( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int row );
 
+    template <typename T>
+    std::vector< T > getCol( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int col );
+
     //Appending utilities
     template<typename T>
     std::vector< T > appendVectors(const std::vector< std::vector< T > > &A);
