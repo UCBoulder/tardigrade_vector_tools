@@ -1793,6 +1793,19 @@ namespace tardigradeVectorTools{
              * \param ncols: The number of columns
              */
 
+            return tardigradeVectorTools::inflate( computeFlatDInvADA( invA, nrows, ncols ), nrows * ncols, nrows * ncols );
+
+        }
+        template<typename T>
+        std::vector< double > computeFlatDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols ){
+            /*!
+             * Compute the derivative of the inverse of a matrix w.r.t. the matrix
+             * 
+             * \param &invA: The vector form of the inverse of the A matrix
+             * \param nrows: The number of rows
+             * \param ncols: The number of columns
+             */
+
             TARDIGRADE_ERROR_TOOLS_CATCH(
                 if (invA.size() != (nrows*ncols)){
                     throw std::length_error( "The size of Avec and the dimensions nrows and ncols do not agree.\n  Avec.size( ): " + std::to_string( invA.size( ) ) + "\n  nrows * ncols: " + std::to_string( nrows * ncols ) );
@@ -1805,7 +1818,7 @@ namespace tardigradeVectorTools{
                 }
             )
 
-            std::vector< std::vector< double > > result( nrows * ncols, std::vector< double >( nrows * ncols, 0 ) );            
+            std::vector< double > result( nrows * ncols * nrows * ncols, 0 );
 
             for ( unsigned int i = 0; i < nrows; i++ ){
 
@@ -1815,7 +1828,7 @@ namespace tardigradeVectorTools{
 
                         for ( unsigned int b = 0; b < ncols; b++ ){
 
-                            result[ ncols * i + j ][ nrows * a + b ] = -invA[ ncols * i + a ] * invA[ ncols * b + j ];
+                            result[ ncols * nrows * ncols * i + nrows * ncols * j + nrows * a + b ] = -invA[ ncols * i + a ] * invA[ ncols * b + j ];
 
                         }
 
