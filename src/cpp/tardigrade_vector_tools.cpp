@@ -19,11 +19,7 @@ std::vector<T>& operator+=(std::vector<T> &lhs, const std::vector<T> &rhs){
      * \param &rhs: The right-hand side vector
      */
 
-    TARDIGRADE_ERROR_TOOLS_CATCH(
-        if (lhs.size() != rhs.size()){
-            throw std::length_error("vectors must be the same size to add");
-        }
-    )
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size( ) == rhs.size( ), "vectors must be the same size to add" )
 
     for (tardigradeVectorTools::size_type i=0; i<lhs.size(); i++){
         lhs[i] += rhs[i];
@@ -55,11 +51,8 @@ std::vector<T> operator+(std::vector<T> lhs, const std::vector<T> &rhs){
      * \param &rhs: The right-hand side vector
      */
 
-    TARDIGRADE_ERROR_TOOLS_CATCH(
-        if (lhs.size() != rhs.size()){
-            throw std::length_error("vectors must be the same size to add");
-        }
-    )
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size( ) == rhs.size( ), "vectors must be the same size to add")
+
     return lhs += rhs;
 }
 
@@ -228,11 +221,7 @@ std::vector< std::vector< T > >& operator+=(std::vector< std::vector< T > > &lhs
      * \param &rhs: The right-hand side matrix
      */
 
-    TARDIGRADE_ERROR_TOOLS_CATCH(
-        if (lhs.size() != rhs.size()){
-            throw std::length_error("matrices must have the same numbers of rows to add");
-        }
-    )
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size() == rhs.size(), "matrices must have the same numbers of rows to add")
 
     for (unsigned int i=0; i<lhs.size(); i++){
         lhs[i] += rhs[i];
@@ -275,11 +264,7 @@ std::vector< std::vector < T > >& operator-=(std::vector< std::vector< T > > &lh
      * \param &rhs: The right-hand side matrix
      */
 
-    TARDIGRADE_ERROR_TOOLS_CATCH(
-        if (lhs.size() != rhs.size()){
-            throw std::length_error("matrices must have the same numbers of rows to add");
-        }
-    )
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size() == rhs.size(), "matrices must have the same numbers of rows to add")
 
     for (unsigned int i=0; i<lhs.size(); i++){
         lhs[i] += -rhs[i];
@@ -365,7 +350,7 @@ namespace tardigradeVectorTools{
             c[2] =  a[0]*b[1] - a[1]*b[0];
         }
         else{
-            TARDIGRADE_ERROR_TOOLS_CATCH( throw std::length_error("Only 2D and 3D vectors are accepted") );
+            TARDIGRADE_ERROR_TOOLS_CHECK( false, "Only 2D and 3D vectors are accepted");
         }
 
         return 0;
@@ -400,11 +385,7 @@ namespace tardigradeVectorTools{
 
         //Get the size and perform error handling
         size_type size = a.size();
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (size != b.size()){
-                throw std::length_error("vectors must be the same size to add");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( size == b.size(), "vectors must be the same size to add" )
 
         //Set v to zero
         v = 0;
@@ -460,17 +441,9 @@ namespace tardigradeVectorTools{
 
         size_type size = A.size();
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( size == 0 ){
-                throw std::length_error("A has no rows");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( size != 0, "A has no rows")
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( size != b.size() ){
-                throw std::length_error("A and b are incompatible shapes");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( size == b.size(), "A and b are incompatible shapes");
 
         std::vector< T > c(A[0].size(), 0);
 
@@ -493,38 +466,21 @@ namespace tardigradeVectorTools{
 
         size_type rows = A.size();
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (B.size() == 0){
-                throw std::length_error("B has no rows");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( B.size() != 0, "B has no rows")
 
         size_type inner = B.size();
         size_type cols = B[0].size();
-
-        //Error handling
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            for (unsigned int I=0; I<rows; I++){
-                if (A[I].size() != inner){
-                    throw std::length_error("A and B have incompatible shapes");
-                }
-            }
-        )
-
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            for (unsigned int I=0; I<inner; I++){
-                if (B[I].size() != cols){
-                    throw std::length_error("B is not a regular matrix");
-                }
-            }
-        )
 
         //Perform the matrix multiplication
         std::vector< std::vector< T > > C(rows, std::vector< T >(cols, 0));
 
         for (unsigned int I=0; I<rows; I++){
 
+            TARDIGRADE_ERROR_TOOLS_CHECK( A[I].size( ) == inner, "A and B have incompatible shapes" )
+
             for (unsigned int K=0; K<inner; K++){
+
+                TARDIGRADE_ERROR_TOOLS_CHECK( B[K].size() == cols, "B is not a regular matrix" )
 
                 for (unsigned int J=0; J<cols; J++){
 
@@ -546,38 +502,21 @@ namespace tardigradeVectorTools{
 
         size_type Arows = A.size();
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (B.size() == 0){
-                throw std::length_error("B has no rows");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( B.size( ) != 0, "B has no rows" );
 
         size_type Brows = B.size();
         size_type Bcols = B[0].size();
-
-        //Error handling
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            for (unsigned int I=0; I<Arows; I++){
-                if (A[I].size() != Bcols){
-                    throw std::length_error("A and B have incompatible shapes");
-                }
-            }
-        )
-
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            for (unsigned int I=0; I<Brows; I++){
-                if (B[I].size() != Bcols){
-                    throw std::length_error("B is not a regular matrix");
-                }
-            }
-        )
 
         //Perform the matrix multiplication
         std::vector< std::vector< T > > C(Arows, std::vector< T >(Brows, 0));
 
         for (unsigned int I=0; I<Arows; I++){
 
+            TARDIGRADE_ERROR_TOOLS_CHECK( A[I].size() == Bcols, "A and B have incompatible shapes" );
+
             for (unsigned int J=0; J<Brows; J++){
+
+                TARDIGRADE_ERROR_TOOLS_CHECK( B[J].size() == Bcols, "B is not a regular matrix" );
 
                 for (unsigned int K=0; K<Bcols; K++){
 
@@ -599,45 +538,16 @@ namespace tardigradeVectorTools{
 
         size_type Arows = A.size();
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (Arows == 0){
-                throw std::length_error("A has no rows");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( Arows != 0, "A has no rows" )
 
         size_type Acols = A[0].size();
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (B.size() == 0){
-                throw std::length_error("B has no rows");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( B.size( ) != 0, "B has no rows" );
 
         size_type Brows = B.size();
         size_type Bcols = B[0].size();
 
-        //Error handling
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (Arows != Brows){
-                throw std::length_error("A and B have incompatible shapes");
-            }
-        )
-
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            for (unsigned int I=0; I<Arows; I++){
-                if (A[I].size() != Acols){
-                    throw std::length_error("A is not a regular matrix");
-                }
-            }
-        )
-
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            for (unsigned int I=0; I<Brows; I++){
-                if (B[I].size() != Bcols){
-                    throw std::length_error("B is not a regular matrix");
-                }
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( Arows == Brows, "A and B have incompatible shapes" );
 
         //Perform the matrix multiplication
         std::vector< std::vector< T > > C(Acols, std::vector< T >(Bcols, 0));
@@ -647,6 +557,10 @@ namespace tardigradeVectorTools{
             for (unsigned int J=0; J<Bcols; J++){
 
                 for (unsigned int K=0; K<Brows; K++){
+
+                    TARDIGRADE_ERROR_TOOLS_CHECK( B[K].size() == Bcols, "B is not a regular matrix" )
+
+                    TARDIGRADE_ERROR_TOOLS_CHECK( A[K].size() == Acols, "A is not a regular matrix" )
 
                     C[I][J] += A[K][I] * B[K][J];
                 }
@@ -728,11 +642,7 @@ namespace tardigradeVectorTools{
         //Get the size and perform error handling
         unsigned int Arows = A.size();
         unsigned int Acols = A[0].size();
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (Arows != B.size() || Acols != B[0].size()){
-                throw std::length_error("Matrices must have the same dimensions to add.");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( Arows == B.size() && Acols == B[0].size(), "Matrices must have the same dimensions to add.")
 
         //Convert to row major matrices
         std::vector< T > Avec = appendVectors(A);
@@ -778,11 +688,7 @@ namespace tardigradeVectorTools{
         //Get the size and perform error handling
         unsigned int length = A.size();
         unsigned int dimension = std::round(std::sqrt(length));
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (dimension*dimension != length){
-                throw std::length_error("The trace can only be computed for square matrices.");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( dimension*dimension == length, "The trace can only be computed for square matrices.")
 
         //Set v to zero
         v = 0;
@@ -925,11 +831,7 @@ namespace tardigradeVectorTools{
         //Get the size and perform error handling
         unsigned int length = I.size();
         unsigned int dimension = std::round(std::sqrt(length));
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if (dimension*dimension != length){
-                throw std::length_error("The identity tensor can only be constructed for square matrices.");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( dimension*dimension == length, "The identity tensor can only be constructed for square matrices.")
 
         //Construct the identity matrix
         I = std::vector< T >(I.size(), 0);
@@ -1267,17 +1169,9 @@ namespace tardigradeVectorTools{
          * \param &row: The row to extract indexed from 0
          */
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( rows * cols != A.size( ) ){
-                throw std::length_error( "Row-major matrix A's size is not consistent with the number of rows and columns" );
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( rows * cols == A.size( ), "Row-major matrix A's size is not consistent with the number of rows and columns" );
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( row >= rows ){
-                throw std::length_error( "row cannot be greater than or equal to the number of rows" );
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( row < rows, "row cannot be greater than or equal to the number of rows" )
 
         std::vector< T > v( A.begin( ) + cols * row, A.begin( ) + cols * ( row + 1 ) );
 
@@ -1295,17 +1189,9 @@ namespace tardigradeVectorTools{
          * \param &col: The column to extract indexed from 0
          */
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( rows * cols != A.size( ) ){
-                throw std::length_error( "Row-major matrix A's size is not consistent with the number of rows and columns" );
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( rows * cols == A.size( ), "Row-major matrix A's size is not consistent with the number of rows and columns" )
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( col >= cols ){
-                throw std::length_error( "column cannot be greater than or equal to the number of columns" );
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( col < cols, "column cannot be greater than or equal to the number of columns" )
 
         std::vector< T > v( rows, 0 );
 
@@ -1360,11 +1246,7 @@ namespace tardigradeVectorTools{
          * \param &ncols: The number of columns in the matrix.
          */
 
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( Avec.size() != nrows * ncols ){
-                throw std::length_error("Avec is not a consistent size with the desired dimensions of the matrix");
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( Avec.size() == nrows * ncols, "Avec is not a consistent size with the desired dimensions of the matrix")
 
         std::vector< std::vector< T > > A( nrows, std::vector< T >( ncols ) );
 
@@ -1485,11 +1367,7 @@ namespace tardigradeVectorTools{
          * \param &bungeEulerAngles: Vector containing three Bunge-Euler angles in radians
          * \param &directionCosines: Matrix containing the 3x3 rotation matrix
          */
-        TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( bungeEulerAngles.size( ) != ( 3 ) ){
-                throw std::length_error( "There must be exactly three (3) Bunge-Euler angles." );
-            }
-        )
+        TARDIGRADE_ERROR_TOOLS_CHECK( bungeEulerAngles.size( ) == ( 3 ), "There must be exactly three (3) Bunge-Euler angles." )
 
         double s1 = std::sin( bungeEulerAngles[ 0 ] );
         double c1 = std::cos( bungeEulerAngles[ 0 ] );
@@ -1585,11 +1463,8 @@ namespace tardigradeVectorTools{
             const std::vector< T > Avec = appendVectors( A );
 
             unsigned int ncols = Avec.size( ) / nrows;
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( ( Avec.size( ) % nrows ) > 0 ){
-                    throw std::length_error( "A is not a regular matrix" );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( ( Avec.size( ) % nrows ) == 0, "A is not a regular matrix" )
+
             return solveLinearSystem( Avec, b, nrows, ncols, rank );
 
         }
@@ -1619,11 +1494,8 @@ namespace tardigradeVectorTools{
             const std::vector< T > Avec = appendVectors( A );
 
             unsigned int ncols = Avec.size( ) / nrows;
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( ( Avec.size( ) % nrows ) > 0 ){
-                    throw std::length_error( "A is not a regular matrix" );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( ( Avec.size( ) % nrows ) == 0, "A is not a regular matrix" )
+
             return solveLinearSystem( Avec, b, nrows, ncols, rank, linearSolver );
 
         }
@@ -1668,17 +1540,9 @@ namespace tardigradeVectorTools{
              *     using Newton methods.
              */
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( Avec.size( ) != ( nrows * ncols ) ){
-                    throw std::length_error( "The size of Avec and the dimensions nrows and ncols do not align." );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( Avec.size( ) == ( nrows * ncols ), "The size of Avec and the dimensions nrows and ncols do not align." )
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( b.size( ) != ncols ){
-                    throw std::length_error( "The b vector's size is not consistent with A's dimension" );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( b.size( ) == ncols, "The b vector's size is not consistent with A's dimension" )
 
             //Set up the Eigen maps for A and b
             Eigen::Map< const Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > Amat( Avec.data( ), nrows, ncols );
@@ -1727,17 +1591,9 @@ namespace tardigradeVectorTools{
              * \param ncols: The number of columns
              */
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (Avec.size() != (nrows*ncols)){
-                    throw std::length_error( "The size of Avec and the dimensions nrows and ncols do not agree.\n  Avec.size( ): " + std::to_string( Avec.size( ) ) + "\n  nrows * ncols: " + std::to_string( nrows * ncols ) );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( Avec.size() == (nrows*ncols), "The size of Avec and the dimensions nrows and ncols do not agree.\n  Avec.size( ): " + std::to_string( Avec.size( ) ) + "\n  nrows * ncols: " + std::to_string( nrows * ncols ) )
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (nrows != ncols){
-                    throw std::runtime_error( "Error: The number of rows must equal the number of columns.\n  nrows: " + std::to_string( nrows ) + "\n  ncols: " + std::to_string(ncols) );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( nrows == ncols, "Error: The number of rows must equal the number of columns.\n  nrows: " + std::to_string( nrows ) + "\n  ncols: " + std::to_string(ncols) )
 
             //Set up the Eigen map for A
             Eigen::Map < const Eigen::Matrix<T, -1, -1, Eigen::RowMajor> > Amat(Avec.data(), nrows, ncols);
@@ -1763,19 +1619,11 @@ namespace tardigradeVectorTools{
             unsigned int nrows = A.size();
             unsigned int ncols;
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( nrows == 0 ){
-                    throw std::length_error("A has no size" );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( nrows != 0, "A has no size" )
 
             ncols = A[0].size( );
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( ncols == 0 ){
-                    throw std::length_error("A has no columns");
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( ncols != 0, "A has no columns")
 
             std::vector< T > Avec = appendVectors( A );
             std::vector< double > Ainvvec = inverse( Avec, nrows, ncols );
@@ -1806,17 +1654,9 @@ namespace tardigradeVectorTools{
              * \param ncols: The number of columns
              */
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (invA.size() != (nrows*ncols)){
-                    throw std::length_error( "The size of Avec and the dimensions nrows and ncols do not agree.\n  Avec.size( ): " + std::to_string( invA.size( ) ) + "\n  nrows * ncols: " + std::to_string( nrows * ncols ) );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( invA.size() == (nrows*ncols), "The size of Avec and the dimensions nrows and ncols do not agree.\n  Avec.size( ): " + std::to_string( invA.size( ) ) + "\n  nrows * ncols: " + std::to_string( nrows * ncols ) )
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (nrows != ncols){
-                    throw std::runtime_error( "Error: The number of rows must equal the number of columns.\n  nrows: " + std::to_string( nrows ) + "\n  ncols: " + std::to_string(ncols) );
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( nrows == ncols, "Error: The number of rows must equal the number of columns.\n  nrows: " + std::to_string( nrows ) + "\n  ncols: " + std::to_string(ncols) )
 
             std::vector< double > result( nrows * ncols * nrows * ncols, 0 );
 
@@ -1893,17 +1733,9 @@ namespace tardigradeVectorTools{
              */
 
             //Error handling
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (A.size() != Arows*Acols){
-                    throw std::length_error("A has an incompatible shape");
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( A.size() == Arows*Acols, "A has an incompatible shape")
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (B.size() != Brows*Bcols){
-                    throw std::length_error("B has an incompatible shape");
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( B.size() == Brows*Bcols, "B has an incompatible shape")
 
             //Map A and B to Eigen matrices
             Eigen::Map < const Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > Amat(A.data(), Arows, Acols);
@@ -2021,11 +1853,7 @@ namespace tardigradeVectorTools{
              * \param maxLS: The maximum number of line search iterations.
              */
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if (A.size() != Arows * Arows){
-                    throw std::length_error("A has an incompatible shape");
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( A.size() == Arows * Arows, "A has an incompatible shape")
 
             //Initialize the output
             std::vector< double > X(Arows*Arows);
@@ -2119,13 +1947,7 @@ namespace tardigradeVectorTools{
              * \param &V: The returned right-hand side unitary matrix in row-major format
              */
 
-            TARDIGRADE_ERROR_TOOLS_CATCH(
-                if ( A.size( ) != nrows * ncols ){
-
-                    throw std::invalid_argument( "A's size is not consistent with the indicated number of rows and columns" );
-
-                }
-            )
+            TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) == nrows * ncols, "A's size is not consistent with the indicated number of rows and columns" )
 
             // Clear and Re-size the output vectors
             U.clear( );
