@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE( test_trace, * boost::unit_test::tolerance( DEFAULT_TEST_TO
 
     c = 0.;
     c = tardigradeVectorTools::trace( a );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals<floatType>( c, 3. ) );
+    BOOST_TEST( c == 3. );
 
     matrixType A = { { 1., 0., 0. },
                      { 0., 1., 0. },
@@ -421,11 +421,11 @@ BOOST_AUTO_TEST_CASE( test_trace, * boost::unit_test::tolerance( DEFAULT_TEST_TO
 
     c = 0.;
     tardigradeVectorTools::trace( A, c );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals<floatType>( c, 3. ) );
+    BOOST_TEST( c == 3. );
 
     c = 0.;
     c = tardigradeVectorTools::trace( A );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals<floatType>( c, 3. ) );
+    BOOST_TEST( c == 3. );
 
 }
 
@@ -439,10 +439,10 @@ BOOST_AUTO_TEST_CASE( test_l2norm, * boost::unit_test::tolerance( DEFAULT_TEST_T
                      { 5, 6, 7, 8 } };
 
     double r = tardigradeVectorTools::l2norm( a );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( r, 3.7416573867739413 ) );
+    BOOST_TEST( r == 3.7416573867739413 );
 
     r = tardigradeVectorTools::l2norm( A );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( r, 14.2828568570857 ) );
+    BOOST_TEST( r == 14.2828568570857 );
 
 }
 
@@ -500,7 +500,9 @@ BOOST_AUTO_TEST_CASE( test_argsort, * boost::unit_test::tolerance( DEFAULT_TEST_
     vectorType a = { 1, -2, 7, 3, 9, 11 };
     std::vector< unsigned int > idx = tardigradeVectorTools::argsort( a );
 
-    BOOST_CHECK( tardigradeVectorTools::equals( idx, { 1, 0, 3, 2, 4, 5 } ) );
+    std::vector< unsigned int > answer = { 1, 0, 3, 2, 4, 5 };
+
+    BOOST_TEST( idx == answer );
 
 }
 
@@ -513,7 +515,7 @@ BOOST_AUTO_TEST_CASE( test_fuzzyEquals, * boost::unit_test::tolerance( DEFAULT_T
                      { 1.4, 8.5, 1 + 1e-9,   4, -2+1e-3,   100 } };
 
     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { {   1,  -2, 3, 2.4,            0,        0 },
-                                                { 1.4, 8.5, 1,   4, -2+1e-3+1e-9, 100+1e-4 } } ) );
+                                                          { 1.4, 8.5, 1,   4, -2+1e-3+1e-9, 100+1e-4 } } ) );
 
 }
 
@@ -537,12 +539,12 @@ BOOST_AUTO_TEST_CASE( test_equals, * boost::unit_test::tolerance( DEFAULT_TEST_T
     BOOST_CHECK( !tardigradeVectorTools::equals( v, { 1, 2, 2, 4 } ) );
 
     BOOST_CHECK( tardigradeVectorTools::equals( m, { { 1, 2, 3 },
-                                           { 4, 5, 6 },
-                                           { 7, 8, 9 } } ) );
+                                                     { 4, 5, 6 },
+                                                     { 7, 8, 9 } } ) );
 
     BOOST_CHECK( !tardigradeVectorTools::equals( m, { { 1, 2, 3 },
-                                            { 4, 5, 4 },
-                                            { 7, 8, 9 } } ) );
+                                                      { 4, 5, 4 },
+                                                      { 7, 8, 9 } } ) );
 
 }
 
@@ -602,15 +604,18 @@ BOOST_AUTO_TEST_CASE( test_getValuesByIndex, * boost::unit_test::tolerance( DEFA
                      { 10, 11, 12 },
                      { 13, 14, 15 } };
 
+    vectorType rv_answer = { 2, 4, 1 };
+    vectorType rm_answer = { 4, 5, 6, 10, 11, 12, 1, 2, 3 };
+
     std::vector< tardigradeVectorTools::size_type > indices = { 1, 3, 0 };
 
     vectorType rv;
     tardigradeVectorTools::getValuesByIndex( v, indices, rv );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( rv, { 2, 4, 1 } ) );
+    BOOST_TEST( rv == rv_answer, CHECK_PER_ELEMENT );
 
     matrixType rm;
     tardigradeVectorTools::getValuesByIndex( m, indices, rm );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( rm, { { 4, 5, 6 }, { 10, 11, 12 }, { 1, 2, 3 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( rm ) == rm_answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -629,7 +634,7 @@ BOOST_AUTO_TEST_CASE( test_getRow, * boost::unit_test::tolerance( DEFAULT_TEST_T
 
     vectorType answer = { 7, 8, 9 };
 
-    BOOST_CHECK( tardigradeVectorTools::getRow( m, 5, 3, row ) == answer );
+    BOOST_TEST( tardigradeVectorTools::getRow( m, 5, 3, row ) == answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -650,7 +655,7 @@ BOOST_AUTO_TEST_CASE( test_getCol, * boost::unit_test::tolerance( DEFAULT_TEST_T
 
     vectorType result = tardigradeVectorTools::getCol( m, 5, 3, col );
 
-    BOOST_CHECK( tardigradeVectorTools::getCol( m, 5, 3, col ) == answer );
+    BOOST_TEST( tardigradeVectorTools::getCol( m, 5, 3, col ) == answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -662,14 +667,17 @@ BOOST_AUTO_TEST_CASE( test_appendVectors, * boost::unit_test::tolerance( DEFAULT
     matrixType m = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
     vectorType v = tardigradeVectorTools::appendVectors( m );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( v, { 1, 2, 3, 4, 5, 6, 7, 8, 9 } ) );
+    vectorType v_answer_1 = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    vectorType v_answer_2 = { 1, 7, 5, 4, 6, 2 };
+
+    BOOST_TEST( v == v_answer_1, CHECK_PER_ELEMENT );
 
     v.clear( );
     vectorType v1 = { 1, 7, 5 };
     vectorType v2 = { 4, 6, 2 };
     v = tardigradeVectorTools::appendVectors( { v1, v2 } );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( v, { 1, 7, 5, 4, 6, 2 } ) );
+    BOOST_TEST( v == v_answer_2, CHECK_PER_ELEMENT );
 
 }
 
