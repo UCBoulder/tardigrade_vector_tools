@@ -15,6 +15,9 @@
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/tools/output_test_stream.hpp>
 
+#define DEFAULT_TEST_TOLERANCE 1e-6
+#define CHECK_PER_ELEMENT boost::test_tools::per_element( )
+
 typedef double floatType;
 typedef std::vector< floatType > vectorType;
 typedef std::vector< vectorType > matrixType;
@@ -40,7 +43,7 @@ void print( matrixType A ){
     }
 }
 
-BOOST_AUTO_TEST_CASE( test_addition_operators ){
+BOOST_AUTO_TEST_CASE( test_addition_operators, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the addition operators
      */
@@ -73,25 +76,25 @@ BOOST_AUTO_TEST_CASE( test_addition_operators ){
     vectorType A_answer = { 0,  -1,  0, 6,  10, 12 };
     vectorType C_answer = { -1, -4, -3, 8, 15, 18 };
 
-    BOOST_TEST( a == a_answer_2 );
+    BOOST_TEST( a == a_answer_2, CHECK_PER_ELEMENT );
 
     c = a + 2.;
-    BOOST_TEST( c == c_answer_2 );
-    BOOST_TEST( a == a_answer_2 );
+    BOOST_TEST( c == c_answer_2, CHECK_PER_ELEMENT );
+    BOOST_TEST( a == a_answer_2, CHECK_PER_ELEMENT );
 
     c = 2. + a;
-    BOOST_TEST( c == c_answer_2 );
-    BOOST_TEST( a == a_answer_2 );
+    BOOST_TEST( c == c_answer_2, CHECK_PER_ELEMENT );
+    BOOST_TEST( a == a_answer_2, CHECK_PER_ELEMENT );
 
     A += B;
-    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer, CHECK_PER_ELEMENT );
 
     C = A + B;
-    BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer, CHECK_PER_ELEMENT );
 
 }
 
-BOOST_AUTO_TEST_CASE( test_subtraction_operators ){
+BOOST_AUTO_TEST_CASE( test_subtraction_operators, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the subtraction operators
      */
@@ -119,39 +122,39 @@ BOOST_AUTO_TEST_CASE( test_subtraction_operators ){
 
     vectorType C_answer_1 = { 3, 8, 9, 0, -5, -6 };
 
-    BOOST_TEST( ( -a ) == a_answer_1 );
+    BOOST_TEST( ( -a ) == a_answer_1, CHECK_PER_ELEMENT );
 
     a -= b;
 
-    BOOST_TEST( a == a_answer_2 );
+    BOOST_TEST( a == a_answer_2, CHECK_PER_ELEMENT );
 
     c = a - b;
 
-    BOOST_TEST( c == c_answer_1 );
+    BOOST_TEST( c == c_answer_1, CHECK_PER_ELEMENT );
 
     a -= 1.;
 
-    BOOST_TEST( a == a_answer_3 );
+    BOOST_TEST( a == a_answer_3, CHECK_PER_ELEMENT );
 
     c = a - 2.;
-    BOOST_TEST( c == c_answer_2 );
-    BOOST_TEST( a == a_answer_3 );
+    BOOST_TEST( c == c_answer_2, CHECK_PER_ELEMENT );
+    BOOST_TEST( a == a_answer_3, CHECK_PER_ELEMENT );
 
     c = 2. - a;
-    BOOST_TEST( c == c_answer_3 );
-    BOOST_TEST( a == a_answer_3 );
+    BOOST_TEST( c == c_answer_3, CHECK_PER_ELEMENT );
+    BOOST_TEST( a == a_answer_3, CHECK_PER_ELEMENT );
 
-    BOOST_TEST( tardigradeVectorTools::appendVectors( -A ) == A_answer_1 );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( -A ) == A_answer_1, CHECK_PER_ELEMENT );
 
     A -= B;
-    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer_2 );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer_2, CHECK_PER_ELEMENT );
 
     C = A - B;
-    BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer_1 );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer_1, CHECK_PER_ELEMENT );
 
 }
 
-BOOST_AUTO_TEST_CASE( test_multiplication_operators ){
+BOOST_AUTO_TEST_CASE( test_multiplication_operators, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the multiplication operators
      */
@@ -164,17 +167,17 @@ BOOST_AUTO_TEST_CASE( test_multiplication_operators ){
 
     a *= 2;
 
-    BOOST_TEST( a == a_answer );
+    BOOST_TEST( a == a_answer, CHECK_PER_ELEMENT );
 
     b = 3*a;
     c = a*3;
 
-    BOOST_TEST( b == c );
-    BOOST_TEST( b == b_answer );
+    BOOST_TEST( b == c, CHECK_PER_ELEMENT );
+    BOOST_TEST( b == b_answer, CHECK_PER_ELEMENT );
 
 }
 
-BOOST_AUTO_TEST_CASE( test_division_operators ){
+BOOST_AUTO_TEST_CASE( test_division_operators, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the division operators
      */
@@ -182,18 +185,21 @@ BOOST_AUTO_TEST_CASE( test_division_operators ){
     vectorType a = { 1, 2, 3 };
     vectorType b;
 
+    vectorType a_answer = { 0.50, 1.0, 1.50 };
+    vectorType b_answer = { 0.25, 0.5, 0.75 };
 
     a /= 2;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 0.5, 1, 1.5 } ) );
+    BOOST_TEST( a == a_answer, CHECK_PER_ELEMENT );
 
     b = a/2;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( b, { 0.25, 0.5, 0.75 } ) );
+    BOOST_TEST( b == b_answer, CHECK_PER_ELEMENT );
 
 }
 
-BOOST_AUTO_TEST_CASE( test_computeMean ){
+BOOST_AUTO_TEST_CASE( test_computeMean, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
+//boost::test_tools::tolerance( 0.1 ) ){
     /*!
      * Test the computation of the mean of a vector of vectors
      */
@@ -202,18 +208,19 @@ BOOST_AUTO_TEST_CASE( test_computeMean ){
                      { -4, 13, 0.4, 5 },
                      {  2,  6, 1.0, 7 } };
 
-    vectorType answer = { -1./3, 7, 8.8/6, 5 + 1/3. };
+    vectorType answer = {-1./3., 7., 8.8/6., 5. + 1/3. };
+
     vectorType result;
     tardigradeVectorTools::computeMean( A, result );
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, answer ) );
+    BOOST_TEST( result == answer, CHECK_PER_ELEMENT );
 
     result = tardigradeVectorTools::computeMean( A );
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, answer ) );
+    BOOST_TEST( result == answer, CHECK_PER_ELEMENT );
 
 }
 
-BOOST_AUTO_TEST_CASE( test_cross ){
+BOOST_AUTO_TEST_CASE( test_cross, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the cross product of two vectors
      */
@@ -222,24 +229,27 @@ BOOST_AUTO_TEST_CASE( test_cross ){
     vectorType b = { -1, 7 };
     vectorType c;
 
+    vectorType c_answer_1 = { 0, 0, 9 };
+    vectorType c_answer_2 = { -27, 0, 9 };
+
     tardigradeVectorTools::cross( a, b, c );
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 0, 0, 9 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, c_answer_1 ) );
 
     a = {  1, 2, 3 };
     b = { -1, 7, -3 };
 
     tardigradeVectorTools::cross( a, b, c );
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { -27, 0, 9 } ) );
+    BOOST_TEST( c == c_answer_2, CHECK_PER_ELEMENT );
 
     c = tardigradeVectorTools::cross( a, b );
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { -27, 0, 9 } ) );
+    BOOST_TEST( c == c_answer_2, CHECK_PER_ELEMENT );
 
 }
 
-BOOST_AUTO_TEST_CASE( test_dot ){
+BOOST_AUTO_TEST_CASE( test_dot, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the dot product of two vectors
      */
@@ -276,7 +286,7 @@ BOOST_AUTO_TEST_CASE( test_dot ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_dotT ){
+BOOST_AUTO_TEST_CASE( test_dotT, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the dot product of two matrices
      */
@@ -296,7 +306,7 @@ BOOST_AUTO_TEST_CASE( test_dotT ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_Tdot ){
+BOOST_AUTO_TEST_CASE( test_Tdot, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the dot product of two matrices
      */
@@ -323,7 +333,7 @@ BOOST_AUTO_TEST_CASE( test_Tdot ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_TdotT ){
+BOOST_AUTO_TEST_CASE( test_TdotT, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the dot product of two matrices
      */
@@ -343,7 +353,7 @@ BOOST_AUTO_TEST_CASE( test_TdotT ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_inner ){
+BOOST_AUTO_TEST_CASE( test_inner, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
 
     //Initialize test variables
     vectorType Avec, Bvec ;
@@ -377,7 +387,7 @@ BOOST_AUTO_TEST_CASE( test_inner ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_trace ){
+BOOST_AUTO_TEST_CASE( test_trace, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the trace for a square matrix
      */
@@ -417,7 +427,7 @@ BOOST_AUTO_TEST_CASE( test_trace ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_l2norm ){
+BOOST_AUTO_TEST_CASE( test_l2norm, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the l2norm of vectors and matrices
      */
@@ -434,7 +444,7 @@ BOOST_AUTO_TEST_CASE( test_l2norm ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_unitVector ){
+BOOST_AUTO_TEST_CASE( test_unitVector, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of unit vectors
      */
@@ -480,7 +490,7 @@ BOOST_AUTO_TEST_CASE( test_unitVector ){
     }
 }
 
-BOOST_AUTO_TEST_CASE( test_argsort ){
+BOOST_AUTO_TEST_CASE( test_argsort, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the utility that returns the indices required to sort a vector
      */
@@ -492,7 +502,7 @@ BOOST_AUTO_TEST_CASE( test_argsort ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_fuzzyEquals ){
+BOOST_AUTO_TEST_CASE( test_fuzzyEquals, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the tolerant compare function
      */
@@ -505,7 +515,7 @@ BOOST_AUTO_TEST_CASE( test_fuzzyEquals ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_equals ){
+BOOST_AUTO_TEST_CASE( test_equals, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the exact equality function
      */
@@ -534,7 +544,7 @@ BOOST_AUTO_TEST_CASE( test_equals ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_verifyLength ){
+BOOST_AUTO_TEST_CASE( test_verifyLength, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
 
     std::vector< double > testVectorDouble = { 1. };
     BOOST_CHECK_NO_THROW( tardigradeVectorTools::verifyLength( testVectorDouble, 1 ) );
@@ -577,7 +587,7 @@ BOOST_AUTO_TEST_CASE( test_verifyLength ){
     );
 }
 
-BOOST_AUTO_TEST_CASE( test_getValuesByIndex ){
+BOOST_AUTO_TEST_CASE( test_getValuesByIndex, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the retrieval of values of a vector as
      * indicated by vector of indices.
@@ -602,7 +612,7 @@ BOOST_AUTO_TEST_CASE( test_getValuesByIndex ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_getRow ){
+BOOST_AUTO_TEST_CASE( test_getRow, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the retrieval of values of a row of the matrix
      */
@@ -621,7 +631,7 @@ BOOST_AUTO_TEST_CASE( test_getRow ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_getCol ){
+BOOST_AUTO_TEST_CASE( test_getCol, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the retrieval of values of a column of the matrix
      */
@@ -642,7 +652,7 @@ BOOST_AUTO_TEST_CASE( test_getCol ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_appendVectors ){
+BOOST_AUTO_TEST_CASE( test_appendVectors, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the utility to append a vector of vectors into a row-major vector.
      */
@@ -825,7 +835,7 @@ BOOST_AUTO_TEST_CASE ( test_rotationMatrix, * boost::unit_test::tolerance( 1.0e-
 
 }
 
-BOOST_AUTO_TEST_CASE( test_solveLinearSystem ){
+BOOST_AUTO_TEST_CASE( test_solveLinearSystem, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the utility to solve a linear system of equations.
      */
@@ -871,7 +881,7 @@ BOOST_AUTO_TEST_CASE( test_solveLinearSystem ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_isParallel ){
+BOOST_AUTO_TEST_CASE( test_isParallel, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the utility that tests if two vectors are parallel or not
      */
@@ -895,7 +905,7 @@ BOOST_AUTO_TEST_CASE( test_isParallel ){
 }
 
 //TODO: Parametrize with BOOST_DATA_TEST_CASE
-BOOST_AUTO_TEST_CASE( test_isOrthogonal_verifyOrthogonal ){
+BOOST_AUTO_TEST_CASE( test_isOrthogonal_verifyOrthogonal, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the utility that tests if two vectors are orthogonal or not
      */
@@ -973,7 +983,7 @@ BOOST_AUTO_TEST_CASE( test_isOrthogonal_verifyOrthogonal ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_dyadic ){
+BOOST_AUTO_TEST_CASE( test_dyadic, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the dyadic product between two vectors
      */
@@ -988,7 +998,7 @@ BOOST_AUTO_TEST_CASE( test_dyadic ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_eye ){
+BOOST_AUTO_TEST_CASE( test_eye, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the formation of an identity matrix
      */
@@ -1018,7 +1028,7 @@ BOOST_AUTO_TEST_CASE( test_eye ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_determinant ){
+BOOST_AUTO_TEST_CASE( test_determinant, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the determinant of a matrix
      */
@@ -1034,7 +1044,7 @@ BOOST_AUTO_TEST_CASE( test_determinant ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_inverse ){
+BOOST_AUTO_TEST_CASE( test_inverse, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the matrix inverse;
      */
@@ -1058,7 +1068,7 @@ BOOST_AUTO_TEST_CASE( test_inverse ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_inflate ){
+BOOST_AUTO_TEST_CASE( test_inflate, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the inflate command in tardigrade_vector_tools
      */
@@ -1078,7 +1088,7 @@ BOOST_AUTO_TEST_CASE( test_inflate ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_computeDDetADA ){
+BOOST_AUTO_TEST_CASE( test_computeDDetADA, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the derivative of the determinant w.r.t.
      * the matrix.
@@ -1105,7 +1115,7 @@ BOOST_AUTO_TEST_CASE( test_computeDDetADA ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_matrixMultiply ){
+BOOST_AUTO_TEST_CASE( test_matrixMultiply, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the matrix multiplication function.
      */
@@ -1132,7 +1142,7 @@ BOOST_AUTO_TEST_CASE( test_matrixMultiply ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual ){
+BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the residual used in solving for
      * the square root of a matrix.
@@ -1162,7 +1172,7 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_matrixSqrt ){
+BOOST_AUTO_TEST_CASE( test_matrixSqrt, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the square root of a matrix.
      */
@@ -1199,7 +1209,7 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrt ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_median ){
+BOOST_AUTO_TEST_CASE( test_median, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the median of a vector
      */
@@ -1212,7 +1222,7 @@ BOOST_AUTO_TEST_CASE( test_median ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_abs ){
+BOOST_AUTO_TEST_CASE( test_abs, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the absolute value of a vector.
      */
@@ -1225,7 +1235,7 @@ BOOST_AUTO_TEST_CASE( test_abs ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_svd ){
+BOOST_AUTO_TEST_CASE( test_svd, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the singular value decomposition of a matrix.
      */
@@ -1282,7 +1292,7 @@ BOOST_AUTO_TEST_CASE( test_svd ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_polar_decomposition ){
+BOOST_AUTO_TEST_CASE( test_polar_decomposition, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the polar decomposition function
      */
@@ -1325,7 +1335,7 @@ BOOST_AUTO_TEST_CASE( test_polar_decomposition ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_computeDinvAdA ){
+BOOST_AUTO_TEST_CASE( test_computeDinvAdA, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the derivative of the inverse of A w.r.t. A
      */
