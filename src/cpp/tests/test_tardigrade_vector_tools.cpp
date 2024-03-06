@@ -862,23 +862,23 @@ BOOST_AUTO_TEST_CASE( test_solveLinearSystem, * boost::unit_test::tolerance( DEF
 
     vectorType xAnswer = tardigradeVectorTools::solveLinearSystem( A, b, rank );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( xSolution, xAnswer ) );
+    BOOST_TEST( xSolution == xAnswer, CHECK_PER_ELEMENT );
 
-    BOOST_CHECK( tardigradeVectorTools::equals<unsigned int>( rank, 3 ) );
+    BOOST_TEST( rank == 3 );
 
     tardigradeVectorTools::solverType< floatType > linearSolver;
     xAnswer = tardigradeVectorTools::solveLinearSystem( A, b, rank, linearSolver );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( xSolution, xAnswer )  );
+    BOOST_TEST( xSolution == xAnswer, CHECK_PER_ELEMENT );
 
-    BOOST_CHECK( tardigradeVectorTools::equals< unsigned int >( rank, 3 )  );
+    BOOST_CHECK( rank == 3 );
 
     xAnswer = vectorType( 3, 0 );
     Eigen::Map< Eigen::MatrixXd > xmat( xAnswer.data( ), 3, 1 );
     Eigen::Map< const Eigen::MatrixXd > bmat( b.data( ), 3, 1 );
     xmat = linearSolver.solve( bmat );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( xSolution, xAnswer )  );
+    BOOST_TEST( xSolution == xAnswer, CHECK_PER_ELEMENT );
 
     A = { { 2 } };
     b = { 7 };
@@ -887,7 +887,7 @@ BOOST_AUTO_TEST_CASE( test_solveLinearSystem, * boost::unit_test::tolerance( DEF
 
     xAnswer = tardigradeVectorTools::solveLinearSystem( A, b, rank );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( xAnswer, xSolution )  );
+    BOOST_TEST( xAnswer == xSolution, CHECK_PER_ELEMENT );
 
 }
 
@@ -1002,9 +1002,9 @@ BOOST_AUTO_TEST_CASE( test_dyadic, * boost::unit_test::tolerance( DEFAULT_TEST_T
     vectorType v2 = { 4, 5, 6 };
     matrixType A = tardigradeVectorTools::dyadic( v1, v2 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( A, { { 4,  5,  6 },
-                                                { 8, 10, 12 },
-                                                { 12, 15, 18 } } ) );
+    vectorType answer = { 4, 5, 6, 8, 10, 12, 12, 15, 18 };
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == answer, CHECK_PER_ELEMENT );
 
 }
 
