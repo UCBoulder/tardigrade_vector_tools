@@ -1122,7 +1122,7 @@ BOOST_AUTO_TEST_CASE( test_computeDDetADA, * boost::unit_test::tolerance( DEFAUL
         delta[ i ] = fabs( A[ i ]*eps );
         detA = tardigradeVectorTools::determinant( A + delta, 3, 3 );
 
-        BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( ( detA - detA0 )/delta[ i ], ddetAdA[ i ] ) );
+        BOOST_TEST( ( detA - detA0 )/delta[ i ] == ddetAdA[ i ] );
 
     }
 
@@ -1137,21 +1137,26 @@ BOOST_AUTO_TEST_CASE( test_matrixMultiply, * boost::unit_test::tolerance( DEFAUL
     vectorType B = { 10, 11, 12, 13, 14, 15, 16, 17, 18 };
     vectorType C;
 
+    vectorType answer_1 = { 84,  90,  96, 201, 216, 231, 318, 342, 366 };
+    vectorType answer_2 = { 174, 186, 198, 213, 228, 243, 252, 270, 288 };
+    vectorType answer_3 = { 68,  86, 104, 167, 212, 257, 266, 338, 410 };
+    vectorType answer_4 = { 138, 174, 210, 171, 216, 261, 204, 258, 312 };
+
     C = tardigradeVectorTools::matrixMultiply( A, B, 3, 3, 3, 3, 0, 0 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { 84,  90,  96, 201, 216, 231, 318, 342, 366 } ) );
+    BOOST_TEST( C == answer_1, CHECK_PER_ELEMENT );
 
     C = tardigradeVectorTools::matrixMultiply( A, B, 3, 3, 3, 3, 1, 0 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { 174, 186, 198, 213, 228, 243, 252, 270, 288 } ) );
+    BOOST_TEST( C == answer_2, CHECK_PER_ELEMENT );
 
     C = tardigradeVectorTools::matrixMultiply( A, B, 3, 3, 3, 3, 0, 1 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { 68,  86, 104, 167, 212, 257, 266, 338, 410 } ) );
+    BOOST_TEST( C == answer_3, CHECK_PER_ELEMENT );
 
     C = tardigradeVectorTools::matrixMultiply( A, B, 3, 3, 3, 3, 1, 1 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { 138, 174, 210, 171, 216, 261, 204, 258, 312 } ) );
+    BOOST_TEST( C == answer_4, CHECK_PER_ELEMENT );
 
 }
 
@@ -1164,7 +1169,7 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
     vectorType A = { 3., 3., 5., 3., 7., 7., 5., 7., 11. };
     vectorType X = { 1., 2., 3., 4., 5., 6., 7., 8.,  9. };
 
-    vectorType R, RJ;
+    vectorType R, RJp, RJm;
     matrixType J, JJ;
     tardigradeVectorTools::__matrixSqrtResidual( A, 3, X, R, J );
 
@@ -1174,12 +1179,13 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
         vectorType delta( X.size( ), 0 );
         delta[ i ] = eps*fabs( X[ i ] ) + eps;
 
-        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X + delta, RJ, JJ );
+        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X + delta, RJp, JJ );
+        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X - delta, RJm, JJ );
 
-        vectorType gradCol = ( RJ - R )/delta[ i ];
+        vectorType gradCol = ( RJp - RJm )/(2*delta[ i ]);
 
         for ( unsigned int j=0; j<A.size( ); j++ ){
-            BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( gradCol[ j ], J[ j ][ i ] ) );
+            BOOST_TEST( gradCol[ j ] == J[ j ][ i ] );
         }
     }
 
@@ -1197,13 +1203,13 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrt, * boost::unit_test::tolerance( DEFAULT_TE
 
     vectorType X = tardigradeVectorTools::matrixSqrt( A, 3 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( A, tardigradeVectorTools::matrixMultiply( X, X, dim, dim, dim, dim, 0, 0 ) ) );
+    BOOST_TEST( A == tardigradeVectorTools::matrixMultiply( X, X, dim, dim, dim, dim, 0, 0 ), CHECK_PER_ELEMENT );
 
     //Test the jacobian
     matrixType dAdX;
     vectorType XJ = tardigradeVectorTools::matrixSqrt( A, 3, dAdX );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( XJ, X ) );
+    BOOST_TEST( XJ == X, CHECK_PER_ELEMENT );
 
     vectorType dXdA = tardigradeVectorTools::inverse( tardigradeVectorTools::appendVectors( dAdX ), A.size( ), A.size( ) );
 
@@ -1211,12 +1217,13 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrt, * boost::unit_test::tolerance( DEFAULT_TE
         vectorType delta( A.size( ), 0 );
         delta[ i ] = eps*A[ i ] + eps;
 
-        XJ = tardigradeVectorTools::matrixSqrt( A + delta, 3 );
+        vectorType XJp = tardigradeVectorTools::matrixSqrt( A + delta, 3 );
+        vectorType XJm = tardigradeVectorTools::matrixSqrt( A - delta, 3 );
 
-        gradCol = ( XJ - X )/delta[ i ];
+        gradCol = ( XJp - XJm )/(2*delta[ i ]);
 
         for ( unsigned int j=0; j<gradCol.size( ); j++ ){
-            BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( gradCol[ j ], dXdA[ A.size( )*j + i ] ) );
+            BOOST_TEST( gradCol[ j ] == dXdA[ A.size( )*j + i ] );
         }
     }
 
@@ -1228,10 +1235,10 @@ BOOST_AUTO_TEST_CASE( test_median, * boost::unit_test::tolerance( DEFAULT_TEST_T
      */
 
     vectorType x = { 0.65353053, 0.97839806, 0.32387778, 0.13137077, 0.17253149, 0.03216338 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::median( x ), 0.24820463352966032 ) );
+    BOOST_TEST( tardigradeVectorTools::median( x ) == 0.24820463352966032 );
 
     x = { 0.82387829, 0.07615528, 0.89366009, 0.04843728, 0.81331188, 0.19575555, 0.02308312 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::median( x ), .19575554955487007 ) );
+    BOOST_TEST( tardigradeVectorTools::median( x ) == .19575554955487007 );
 
 }
 
