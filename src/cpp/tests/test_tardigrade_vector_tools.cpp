@@ -1018,23 +1018,22 @@ BOOST_AUTO_TEST_CASE( test_eye, * boost::unit_test::tolerance( DEFAULT_TEST_TOLE
                                            0., 1., 0.,
                                            0., 0., 1. };
     tardigradeVectorTools::eye( Ivec );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( Ivec, IvecExpected ) );
+    BOOST_TEST( Ivec == IvecExpected, CHECK_PER_ELEMENT );
 
     unsigned int dim = 4;
     std::vector< std::vector< double > > I = tardigradeVectorTools::eye< double >( dim );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( I, { { 1, 0, 0, 0 },
-                                                { 0, 1, 0, 0 },
-                                                { 0, 0, 1, 0 },
-                                                { 0, 0, 0, 1 } } ) );
+    std::vector< double > I_answer = { 1, 0, 0, 0,
+                                       0, 1, 0, 0,
+                                       0, 0, 1, 0,
+                                       0, 0, 0, 1 };
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( I ) == I_answer, CHECK_PER_ELEMENT );
 
     I.clear( );
     tardigradeVectorTools::eye( dim, I );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( I, { { 1, 0, 0, 0 },
-                                                { 0, 1, 0, 0 },
-                                                { 0, 0, 1, 0 },
-                                                { 0, 0, 0, 1 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( I ) == I_answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -1044,13 +1043,13 @@ BOOST_AUTO_TEST_CASE( test_determinant, * boost::unit_test::tolerance( DEFAULT_T
      */
 
     std::vector< floatType > Avec = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::determinant( Avec, 3, 3 ), 1. ) );
+    BOOST_TEST( tardigradeVectorTools::determinant( Avec, 3, 3 ) == 1. );
 
     Avec = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::determinant( Avec, 3, 3 ), 0. ) );
+    BOOST_TEST( tardigradeVectorTools::determinant( Avec, 3, 3 ) == 0. );
 
     Avec = { 1, 2, 3, 4 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::determinant( Avec, 2, 2 ), -2. ) );
+    BOOST_TEST( tardigradeVectorTools::determinant( Avec, 2, 2 ) == -2. );
 
 }
 
@@ -1069,12 +1068,12 @@ BOOST_AUTO_TEST_CASE( test_inverse, * boost::unit_test::tolerance( DEFAULT_TEST_
 
     std::vector< floatType > Avecinv = tardigradeVectorTools::inverse( Avec, 3, 3 );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( Avecinv, answer ) );
+    BOOST_TEST( Avecinv == answer, CHECK_PER_ELEMENT );
 
     std::vector< std::vector< floatType > > A = tardigradeVectorTools::inflate( Avec, 3, 3 );
     std::vector< std::vector< double > > Ainv = tardigradeVectorTools::inverse( A );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::appendVectors( Ainv ), answer ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( Ainv ) == answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -1094,7 +1093,11 @@ BOOST_AUTO_TEST_CASE( test_inflate, * boost::unit_test::tolerance( DEFAULT_TEST_
 
     std::vector< std::vector< floatType > > result = tardigradeVectorTools::inflate( Avec, nrows, ncols );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( answer, result ) );
+    for ( unsigned int i = 0; i < nrows; i++ ){
+
+        BOOST_TEST( answer[ i ] == result[ i ], CHECK_PER_ELEMENT );
+
+    }
 
 }
 
