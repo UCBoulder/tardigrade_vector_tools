@@ -159,16 +159,18 @@ BOOST_AUTO_TEST_CASE( test_multiplication_operators ){
     vectorType a = { 1, 2, 3 };
     vectorType b, c;
 
+    vectorType a_answer = { 2,  4,  6 };
+    vectorType b_answer = { 6, 12, 18 };
 
     a *= 2;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, 4, 6 } ) );
+    BOOST_TEST( a == a_answer );
 
     b = 3*a;
     c = a*3;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( b, c ) );
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( b, { 6, 12, 18 } ) );
+    BOOST_TEST( b == c );
+    BOOST_TEST( b == b_answer );
 
 }
 
