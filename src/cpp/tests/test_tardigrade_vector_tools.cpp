@@ -57,29 +57,37 @@ BOOST_AUTO_TEST_CASE( test_addition_operators ){
 
     a += b;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { -1, 9, 5 } ) );
+    vectorType a_answer_1 = { -1, 9, 5 };
+    vectorType c_answer_1 = { -3, 16, 7 };
+
+    BOOST_TEST( a == a_answer_1 );
 
     c = a + b;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { -3, 16, 7 } ) );
+    BOOST_TEST( c == c_answer_1 );
 
     a += 1.;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { 0, 10, 6 } ) );
+    vectorType a_answer_2 = { 0, 10, 6 };
+    vectorType c_answer_2 = { 2, 12, 8 };
+    vectorType A_answer = { 0,  -1,  0, 6,  10, 12 };
+    vectorType C_answer = { -1, -4, -3, 8, 15, 18 };
+
+    BOOST_TEST( a == a_answer_2 );
 
     c = a + 2.;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { 2, 12, 8 } ) && tardigradeVectorTools::fuzzyEquals( a, { 0, 10, 6 } ) );
+    BOOST_TEST( c == c_answer_2 );
+    BOOST_TEST( a == a_answer_2 );
 
     c = 2. + a;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { 2, 12, 8 } ) && tardigradeVectorTools::fuzzyEquals( a, { 0, 10, 6 } ) );
+    BOOST_TEST( c == c_answer_2 );
+    BOOST_TEST( a == a_answer_2 );
 
     A += B;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( A, { { 0,  -1,  0 },
-                                                { 6,  10, 12 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer );
 
     C = A + B;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { { -1, -4, -3 },
-                                                {  8, 15, 18 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer );
 
 }
 
@@ -98,36 +106,37 @@ BOOST_AUTO_TEST_CASE( test_subtraction_operators ){
                      {  2,  5,  6 } };
     matrixType C;
 
-
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( -a, { -1, -2, -3 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( -a, { -1, -2, -3 } ) );
 
     a -= b;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { 3, -5, 1 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 3, -5, 1 } ) );
 
     c = a - b;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { 5, -12, -1 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 5, -12, -1 } ) );
 
     a -= 1.;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
 
     c = a - 2.;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { 0, -8, -2 } ) && tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 0, -8, -2 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
 
     c = 2. - a;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { 0, 8, 2 } ) && tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 0, 8, 2 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( -A, { { -1, -2, -3 },
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( -A, { { -1, -2, -3 },
                                                  { -4, -5, -6 } } ) );
 
     A -= B;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( A, { { 2, 5, 6 },
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( A, { { 2, 5, 6 },
                                                 { 2, 0, 0 } } ) );
 
     C = A - B;
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { { 3,  8,  9 },
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( C, { { 3,  8,  9 },
                                                 { 0, -5, -6 } } ) );
 
 }
@@ -143,12 +152,13 @@ BOOST_AUTO_TEST_CASE( test_multiplication_operators ){
 
     a *= 2;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { 2, 4, 6 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, 4, 6 } ) );
 
     b = 3*a;
     c = a*3;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( b, c ) && tardigradeVectorTools::fuzzyEquals( b, { 6, 12, 18 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( b, c ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( b, { 6, 12, 18 } ) );
 
 }
 
@@ -163,11 +173,11 @@ BOOST_AUTO_TEST_CASE( test_division_operators ){
 
     a /= 2;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( a, { 0.5, 1, 1.5 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 0.5, 1, 1.5 } ) );
 
     b = a/2;
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( b, { 0.25, 0.5, 0.75 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( b, { 0.25, 0.5, 0.75 } ) );
 
 }
 
@@ -184,10 +194,10 @@ BOOST_AUTO_TEST_CASE( test_computeMean ){
     vectorType result;
     tardigradeVectorTools::computeMean( A, result );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, answer ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, answer ) );
 
     result = tardigradeVectorTools::computeMean( A );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, answer ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, answer ) );
 
 }
 
@@ -202,18 +212,18 @@ BOOST_AUTO_TEST_CASE( test_cross ){
 
     tardigradeVectorTools::cross( a, b, c );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { 0, 0, 9 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 0, 0, 9 } ) );
 
     a = {  1, 2, 3 };
     b = { -1, 7, -3 };
 
     tardigradeVectorTools::cross( a, b, c );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { -27, 0, 9 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { -27, 0, 9 } ) );
 
     c = tardigradeVectorTools::cross( a, b );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( c, { -27, 0, 9 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { -27, 0, 9 } ) );
 
 }
 
@@ -228,10 +238,10 @@ BOOST_AUTO_TEST_CASE( test_dot ){
 
     tardigradeVectorTools::dot( a, b, c );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals<floatType>( c, -1 + 14 + 18 ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals<floatType>( c, -1 + 14 + 18 ) );
 
     c = tardigradeVectorTools::dot( a, b );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals<floatType>( c, -1 + 14 + 18 ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals<floatType>( c, -1 + 14 + 18 ) );
 
     matrixType A = { { 1, 2, 3 },
                      { 4, 5, 6 },
@@ -240,7 +250,7 @@ BOOST_AUTO_TEST_CASE( test_dot ){
 
     d = tardigradeVectorTools::dot( A, a );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( d, { 14, 32, 50 } ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( d, { 14, 32, 50 } ) );
 
     matrixType B = { { 10, 11, 12 },
                      { 13, 14, 15 },
@@ -248,7 +258,7 @@ BOOST_AUTO_TEST_CASE( test_dot ){
 
     matrixType C = tardigradeVectorTools::dot( A, B );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( C, { {  84,  90,  96 },
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( C, { {  84,  90,  96 },
                                                 { 201, 216, 231 },
                                                 { 318, 342, 366 } } ) );
 
@@ -270,7 +280,7 @@ BOOST_AUTO_TEST_CASE( test_dotT ){
                           { 167, 212 },
                           { 266, 338 } };
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::dotT( A, B ), answer ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::dotT( A, B ), answer ) );
 
 }
 
@@ -295,9 +305,9 @@ BOOST_AUTO_TEST_CASE( test_Tdot ){
 
     vectorType vectorAnswer = { 66, 81, 96 };
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::Tdot( A, B ), matrixAnswer ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::Tdot( A, B ), matrixAnswer ) );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::Tdot( A, b ), vectorAnswer ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::Tdot( A, b ), vectorAnswer ) );
 
 }
 
@@ -317,7 +327,7 @@ BOOST_AUTO_TEST_CASE( test_TdotT ){
                           { 171, 216 },
                           { 204, 258 } };
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::TdotT( A, B ), answer ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::TdotT( A, B ), answer ) );
 
 }
 
@@ -338,20 +348,20 @@ BOOST_AUTO_TEST_CASE( test_inner ){
     //Test inner product of row major matrices
     result = 0.;
     tardigradeVectorTools::inner( Avec, Bvec, result );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, expected ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, expected ) );
 
     result = 0.;
     result = tardigradeVectorTools::inner( Avec, Bvec );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, expected ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, expected ) );
 
     //Test inner product of matrices
     result = 0.;
     tardigradeVectorTools::inner( A, B, result );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, expected ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, expected ) );
 
     result = 0.;
     result = tardigradeVectorTools::inner( A, B );
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( result, expected ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( result, expected ) );
 
 }
 
@@ -367,7 +377,7 @@ BOOST_AUTO_TEST_CASE( test_trace ){
 
     tardigradeVectorTools::trace( a, c );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals<floatType>( c, 3. ) );
+    BOOST_TEST( tardigradeVectorTools::fuzzyEquals<floatType>( c, 3. ) );
 
     //TODO: Refactor with boost or pytest
     vectorType b = { 1., 0., 0.,
