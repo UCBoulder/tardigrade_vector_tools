@@ -1248,10 +1248,14 @@ BOOST_AUTO_TEST_CASE( test_abs, * boost::unit_test::tolerance( DEFAULT_TEST_TOLE
      */
 
     std::vector< double > x = { -1, 2, 3, 4, -5, 6 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::abs( x ), { 1., 2., 3., 4., 5., 6. } ) );
+    std::vector< double > x_answer = { 1, 2, 3, 4, 5, 6 };
+
+    BOOST_TEST( tardigradeVectorTools::abs( x ) == x_answer, CHECK_PER_ELEMENT );
 
     std::vector< int > y = { -1, 2, 3, 4, -5, 6 };
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( tardigradeVectorTools::abs( y ), { 1, 2, 3, 4, 5, 6 } ) );
+    std::vector< int > y_answer = { 1, 2, 3, 4, 5, 6 };
+
+    BOOST_TEST( tardigradeVectorTools::abs( y ) == y_answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -1288,13 +1292,13 @@ BOOST_AUTO_TEST_CASE( test_svd, * boost::unit_test::tolerance( DEFAULT_TEST_TOLE
 
      // Check that the singular values are correct
 
-     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( SigmaAnswer1, SigmaResult ) );
+     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( SigmaAnswer1, SigmaResult ) ); //Leaving as fuzzy equals because the final value is noise
 
      // Check that the left and right singular values are orthogonal
 
-     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( UAnswer1, tardigradeVectorTools::matrixMultiply( UResult, UResult, 3, 3, 3, 3, 0, 1 ) ) );
+     BOOST_TEST( UAnswer1 == tardigradeVectorTools::matrixMultiply( UResult, UResult, 3, 3, 3, 3, 0, 1 ), CHECK_PER_ELEMENT );
 
-     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( VAnswer1, tardigradeVectorTools::matrixMultiply( VResult, VResult, 4, 4, 4, 4, 0, 1 ) ) );
+     BOOST_TEST( VAnswer1 == tardigradeVectorTools::matrixMultiply( VResult, VResult, 4, 4, 4, 4, 0, 1 ), CHECK_PER_ELEMENT );
 
      // Test the second orientation of A
 
@@ -1302,13 +1306,13 @@ BOOST_AUTO_TEST_CASE( test_svd, * boost::unit_test::tolerance( DEFAULT_TEST_TOLE
 
      // Check that the singular values are correct
 
-     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( SigmaAnswer2, SigmaResult ) );
+     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( SigmaAnswer2, SigmaResult ) ); //Leaving as fuzzy equals because the final value is noise
 
      // Check that the left and right singular values are orthogonal
 
-     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( UAnswer2, tardigradeVectorTools::matrixMultiply( UResult, UResult, 4, 4, 4, 4, 0, 1 ) ) );
+     BOOST_TEST( UAnswer2 == tardigradeVectorTools::matrixMultiply( UResult, UResult, 4, 4, 4, 4, 0, 1 ), CHECK_PER_ELEMENT );
 
-     BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( VAnswer2, tardigradeVectorTools::matrixMultiply( VResult, VResult, 3, 3, 3, 3, 0, 1 ) ) );
+     BOOST_TEST( VAnswer2 == tardigradeVectorTools::matrixMultiply( VResult, VResult, 3, 3, 3, 3, 0, 1 ), CHECK_PER_ELEMENT );
 
 }
 
@@ -1341,17 +1345,17 @@ BOOST_AUTO_TEST_CASE( test_polar_decomposition, * boost::unit_test::tolerance( D
 
     tardigradeVectorTools::polar_decomposition( A, 3, 3, RResult, UResult, false );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( UResult, UAnswer ) );
+    BOOST_TEST( UResult == UAnswer, CHECK_PER_ELEMENT );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( RResult, RAnswer ) );
+    BOOST_TEST( RResult == RAnswer, CHECK_PER_ELEMENT );
 
     // Test the left polar decomposition
 
     tardigradeVectorTools::polar_decomposition( A, 3, 3, RResult, VResult, true );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( VResult, VAnswer ) );
+    BOOST_TEST( VResult == VAnswer, CHECK_PER_ELEMENT );
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( RResult, RAnswer ) );
+    BOOST_TEST( RResult == RAnswer, CHECK_PER_ELEMENT );
 
 }
 
@@ -1390,6 +1394,6 @@ BOOST_AUTO_TEST_CASE( test_computeDinvAdA, * boost::unit_test::tolerance( DEFAUL
 
     }
 
-    BOOST_CHECK( tardigradeVectorTools::fuzzyEquals( gradient, tardigradeVectorTools::computeDInvADA( invA, 3, 3 ) ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( gradient ) == tardigradeVectorTools::appendVectors( tardigradeVectorTools::computeDInvADA( invA, 3, 3 ) ), CHECK_PER_ELEMENT );
 
 }
