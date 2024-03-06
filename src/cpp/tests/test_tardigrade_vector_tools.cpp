@@ -106,38 +106,48 @@ BOOST_AUTO_TEST_CASE( test_subtraction_operators ){
                      {  2,  5,  6 } };
     matrixType C;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( -a, { -1, -2, -3 } ) );
+    vectorType a_answer_1 = { -1, -2, -3 };
+    vectorType a_answer_2 = {  3, -5,  1 };
+    vectorType a_answer_3 = {  2, -6,  0 };
+
+    vectorType c_answer_1 = { 5, -12, -1 };
+    vectorType c_answer_2 = { 0,  -8, -2 };
+    vectorType c_answer_3 = { 0,   8,  2 };
+
+    vectorType A_answer_1 = { -1, -2, -3, -4, -5, -6 };
+    vectorType A_answer_2 = {  2,  5,  6,  2,  0,  0 };
+
+    vectorType C_answer_1 = { 3, 8, 9, 0, -5, -6 };
+
+    BOOST_TEST( ( -a ) == a_answer_1 );
 
     a -= b;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 3, -5, 1 } ) );
+    BOOST_TEST( a == a_answer_2 );
 
     c = a - b;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 5, -12, -1 } ) );
+    BOOST_TEST( c == c_answer_1 );
 
     a -= 1.;
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
+    BOOST_TEST( a == a_answer_3 );
 
     c = a - 2.;
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 0, -8, -2 } ) );
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
+    BOOST_TEST( c == c_answer_2 );
+    BOOST_TEST( a == a_answer_3 );
 
     c = 2. - a;
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( c, { 0, 8, 2 } ) );
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( a, { 2, -6, 0 } ) );
+    BOOST_TEST( c == c_answer_3 );
+    BOOST_TEST( a == a_answer_3 );
 
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( -A, { { -1, -2, -3 },
-                                                 { -4, -5, -6 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( -A ) == A_answer_1 );
 
     A -= B;
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( A, { { 2, 5, 6 },
-                                                { 2, 0, 0 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer_2 );
 
     C = A - B;
-    BOOST_TEST( tardigradeVectorTools::fuzzyEquals( C, { { 3,  8,  9 },
-                                                { 0, -5, -6 } } ) );
+    BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer_1 );
 
 }
 
