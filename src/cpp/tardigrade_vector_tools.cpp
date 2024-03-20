@@ -19,9 +19,12 @@ std::vector<T>& operator+=(std::vector<T> &lhs, const std::vector<T> &rhs){
      * \param &rhs: The right-hand side vector
      */
 
-    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size( ) == rhs.size( ), "vectors must be the same size to add" )
+    const unsigned int lhs_size = lhs.size( );
+    const unsigned int rhs_size = rhs.size( );
 
-    for (tardigradeVectorTools::size_type i=0; i<lhs.size(); i++){
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "vectors must be the same size to add" )
+
+    for (tardigradeVectorTools::size_type i=0; i<lhs_size; i++){
         lhs[i] += rhs[i];
     }
     return lhs;
@@ -36,7 +39,9 @@ std::vector<T>& operator+=(std::vector<T> &lhs, const T &rhs){
      * \param &rhs: The scalar being added to the vector
      */
 
-    for (tardigradeVectorTools::size_type i=0; i<lhs.size(); i++){
+    const unsigned int lhs_size = lhs.size( );
+
+    for (tardigradeVectorTools::size_type i=0; i<lhs_size; i++){
         lhs[i] += rhs;
     }
     return lhs;
@@ -51,7 +56,10 @@ std::vector<T> operator+(std::vector<T> lhs, const std::vector<T> &rhs){
      * \param &rhs: The right-hand side vector
      */
 
-    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size( ) == rhs.size( ), "vectors must be the same size to add")
+    const unsigned int lhs_size = lhs.size( );
+    const unsigned int rhs_size = rhs.size( );
+
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "vectors must be the same size to add")
 
     return lhs += rhs;
 }
@@ -88,7 +96,9 @@ std::vector<T> operator-(std::vector<T> v){
      * \param &v: The vector in question
      */
 
-    for (tardigradeVectorTools::size_type i=0; i<v.size(); i++){
+    const unsigned int v_size = v.size( );
+
+    for (tardigradeVectorTools::size_type i=0; i<v_size; i++){
         v[i] = -v[i];
     }
     return v;
@@ -161,7 +171,9 @@ std::vector<T>& operator*=(std::vector<T> &lhs, const t rhs){
      * \param lhs: The left-hand side vector
      * \param rhs: The right-hand side scalar
      */
-    for (tardigradeVectorTools::size_type i=0; i<lhs.size(); i++){
+    const unsigned int lhs_size = lhs.size( );
+
+    for (tardigradeVectorTools::size_type i=0; i<lhs_size; i++){
         lhs[i] *= rhs;
     }
     return lhs;
@@ -221,9 +233,12 @@ std::vector< std::vector< T > >& operator+=(std::vector< std::vector< T > > &lhs
      * \param &rhs: The right-hand side matrix
      */
 
-    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size() == rhs.size(), "matrices must have the same numbers of rows to add")
+    const unsigned int lhs_size = lhs.size( );
+    const unsigned int rhs_size = rhs.size( );
 
-    for (unsigned int i=0; i<lhs.size(); i++){
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "matrices must have the same numbers of rows to add")
+
+    for (unsigned int i=0; i<lhs_size; i++){
         lhs[i] += rhs[i];
     }
     return lhs;
@@ -264,9 +279,12 @@ std::vector< std::vector < T > >& operator-=(std::vector< std::vector< T > > &lh
      * \param &rhs: The right-hand side matrix
      */
 
-    TARDIGRADE_ERROR_TOOLS_CHECK( lhs.size() == rhs.size(), "matrices must have the same numbers of rows to add")
+    const unsigned int lhs_size = lhs.size( );
+    const unsigned int rhs_size = rhs.size( );
 
-    for (unsigned int i=0; i<lhs.size(); i++){
+    TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "matrices must have the same numbers of rows to add")
+
+    for (unsigned int i=0; i<lhs_size; i++){
         lhs[i] += -rhs[i];
     }
 
