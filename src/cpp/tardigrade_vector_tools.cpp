@@ -24,9 +24,10 @@ std::vector<T>& operator+=(std::vector<T> &lhs, const std::vector<T> &rhs){
 
     TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "vectors must be the same size to add" )
 
-    for (tardigradeVectorTools::size_type i=0; i<lhs_size; i++){
-        lhs[i] += rhs[i];
-    }
+    std::transform(lhs.begin( ), lhs.end( ),
+                   rhs.begin( ), lhs.begin( ),
+                   [](T i, T j){return i+j;});
+
     return lhs;
 }
 
@@ -39,11 +40,8 @@ std::vector<T>& operator+=(std::vector<T> &lhs, const T &rhs){
      * \param &rhs: The scalar being added to the vector
      */
 
-    const unsigned int lhs_size = lhs.size( );
-
-    for (tardigradeVectorTools::size_type i=0; i<lhs_size; i++){
-        lhs[i] += rhs;
-    }
+    std::transform(lhs.begin( ), lhs.end( ), lhs.begin( ),
+                   std::bind(std::plus<T>(), std::placeholders::_1, rhs ));
     return lhs;
 }
 
@@ -55,11 +53,6 @@ std::vector<T> operator+(std::vector<T> lhs, const std::vector<T> &rhs){
      * \param &lhs: The left-hand side vector
      * \param &rhs: The right-hand side vector
      */
-
-    const unsigned int lhs_size = lhs.size( );
-    const unsigned int rhs_size = rhs.size( );
-
-    TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "vectors must be the same size to add")
 
     return lhs += rhs;
 }
@@ -96,11 +89,8 @@ std::vector<T> operator-(std::vector<T> v){
      * \param &v: The vector in question
      */
 
-    const unsigned int v_size = v.size( );
+    std::transform(v.cbegin( ), v.cend( ), v.begin( ), std::negate<T>( ));
 
-    for (tardigradeVectorTools::size_type i=0; i<v_size; i++){
-        v[i] = -v[i];
-    }
     return v;
 }
 
@@ -171,11 +161,9 @@ std::vector<T>& operator*=(std::vector<T> &lhs, const t rhs){
      * \param lhs: The left-hand side vector
      * \param rhs: The right-hand side scalar
      */
-    const unsigned int lhs_size = lhs.size( );
+    std::transform( lhs.begin( ), lhs.end( ), lhs.begin( ),
+                    std::bind( std::multiplies<T>(), std::placeholders::_1, rhs));
 
-    for (tardigradeVectorTools::size_type i=0; i<lhs_size; i++){
-        lhs[i] *= rhs;
-    }
     return lhs;
 }
 
@@ -238,9 +226,9 @@ std::vector< std::vector< T > >& operator+=(std::vector< std::vector< T > > &lhs
 
     TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "matrices must have the same numbers of rows to add")
 
-    for (unsigned int i=0; i<lhs_size; i++){
-        lhs[i] += rhs[i];
-    }
+    std::transform( lhs.begin( ), lhs.end( ), rhs.begin( ), lhs.begin( ),
+                    [](std::vector<T> a, std::vector<T> b){ return a += b; } );
+
     return lhs;
 }
 
@@ -264,9 +252,7 @@ std::vector< std::vector< T > > operator-(std::vector< std::vector< T > > v){
      * \param v: The matrix to negate.
      */
 
-    for (unsigned int i=0; i<v.size(); i++){
-        v[i] = -v[i];
-    }
+    std::transform(v.begin( ), v.end( ), v.begin( ), [](std::vector<T> vi){return -vi;});
     return v;
 }
 
