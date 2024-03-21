@@ -162,8 +162,17 @@ BOOST_AUTO_TEST_CASE( test_multiplication_operators, * boost::unit_test::toleran
     vectorType a = { 1, 2, 3 };
     vectorType b, c;
 
+    matrixType A = { { 1, 2, 3 },
+                     { 4, 5, 6 } };
+    matrixType B, C;
+
     vectorType a_answer = { 2,  4,  6 };
     vectorType b_answer = { 6, 12, 18 };
+
+    matrixType A_answer = { { 2,  4,  6 },
+                            { 8, 10, 12 } };
+    matrixType B_answer = { {  6, 12, 18 },
+                            { 24, 30, 36 } };
 
     a *= 2;
 
@@ -174,6 +183,16 @@ BOOST_AUTO_TEST_CASE( test_multiplication_operators, * boost::unit_test::toleran
 
     BOOST_TEST( b == c, CHECK_PER_ELEMENT );
     BOOST_TEST( b == b_answer, CHECK_PER_ELEMENT );
+
+    A *= 2;
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == tardigradeVectorTools::appendVectors( A_answer ), CHECK_PER_ELEMENT );
+
+   B = 3 * A;
+   C = A * 3;
+
+   BOOST_TEST( tardigradeVectorTools::appendVectors( B ) == tardigradeVectorTools::appendVectors( B_answer ), CHECK_PER_ELEMENT );
+   BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == tardigradeVectorTools::appendVectors( B_answer ), CHECK_PER_ELEMENT );
 
 }
 
