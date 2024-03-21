@@ -300,18 +300,19 @@ namespace tardigradeVectorTools{
          * \param &v: The resulting mean
          */
 
-        if (A.size() == 0){
-            std::cerr << "Error: Matrix must have a size greater than zero\n";
-            return 1;
-        }
+        const unsigned int A_size = A.size( );
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( A_size != 0, "Matrix must have a size greater than zero" );
 
         //Size the output vector
         v = std::vector<T>(A[0].size(), 0);
 
-        //Compute the mean
-        for (auto it = A.begin(); it!=A.end(); it++){
-            v += *it/A.size();
+        for ( auto Ai = A.begin( ); Ai != A.end( ); Ai++ ){
+            v += *Ai;
         }
+
+        v /= A_size;
+
         return 0;
     }
 
@@ -389,14 +390,11 @@ namespace tardigradeVectorTools{
 
         //Get the size and perform error handling
         size_type size = a.size();
-        TARDIGRADE_ERROR_TOOLS_CHECK( size == b.size(), "vectors must be the same size to add" )
+        TARDIGRADE_ERROR_TOOLS_CHECK( size == b.size(), "vectors must be the same size to compute the dot product" )
 
         //Set v to zero
-        v = 0;
+        v = std::inner_product(a.begin(), a.end(), b.begin(), T());
 
-        for (size_type i=0; i<size; i++){
-            v += a[i]*b[i];
-        }
         return 0;
     }
 
