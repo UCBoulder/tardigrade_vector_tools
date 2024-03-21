@@ -170,7 +170,7 @@ std::vector<T>& operator*=(std::vector<T> &lhs, const t rhs){
 template<typename T, typename t>
 std::vector<T> operator*(const t lhs, std::vector<T> rhs){
     /*!
-     * Overload the / operator for vectors
+     * Overload the * operator for vectors
      *
      * \param lhs: The left-hand side scalar
      * \param rhs: The right-hand side vector
@@ -182,7 +182,7 @@ std::vector<T> operator*(const t lhs, std::vector<T> rhs){
 template<typename T, typename t>
 std::vector<T> operator*(std::vector<T> lhs, const t rhs){
     /*!
-     * Overload the / operator for vectors
+     * Overload the * operator for vectors
      *
      * \param lhs: The left-hand side vector
      * \param rhs: The right-hand side scalar
@@ -286,6 +286,44 @@ std::vector< std::vector< T > > operator-(std::vector< std::vector< T > > lhs, c
      * \param &rhs: The right-hand side matrix
      */
     return lhs -= rhs;
+}
+
+template<typename T, typename t>
+std::vector<std::vector<T>>& operator*=(std::vector<std::vector<T>> &lhs, const t rhs){
+    /*!
+     * Overload the *= operator for matrices
+     *
+     * \param lhs: The left-hand side matrix
+     * \param rhs: The right-hand side scalar
+     */
+    for ( auto li=lhs.begin(); li!=lhs.end(); li++ ){
+        *li *= rhs;
+    }
+
+    return lhs;
+}
+
+template<typename T, typename t>
+std::vector<std::vector<T>> operator*(const t lhs, std::vector<std::vector<T>> rhs){
+    /*!
+     * Overload the * operator for matrices
+     *
+     * \param lhs: The left-hand side scalar
+     * \param rhs: The right-hand side matrix
+     */
+    return rhs*=lhs;
+}
+
+
+template<typename T, typename t>
+std::vector<std::vector<T>> operator*(std::vector<std::vector<T>> lhs, const t rhs){
+    /*!
+     * Overload the * operator for matrices
+     *
+     * \param lhs: The left-hand side matrix
+     * \param rhs: The right-hand side scalar
+     */
+    return lhs*=rhs;
 }
 
 namespace tardigradeVectorTools{

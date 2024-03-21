@@ -23,6 +23,7 @@
 #include<string.h>
 #include<numeric>
 #include<algorithm>
+#include<functional>
 
 #ifdef USE_EIGEN
     #include<Eigen/Dense>
