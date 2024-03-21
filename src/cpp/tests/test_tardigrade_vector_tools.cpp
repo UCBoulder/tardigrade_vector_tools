@@ -75,6 +75,7 @@ BOOST_AUTO_TEST_CASE( test_addition_operators, * boost::unit_test::tolerance( DE
     vectorType c_answer_2 = { 2, 12, 8 };
     vectorType A_answer = { 0,  -1,  0, 6,  10, 12 };
     vectorType C_answer = { -1, -4, -3, 8, 15, 18 };
+    vectorType A_answer2 = { 1, 0, 1, 7, 11, 13 };
 
     BOOST_TEST( a == a_answer_2, CHECK_PER_ELEMENT );
 
@@ -91,6 +92,10 @@ BOOST_AUTO_TEST_CASE( test_addition_operators, * boost::unit_test::tolerance( DE
 
     C = A + B;
     BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer, CHECK_PER_ELEMENT );
+
+    A += 1.;
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == A_answer2, CHECK_PER_ELEMENT );
 
 }
 
@@ -204,8 +209,17 @@ BOOST_AUTO_TEST_CASE( test_division_operators, * boost::unit_test::tolerance( DE
     vectorType a = { 1, 2, 3 };
     vectorType b;
 
+    matrixType A = { { 1, 2, 3 },
+                     { 4, 5, 6 } };
+    matrixType B, C;
+
     vectorType a_answer = { 0.50, 1.0, 1.50 };
     vectorType b_answer = { 0.25, 0.5, 0.75 };
+
+    matrixType A_answer = { { 0.50, 1.00, 1.50 },
+                            { 2.00, 2.50, 3.00 } };
+    matrixType B_answer = { { 0.25, 0.50, 0.75 },
+                            { 1.00, 1.25, 1.50 } };
 
     a /= 2;
 
@@ -214,6 +228,14 @@ BOOST_AUTO_TEST_CASE( test_division_operators, * boost::unit_test::tolerance( DE
     b = a/2;
 
     BOOST_TEST( b == b_answer, CHECK_PER_ELEMENT );
+
+    A /= 2;
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == tardigradeVectorTools::appendVectors( A_answer ), CHECK_PER_ELEMENT );
+
+    B = A / 2;
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( B ) == tardigradeVectorTools::appendVectors( B_answer ), CHECK_PER_ELEMENT );
 
 }
 

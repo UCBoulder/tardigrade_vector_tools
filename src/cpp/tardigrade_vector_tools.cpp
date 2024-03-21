@@ -326,6 +326,68 @@ std::vector<std::vector<T>> operator*(std::vector<std::vector<T>> lhs, const t r
     return lhs*=rhs;
 }
 
+template<typename T, typename t>
+std::vector<std::vector<T>>& operator/=(std::vector<std::vector<T>> &lhs, const t rhs){
+    /*!
+     * Overload the /= operator for matrices
+     *
+     * \param lhs: The left-hand side matrix
+     * \param rhs: The right-hand side scalar
+     */
+    return lhs*=(1./rhs);
+}
+
+template<typename T, typename t>
+std::vector<std::vector<T>> operator/(std::vector<std::vector<T>> lhs, const t rhs){
+    /*!
+     * Overload the / operator for matrices
+     *
+     * \param lhs: The left-hand side matrices
+     * \param rhs: The right-hand side scalar
+     */
+    return lhs/=rhs;
+}
+
+template<typename T>
+std::vector<std::vector<T>>& operator+=(std::vector<std::vector<T>> &lhs, const T &rhs){
+    /*!
+     * Overload the += operator for matrix scalar addition
+     *
+     * \param &lhs: The left-hand side matrix
+     * \param &rhs: The scalar being added to the matrix
+     */
+
+    for ( auto li = lhs.begin( ); li != lhs.end( ); li++ ){
+        *li += rhs;
+    }
+
+    return lhs;
+}
+
+template<typename T>
+std::vector<std::vector<T>> operator+(std::vector<std::vector<T>> lhs, const T &rhs){
+    /*!
+     * Overload the + operator for matrix - scalar addition
+     *
+     * \param &lhs: The left-hand side matrix
+     * \param &rhs: The right-hand side scalar
+     */
+
+    return lhs += rhs;
+}
+
+template<typename T>
+std::vector<std::vector<T>> operator+(const T &lhs, std::vector<std::vector<T>> rhs){
+    /*!
+     * Overload the + operator for matrix - scalar addition
+     *
+     * \param &lhs: The left-hand side scalar
+     * \param &rhs: The right-hand side matrix
+     */
+
+    return rhs += lhs;
+}
+
 namespace tardigradeVectorTools{
 
     //Computation Utilities
