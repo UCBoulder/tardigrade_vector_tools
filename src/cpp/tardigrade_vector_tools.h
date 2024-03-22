@@ -23,6 +23,7 @@
 #include<string.h>
 #include<numeric>
 #include<algorithm>
+#include<functional>
 
 #ifdef USE_EIGEN
     #include<Eigen/Dense>
@@ -236,6 +237,12 @@ namespace tardigradeVectorTools{
     int getValuesByIndex(const std::vector< T > &v, const std::vector< size_type > &indices,
         std::vector< T > &subv);
 
+    template <typename T>
+    std::vector< T > getRow( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int row );
+
+    template <typename T>
+    std::vector< T > getCol( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int col );
+
     //Appending utilities
     template<typename T>
     std::vector< T > appendVectors(const std::vector< std::vector< T > > &A);
@@ -300,7 +307,10 @@ namespace tardigradeVectorTools{
         std::vector< std::vector< double > > inverse( const std::vector< std::vector< T > > &A );
 
         template<typename T>
-        std::vector< std::vector< double > > computeDAInvDA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols );
+        std::vector< double > computeFlatDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols );
+
+        template<typename T>
+        std::vector< std::vector< double > > computeDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols );
 
         template<typename T>
         std::vector< double > computeDDetADA(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols);
