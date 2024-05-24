@@ -1675,6 +1675,120 @@ namespace tardigradeVectorTools{
         }
 
     }
+    
+    template<typename T>
+    void computeMatrixExponentialScalingAndSquaring( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, const unsigned int nmax, double tola, double tolr ){
+        /*!
+         * Compute the matrix exponential using scaling-and-squaring
+         * 
+         * \param &A: The matrix to compute the exponential of
+         * \param &dim: The number of rows and columns in A
+         * \param &expA: The matrix exponential of A
+         * \param nmax: The maximum number of allowable iterations
+         * \param tola: The absolute tolerance
+         * \param tolr: The relative tolerance
+         */
+
+        double normA = l2norm( A );
+
+        unsigned int m = ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 );
+
+        std::vector< T > expAoverm;
+
+        TARDIGRADE_ERROR_TOOLS_CATCH( computeMatrixExponential( A / m, dim, expAoverm, nmax, tola, tolr ) )
+
+        expA = std::vector< T >( dim * dim, 0 );
+        for ( unsigned int i = 0; i < dim; i++ ){ expA[ dim * i + i ] = 1; }
+
+        for ( unsigned int i = 0; i < m; i++ ){
+
+            std::vector< T > expAi( dim * dim, 0 );
+
+            for ( unsigned int j = 0; j < dim; j++ ){
+
+                for ( unsigned int k = 0; k < dim; k++ ){
+
+                    for ( unsigned int l = 0; l < dim; l++ ){
+
+                        expAi[ dim * j + l ] += expA[ dim * j + k ] * expAoverm[ dim * k + l ];
+
+                    }
+
+                }
+
+            }
+
+            expA = expAi;
+
+        }
+
+    }
+
+    template<typename T>
+    void computeMatrixExponentialScalingAndSquaring( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, std::vector< T > & dExpAdA, const unsigned int nmax, double tola, double tolr ){
+        /*!
+         * Compute the matrix exponential using scaling-and-squaring
+         * 
+         * \param &A: The matrix to compute the exponential of
+         * \param &dim: The number of rows and columns in A
+         * \param &expA: The matrix exponential of A
+         * \param &dExpAdA: The derivative of the matrix exponential of A w.r.t. A
+         * \param nmax: The maximum number of allowable iterations
+         * \param tola: The absolute tolerance
+         * \param tolr: The relative tolerance
+         */
+
+        double normA = l2norm( A );
+
+        unsigned int m = ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 );
+
+        std::vector< T > expAoverm;
+
+        std::vector< T > dExpAovermdA;
+
+        TARDIGRADE_ERROR_TOOLS_CATCH( computeMatrixExponential( A / m, dim, expAoverm, dExpAovermdA, nmax, tola, tolr ) )
+
+        dExpAovermdA /= m;
+
+        expA = std::vector< T >( dim * dim, 0 );
+        for ( unsigned int i = 0; i < dim; i++ ){ expA[ dim * i + i ] = 1; }
+
+        dExpAdA = std::vector< T >( dim * dim * dim * dim, 0 );
+
+        for ( unsigned int i = 0; i < m; i++ ){
+
+            std::vector< T > expAi( dim * dim, 0 );
+
+            std::vector< T > dExpAidA( dim * dim * dim * dim, 0 );
+
+            for ( unsigned int j = 0; j < dim; j++ ){
+
+                for ( unsigned int k = 0; k < dim; k++ ){
+
+                    for ( unsigned int l = 0; l < dim; l++ ){
+
+                        expAi[ dim * j + l ] += expA[ dim * j + k ] * expAoverm[ dim * k + l ];
+
+                        for ( unsigned int ab = 0; ab < dim * dim; ab++ ){
+
+                            dExpAidA[ dim * dim * dim * j + dim * dim * l + ab ] += dExpAdA[ dim * dim * dim * j + dim * dim * k + ab ] * expAoverm[ dim * k + l ]
+                                                                                  + expA[ dim * j + k ] * dExpAovermdA[ dim * dim * dim * k + dim * dim * l + ab ];
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            expA = expAi;
+
+            dExpAdA = dExpAidA;
+
+        }
+
+    }
 
     #ifdef USE_EIGEN
         template< typename T >
