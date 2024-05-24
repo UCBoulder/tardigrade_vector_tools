@@ -1454,39 +1454,42 @@ BOOST_AUTO_TEST_CASE( test_computeMatrixExponential, * boost::unit_test::toleran
                          -0.11397388,  0.60563844,  0.0935307 ,
                          -0.71521989, -0.4244122 ,  0.78340236 };
 
-    vectorType result;
+    vectorType result, resultJ;
+
+    vectorType dExpAdA;
 
     tardigradeVectorTools::computeMatrixExponential( A, dim, result );
 
     BOOST_TEST( answer == result, CHECK_PER_ELEMENT );
 
+    tardigradeVectorTools::computeMatrixExponential( A, dim, resultJ, dExpAdA );
 
-//    vectorType invA = tardigradeVectorTools::inverse( A, 3, 3 );
-//
-//    floatType eps = 1e-6;
-//
-//    matrixType gradient( A.size( ), vectorType( A.size( ), 0 ) );
-//
-//    for ( unsigned int i = 0; i < A.size( ); i++ ){
-//
-//        vectorType delta( A.size( ), 0 );
-//
-//        delta[ i ] = eps * std::fabs( A[ i ] ) + eps;
-//
-//        vectorType invAp, invAm;
-//
-//        BOOST_CHECK_NO_THROW( invAp = tardigradeVectorTools::inverse( A + delta, 3, 3 ) );
-//
-//        BOOST_CHECK_NO_THROW( invAm = tardigradeVectorTools::inverse( A - delta, 3, 3 ) );
-//
-//        for ( unsigned int j = 0; j < A.size( ); j++ ){
-//
-//            gradient[ j ][ i ] = ( invAp[ j ] - invAm[ j ] ) / ( 2 * delta[ i ] );
-//
-//        }
-//
-//    }
-//
-//    BOOST_TEST( tardigradeVectorTools::appendVectors( gradient ) == tardigradeVectorTools::appendVectors( tardigradeVectorTools::computeDInvADA( invA, 3, 3 ) ), CHECK_PER_ELEMENT );
+    BOOST_TEST( answer == resultJ, CHECK_PER_ELEMENT );
+
+    vectorType J( dim * dim * dim * dim, 0 );
+
+    floatType eps = 1e-6;
+
+    for ( unsigned int i = 0; i < A.size( ); i++ ){
+
+        vectorType delta( A.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( A[ i ] ) + eps;
+
+        vectorType expAp, expAm;
+
+        BOOST_CHECK_NO_THROW( tardigradeVectorTools::computeMatrixExponential( A + delta, 3, expAp ) );
+
+        BOOST_CHECK_NO_THROW( tardigradeVectorTools::computeMatrixExponential( A - delta, 3, expAm ) );
+
+        for ( unsigned int j = 0; j < A.size( ); j++ ){
+
+            J[ 9 * j + i ] = ( expAp[ j ] - expAm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_TEST( J == dExpAdA, CHECK_PER_ELEMENT );
 
 }

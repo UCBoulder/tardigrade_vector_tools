@@ -1601,6 +1601,81 @@ namespace tardigradeVectorTools{
 
     }
 
+    template<typename T>
+    void computeMatrixExponential( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, std::vector< T > &dExpAdA, const unsigned int nmax, double tola, double tolr ){
+        /*!
+         * Compute the matrix exponential
+         * 
+         * \param &A: The matrix to compute the exponential of
+         * \param &dim: The number of rows and columns in A
+         * \param &expA: The matrix exponential of A
+         * \param &dExpAdA: The derivative of the matrix exponential of A w.r.t. A
+         * \param nmax: The maximum number of allowable iterations
+         * \param tola: The absolute tolerance
+         * \param tolr: The relative tolerance
+         */
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( A.size( ) ) +
+                                                              "\n  dim * dim: " + std::to_string( dim ) + "\n" )
+
+        std::vector< T > X( dim * dim, 0 );
+        for ( unsigned int i = 0; i < dim; i++ ){ X[ dim * i + i ] = 1; }
+
+        expA = X;
+
+        dExpAdA = std::vector< T >( dim * dim * dim * dim, 0 );
+
+        std::vector< T > dXdA( dim * dim * dim * dim, 0 );
+
+        double tol = tola * std::fabs( l2norm( A ) ) + tolr;
+
+        for ( unsigned int n = 1; n < nmax; n++ ){
+
+            std::vector< T > Xn( dim * dim, 0 );
+
+            std::vector< T > dXndA( dim * dim * dim * dim, 0 );
+
+            for ( unsigned int i = 0; i < dim; i++ ){
+
+                for ( unsigned int j = 0; j < dim; j++ ){
+
+                    for ( unsigned int k = 0; k < dim; k++ ){
+
+                        Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
+
+                        dXndA[ dim * dim * dim * i + dim * dim * j + dim * k + j ] += X[ dim * i + k ];
+
+                        for ( unsigned int ab = 0; ab < dim * dim; ab++ ){
+
+                            dXndA[ dim * dim * dim * i + dim * dim * k + ab ] += dXdA[ dim * dim * dim * i + dim * dim * j + ab ] * A[ dim * j + k ];
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+            expA += Xn / std::tgamma( n + 1 );
+
+            dExpAdA += dXndA / std::tgamma( n + 1 );
+
+            double delta = l2norm( Xn ) / std::tgamma( n + 1 );
+
+            if ( delta < tol ){
+
+                break;
+
+            }
+
+            X = Xn;
+            dXdA = dXndA;
+
+        }
+
+    }
+
     #ifdef USE_EIGEN
         template< typename T >
         std::vector< double > solveLinearSystem( const std::vector< std::vector< T > > &A, const std::vector< T > &b,
