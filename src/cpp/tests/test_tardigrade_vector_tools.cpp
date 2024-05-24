@@ -1438,3 +1438,55 @@ BOOST_AUTO_TEST_CASE( test_computeDinvAdA, * boost::unit_test::tolerance( DEFAUL
     BOOST_TEST( tardigradeVectorTools::appendVectors( gradient ) == tardigradeVectorTools::appendVectors( tardigradeVectorTools::computeDInvADA( invA, 3, 3 ) ), CHECK_PER_ELEMENT );
 
 }
+
+BOOST_AUTO_TEST_CASE( test_computeMatrixExponential, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
+    /*!
+     * Test the computation of the derivative of the inverse of A w.r.t. A
+     */
+
+    vectorType A = { -0.39293837,  0.42772133,  0.54629709,
+                     -0.10262954, -0.43893794,  0.15378708,
+                     -0.9615284 , -0.36965948,  0.0381362 };
+
+    unsigned int dim = 3;
+
+    vectorType answer = { 0.46127063,  0.17591871,  0.43827842,
+                         -0.11397388,  0.60563844,  0.0935307 ,
+                         -0.71521989, -0.4244122 ,  0.78340236 };
+
+    vectorType result;
+
+    tardigradeVectorTools::computeMatrixExponential( A, dim, result );
+
+    BOOST_TEST( answer == result, CHECK_PER_ELEMENT );
+
+
+//    vectorType invA = tardigradeVectorTools::inverse( A, 3, 3 );
+//
+//    floatType eps = 1e-6;
+//
+//    matrixType gradient( A.size( ), vectorType( A.size( ), 0 ) );
+//
+//    for ( unsigned int i = 0; i < A.size( ); i++ ){
+//
+//        vectorType delta( A.size( ), 0 );
+//
+//        delta[ i ] = eps * std::fabs( A[ i ] ) + eps;
+//
+//        vectorType invAp, invAm;
+//
+//        BOOST_CHECK_NO_THROW( invAp = tardigradeVectorTools::inverse( A + delta, 3, 3 ) );
+//
+//        BOOST_CHECK_NO_THROW( invAm = tardigradeVectorTools::inverse( A - delta, 3, 3 ) );
+//
+//        for ( unsigned int j = 0; j < A.size( ); j++ ){
+//
+//            gradient[ j ][ i ] = ( invAp[ j ] - invAm[ j ] ) / ( 2 * delta[ i ] );
+//
+//        }
+//
+//    }
+//
+//    BOOST_TEST( tardigradeVectorTools::appendVectors( gradient ) == tardigradeVectorTools::appendVectors( tardigradeVectorTools::computeDInvADA( invA, 3, 3 ) ), CHECK_PER_ELEMENT );
+
+}

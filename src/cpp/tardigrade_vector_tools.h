@@ -276,6 +276,9 @@ namespace tardigradeVectorTools{
                         std::vector< std::vector< T > > &dDirectionCosinesdBeta,
                         std::vector< std::vector< T > > &dDirectionCosinesdGamma );
 
+    template<typename T>
+    void computeMatrixExponential( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, const unsigned int nmax=40, double tola=1e-9, double tolr=1e-9);
+
     //Utilities which require Eigen
     #ifdef USE_EIGEN
         //Eigen specific type definitions
