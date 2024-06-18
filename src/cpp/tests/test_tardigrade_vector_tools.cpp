@@ -1494,6 +1494,57 @@ BOOST_AUTO_TEST_CASE( test_computeMatrixExponential, * boost::unit_test::toleran
 
 }
 
+BOOST_AUTO_TEST_CASE( test_computeMatrixExponential2, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
+    /*!
+     * Test the computation of the derivative of the inverse of A w.r.t. A
+     */
+
+    vectorType A = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    unsigned int dim = 3;
+
+    vectorType answer = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+
+    vectorType result, resultJ;
+
+    vectorType dExpAdA;
+
+    tardigradeVectorTools::computeMatrixExponential( A, dim, result );
+
+    BOOST_TEST( answer == result, CHECK_PER_ELEMENT );
+
+    tardigradeVectorTools::computeMatrixExponential( A, dim, resultJ, dExpAdA );
+
+    BOOST_TEST( answer == resultJ, CHECK_PER_ELEMENT );
+
+    vectorType J( dim * dim * dim * dim, 0 );
+
+    floatType eps = 1e-6;
+
+    for ( unsigned int i = 0; i < A.size( ); i++ ){
+
+        vectorType delta( A.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( A[ i ] ) + eps;
+
+        vectorType expAp, expAm;
+
+        BOOST_CHECK_NO_THROW( tardigradeVectorTools::computeMatrixExponential( A + delta, 3, expAp ) );
+
+        BOOST_CHECK_NO_THROW( tardigradeVectorTools::computeMatrixExponential( A - delta, 3, expAm ) );
+
+        for ( unsigned int j = 0; j < A.size( ); j++ ){
+
+            J[ 9 * j + i ] = ( expAp[ j ] - expAm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_TEST( J == dExpAdA, CHECK_PER_ELEMENT );
+
+}
+
 BOOST_AUTO_TEST_CASE( test_computeMatrixExponentialScalingAndSquaring, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the computation of the derivative of the inverse of A w.r.t. A
@@ -1508,6 +1559,57 @@ BOOST_AUTO_TEST_CASE( test_computeMatrixExponentialScalingAndSquaring, * boost::
     vectorType answer = { 0.46127063,  0.17591871,  0.43827842,
                          -0.11397388,  0.60563844,  0.0935307 ,
                          -0.71521989, -0.4244122 ,  0.78340236 };
+
+    vectorType result, resultJ;
+
+    vectorType dExpAdA;
+
+    tardigradeVectorTools::computeMatrixExponentialScalingAndSquaring( A, dim, result );
+
+    BOOST_TEST( answer == result, CHECK_PER_ELEMENT );
+
+    tardigradeVectorTools::computeMatrixExponentialScalingAndSquaring( A, dim, resultJ, dExpAdA );
+
+    BOOST_TEST( answer == resultJ, CHECK_PER_ELEMENT );
+
+    vectorType J( dim * dim * dim * dim, 0 );
+
+    floatType eps = 1e-6;
+
+    for ( unsigned int i = 0; i < A.size( ); i++ ){
+
+        vectorType delta( A.size( ), 0 );
+
+        delta[ i ] = eps * std::fabs( A[ i ] ) + eps;
+
+        vectorType expAp, expAm;
+
+        BOOST_CHECK_NO_THROW( tardigradeVectorTools::computeMatrixExponentialScalingAndSquaring( A + delta, 3, expAp ) );
+
+        BOOST_CHECK_NO_THROW( tardigradeVectorTools::computeMatrixExponentialScalingAndSquaring( A - delta, 3, expAm ) );
+
+        for ( unsigned int j = 0; j < A.size( ); j++ ){
+
+            J[ 9 * j + i ] = ( expAp[ j ] - expAm[ j ] ) / ( 2 * delta[ i ] );
+
+        }
+
+    }
+
+    BOOST_TEST( J == dExpAdA, CHECK_PER_ELEMENT );
+
+}
+
+BOOST_AUTO_TEST_CASE( test_computeMatrixExponentialScalingAndSquaring2, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
+    /*!
+     * Test the computation of the derivative of the inverse of A w.r.t. A
+     */
+
+    vectorType A = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+    unsigned int dim = 3;
+
+    vectorType answer = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
 
     vectorType result, resultJ;
 

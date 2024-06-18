@@ -1691,7 +1691,7 @@ namespace tardigradeVectorTools{
 
         double normA = l2norm( A );
 
-        unsigned int m = ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 );
+        unsigned int m = std::max( ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 ), ( unsigned int )( 1 ) );
 
         std::vector< T > expAoverm;
 
@@ -1740,7 +1740,7 @@ namespace tardigradeVectorTools{
 
         double normA = l2norm( A );
 
-        unsigned int m = ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 );
+        unsigned int m = std::max( ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 ), ( unsigned int )( 1 ) );
 
         std::vector< T > expAoverm;
 
