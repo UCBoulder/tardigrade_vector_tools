@@ -11,8 +11,6 @@
 #ifndef TARDIGRADE_INTERP_NDCARTESIAN_H
 #define TARDIGRADE_INTERP_NDCARTESIAN_H
 
-#include<tardigrade_error_tools.h>
-
 namespace tardigradeVectorTools{
 
     namespace interp{
@@ -27,14 +25,28 @@ namespace tardigradeVectorTools{
 
                 const floatType * const _D;
 
+                const unsigned int _D_size;
+
                 const unsigned int _npts;
+
+                const unsigned int _D_cols;
 
                 const floatType _tolr;
 
                 const floatType _tola;
 
-                ndCartesian( const unsigned int spatial_dimension, const floatType * const D, const unsigned int npts,
+                ndCartesian( const unsigned int spatial_dimension, const floatType * const D, const unsigned int D_size, const unsigned int npts,
                              const floatType tolr = 1e-9, const floatType tola = 1e-9 );
+
+                const std::vector< unsigned int > * getDimensions( ){ return &_dimensions; };
+
+            protected:
+
+                std::vector< unsigned int > getDimensions( const unsigned int span, const unsigned int index = 0 );
+
+                void setDimensions( const std::vector< unsigned int > &dimensions ){ _dimensions = dimensions; }
+
+                std::vector< unsigned int > _dimensions;
 
         };
 
