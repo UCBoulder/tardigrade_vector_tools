@@ -46,6 +46,8 @@ namespace tardigradeVectorTools{
 
                 const std::vector< unsigned int > * getCurrentBounds( ){ return &_current_bounds; }
 
+                const std::vector< floatType > * getCurrentWeights( ){ return &_current_weights; }
+
                 floatType eval( std::vector< floatType > &p, const unsigned int col=0 );
 
             protected:
@@ -56,13 +58,19 @@ namespace tardigradeVectorTools{
 
                 void setStrides( );
 
-                std::vector< unsigned int > getBoundingBoxIndices( std::vector< floatType > &p, const unsigned int insize, const unsigned int index = 0 );
+                std::vector< unsigned int > getBoundingBoxIndices( const std::vector< floatType > &p, const unsigned int insize, const unsigned int index = 0 );
+
+                std::vector< floatType > getWeights( const std::vector< floatType > &p, const unsigned int insize, const unsigned int index = 0 );
+
+                floatType interpolateFunction( const std::vector< floatType > &p, const unsigned int col = 0, const unsigned int index = 0, const unsigned int offset = 0 );
 
                 std::vector< unsigned int > _dimensions;
 
                 std::vector< unsigned int > _strides;
 
                 std::vector< unsigned int > _current_bounds;
+
+                std::vector< floatType > _current_weights;
 
             private:
 

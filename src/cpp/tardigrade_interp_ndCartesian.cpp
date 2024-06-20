@@ -133,7 +133,7 @@ namespace tardigradeVectorTools{
 
         }
 
-        std::vector< unsigned int > ndCartesian::getBoundingBoxIndices( std::vector< floatType > &p, const unsigned int insize, const unsigned int index ){
+        std::vector< unsigned int > ndCartesian::getBoundingBoxIndices( const std::vector< floatType > &p, const unsigned int insize, const unsigned int index ){
             /*!
              * Get the bounding box indices for the given point
              *
@@ -158,6 +158,77 @@ namespace tardigradeVectorTools{
 
         }
 
+        std::vector< floatType > ndCartesian::getWeights( const std::vector< floatType > &p, const unsigned int insize, const unsigned int index ){
+            /*!
+             * Get the weights for the given point
+             *
+             * \param &p: The incoming point
+             * \param &insize: The length of D to be exploring
+             * \param index: The index to be exploring
+             */
+
+            floatType xd_lb = *( _D + _D_cols * _strides[ index ] * _current_bounds[ 2 * index + 0 ] + index );
+            floatType xd_ub = *( _D + _D_cols * _strides[ index ] * _current_bounds[ 2 * index + 1 ] + index );
+
+            floatType w_lb, w_ub;
+
+            if ( _current_bounds[ 2 * index + 0 ] == _current_bounds[ 2 * index + 1 ] ){
+
+                w_lb = 0.5;
+
+                w_ub = 0.5;
+
+            }
+            else{
+
+                w_lb = 1 - ( p[ index ] - xd_lb ) / ( xd_ub - xd_lb );
+                w_ub = ( p[ index ] - xd_lb ) / ( xd_ub - xd_lb );
+
+            }
+
+            std::vector< floatType > weights = { w_lb, w_ub };
+
+            if ( ( index + 1 ) < _spatial_dimension ){
+
+                std::vector< floatType > sub_weights = getWeights( p, _strides[ index ], index + 1 );
+
+                weights.insert( weights.end( ), sub_weights.begin( ), sub_weights.end( ) );
+
+            }
+
+            return weights;
+
+        }
+
+        floatType ndCartesian::interpolateFunction( const std::vector< floatType > &p, const unsigned int col, const unsigned int index, const unsigned int offset ){
+            /*!
+             * Interpolate the function at the given point
+             *
+             * \param &p: The incoming point
+             * \param &col: The column of D after the points to interpolate
+             * \param index: The index to be exploring
+             * \param offset: The offset for the access to the D vector
+             */
+
+            const unsigned int ilb = _D_cols * _strides[ index ] * _current_bounds[ 2 * index + 0 ] + offset;
+
+            const unsigned int iub = _D_cols * _strides[ index ] * _current_bounds[ 2 * index + 1 ] + offset;
+
+            if ( ( index + 1 ) < _spatial_dimension ){
+
+                return _current_weights[ 2 * index + 0 ] * interpolateFunction( p, col, index + 1, ilb )
+                     + _current_weights[ 2 * index + 1 ] * interpolateFunction( p, col, index + 1, iub );
+
+            }
+            else{
+
+                return _current_weights[ 2 * index + 0 ] * ( *( _D + ilb + _spatial_dimension + col ) )
+                     + _current_weights[ 2 * index + 1 ] * ( *( _D + iub + _spatial_dimension + col ) );
+
+            }
+
+        }
+
         floatType ndCartesian::eval( std::vector< floatType > &p, const unsigned int col ){
             /*!
              * Evaluate the interpolation at the provided point
@@ -168,9 +239,9 @@ namespace tardigradeVectorTools{
 
             _current_bounds = getBoundingBoxIndices( p, _npts );
 
-            floatType value = 0;
+            _current_weights = getWeights( p, _npts );
 
-            return value;
+            return interpolateFunction( p, col );
 
         }
 

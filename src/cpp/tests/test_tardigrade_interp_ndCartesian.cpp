@@ -263,20 +263,32 @@ BOOST_AUTO_TEST_CASE( test_eval, * boost::unit_test::tolerance( DEFAULT_TEST_TOL
 
     std::vector< floatType > p_1 = { 0.3, 10.1, 0.0 };
 
+    floatType answer_1 = 9.7;
+
     std::vector< unsigned int > current_bounds_answer_1 = { 2, 3, 6, 6, 0, 0 };
+
+    std::vector< floatType > weights_answer_1 = { 0.075, 0.925, 0.5, 0.5, 0.5, 0.5 };
 
     std::vector< floatType > p_2 = { 0.3, 10.1, 0.5 };
 
+    floatType answer_2 = 9.3;
+
     std::vector< unsigned int > current_bounds_answer_2 = { 2, 3, 6, 6, 1, 2 };
+
+    std::vector< floatType > weights_answer_2 = { 0.075, 0.925, 0.5, 0.5, 0.66666667, 0.33333333 };
 
     tardigradeVectorTools::interp::ndCartesian interp( spatial_dimension, D.data( ), D_size, npts );
 
-    interp.eval( p_1 );
+    BOOST_TEST( answer_1 == interp.eval( p_1 ) );
 
     BOOST_TEST( current_bounds_answer_1 == *interp.getCurrentBounds( ), CHECK_PER_ELEMENT );
 
-    interp.eval( p_2 );
+    BOOST_TEST( weights_answer_1 == *interp.getCurrentWeights( ), CHECK_PER_ELEMENT );
+
+    BOOST_TEST( answer_2 == interp.eval( p_2 ) );
 
     BOOST_TEST( current_bounds_answer_2 == *interp.getCurrentBounds( ), CHECK_PER_ELEMENT );
+
+    BOOST_TEST( weights_answer_2 == *interp.getCurrentWeights( ), CHECK_PER_ELEMENT );
 
 }
