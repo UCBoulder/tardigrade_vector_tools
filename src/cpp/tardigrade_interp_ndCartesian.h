@@ -11,6 +11,8 @@
 #ifndef TARDIGRADE_INTERP_NDCARTESIAN_H
 #define TARDIGRADE_INTERP_NDCARTESIAN_H
 
+#include<array>
+
 namespace tardigradeVectorTools{
 
     namespace interp{
@@ -38,9 +40,13 @@ namespace tardigradeVectorTools{
                 ndCartesian( const unsigned int spatial_dimension, const floatType * const D, const unsigned int D_size, const unsigned int npts,
                              const floatType tolr = 1e-9, const floatType tola = 1e-9 );
 
-                const std::vector< unsigned int > * getDimensions( ){ return &_dimensions; };
+                const std::vector< unsigned int > * getDimensions( ){ return &_dimensions; }
 
-                const std::vector< unsigned int > * getStrides( ){ return &_strides; };
+                const std::vector< unsigned int > * getStrides( ){ return &_strides; }
+
+                const std::vector< unsigned int > * getCurrentBounds( ){ return &_current_bounds; }
+
+                floatType eval( std::vector< floatType > &p, const unsigned int col=0 );
 
             protected:
 
@@ -50,9 +56,17 @@ namespace tardigradeVectorTools{
 
                 void setStrides( );
 
+                std::vector< unsigned int > getBoundingBoxIndices( std::vector< floatType > &p, const unsigned int insize, const unsigned int index = 0 );
+
                 std::vector< unsigned int > _dimensions;
 
                 std::vector< unsigned int > _strides;
+
+                std::vector< unsigned int > _current_bounds;
+
+            private:
+
+                std::array< unsigned int, 2 > getBounds( const unsigned int index, const floatType &pd, const unsigned int dim_npts );
 
         };
 

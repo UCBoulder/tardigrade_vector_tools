@@ -243,3 +243,40 @@ BOOST_AUTO_TEST_CASE( test_constructor, * boost::unit_test::tolerance( DEFAULT_T
     BOOST_TEST( strides_answer == *interp.getStrides( ), CHECK_PER_ELEMENT );
 
 }
+
+BOOST_AUTO_TEST_CASE( test_eval, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
+    /*!
+     * Test the function that extracts the size of each of the interpolation dimensions
+     */
+
+    vectorType D = getD( );
+
+    const unsigned int spatial_dimension = 3;
+
+    const unsigned int D_size = D.size( );
+
+    const unsigned int npts   = D.size( ) / 4;
+
+    std::vector< unsigned int > dimensions_answer = { 10, 7, 3 };
+
+    std::vector< unsigned int > strides_answer = { 21, 3, 1 };
+
+    std::vector< floatType > p_1 = { 0.3, 10.1, 0.0 };
+
+    std::vector< unsigned int > current_bounds_answer_1 = { 2, 3, 6, 6, 0, 0 };
+
+    std::vector< floatType > p_2 = { 0.3, 10.1, 0.5 };
+
+    std::vector< unsigned int > current_bounds_answer_2 = { 2, 3, 6, 6, 1, 2 };
+
+    tardigradeVectorTools::interp::ndCartesian interp( spatial_dimension, D.data( ), D_size, npts );
+
+    interp.eval( p_1 );
+
+    BOOST_TEST( current_bounds_answer_1 == *interp.getCurrentBounds( ), CHECK_PER_ELEMENT );
+
+    interp.eval( p_2 );
+
+    BOOST_TEST( current_bounds_answer_2 == *interp.getCurrentBounds( ), CHECK_PER_ELEMENT );
+
+}

@@ -96,6 +96,84 @@ namespace tardigradeVectorTools{
 
         }
 
+        std::array< unsigned int, 2 > ndCartesian::getBounds( const unsigned int index, const floatType &pd, const unsigned int dim_npts ){
+            /*!
+             * Get the bounding indices for the point in the given dimension
+             *
+             * \param index: The spatial index of the provided value
+             * \param pd: The value to find the bounding box in the given dimension's index
+             * \param dim_npts: The number of points in the given stride
+             */
+
+            unsigned int ub = 0;
+
+            unsigned int lb = 0;
+
+            if ( *( _D + _D_cols * _strides[ index ] * ub + index ) > pd ){
+
+                return { lb, ub };
+
+            }
+
+            while ( ( ub + 1 ) < dim_npts ){
+
+                ub++;
+
+                if ( *( _D + _D_cols * _strides[ index ] * ub + index ) > pd ){
+
+                    break;
+
+                }
+
+                lb++;
+
+            }
+
+            return { lb, ub };
+
+        }
+
+        std::vector< unsigned int > ndCartesian::getBoundingBoxIndices( std::vector< floatType > &p, const unsigned int insize, const unsigned int index ){
+            /*!
+             * Get the bounding box indices for the given point
+             *
+             * \param &p: The incoming point
+             * \param &insize: The length of D to be exploring
+             * \param index: The index to be exploring
+             */
+
+            std::array< unsigned int, 2 > bounds = getBounds( index, p[ index ], insize / _strides[ index ] );
+
+            std::vector< unsigned int > bounding_box( bounds.begin( ), bounds.end( ) );
+
+            if ( ( index + 1 ) < _spatial_dimension ){
+
+                std::vector< unsigned int > sub_bounds = getBoundingBoxIndices( p, _strides[ index ], index + 1 );
+
+                bounding_box.insert( bounding_box.end( ), sub_bounds.begin( ), sub_bounds.end( ) );
+
+            }
+
+            return bounding_box;
+
+        }
+
+        floatType ndCartesian::eval( std::vector< floatType > &p, const unsigned int col ){
+            /*!
+             * Evaluate the interpolation at the provided point
+             *
+             * \param &p: The point to interpolate
+             * \param col: The column of the cartesian grid after the provided spatial points to interpolate
+             */
+
+            _current_bounds = getBoundingBoxIndices( p, _npts );
+
+            floatType value = 0;
+
+            return value;
+
+        }
+
     }
 
 }
