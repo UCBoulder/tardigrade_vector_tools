@@ -40,13 +40,19 @@ namespace tardigradeVectorTools{
 
                 const std::vector< unsigned int > * getDimensions( ){ return &_dimensions; };
 
+                const std::vector< unsigned int > * getStrides( ){ return &_strides; };
+
             protected:
 
                 std::vector< unsigned int > getDimensions( const unsigned int span, const unsigned int index = 0 );
 
                 void setDimensions( const std::vector< unsigned int > &dimensions ){ _dimensions = dimensions; }
 
+                void setStrides( );
+
                 std::vector< unsigned int > _dimensions;
+
+                std::vector< unsigned int > _strides;
 
         };
 

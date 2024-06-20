@@ -30,6 +30,9 @@ namespace tardigradeVectorTools{
             // Set the dimensions of the cartesian grid
             setDimensions( getDimensions( _npts ) );
 
+            // Set the strides for the dimensions
+            setStrides( );
+
         }
 
         std::vector< unsigned int > ndCartesian::getDimensions( const unsigned int span, const unsigned int index ){
@@ -67,6 +70,29 @@ namespace tardigradeVectorTools{
             }
 
             return nd;
+
+        }
+
+        void ndCartesian::setStrides( ){
+            /*!
+             * Set the strides for each of the cartesian dimensions
+             */
+
+            _strides = std::vector< unsigned int >( _dimensions.size( ), 0 );
+
+            unsigned int ndim = _dimensions.size( );
+
+            for ( unsigned int d = 0; d < ndim; d++ ){
+
+                _strides[ d ] = 1;
+
+                for ( unsigned int i = d + 1; i < ndim; i++ ){
+
+                    _strides[ d ] *= _dimensions[ i ];
+
+                }
+
+            }
 
         }
 

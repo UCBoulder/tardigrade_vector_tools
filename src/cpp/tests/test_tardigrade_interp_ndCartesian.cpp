@@ -219,7 +219,7 @@ vectorType getD( ){
 
 }
 
-BOOST_AUTO_TEST_CASE( test_getDimensions, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
+BOOST_AUTO_TEST_CASE( test_constructor, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
     /*!
      * Test the function that extracts the size of each of the interpolation dimensions
      */
@@ -232,10 +232,14 @@ BOOST_AUTO_TEST_CASE( test_getDimensions, * boost::unit_test::tolerance( DEFAULT
 
     const unsigned int npts   = D.size( ) / 4;
 
-    std::vector< unsigned int > answer = { 10, 7, 3 };
+    std::vector< unsigned int > dimensions_answer = { 10, 7, 3 };
+
+    std::vector< unsigned int > strides_answer = { 21, 3, 1 };
 
     tardigradeVectorTools::interp::ndCartesian interp( spatial_dimension, D.data( ), D_size, npts );
 
-    BOOST_TEST( answer == *interp.getDimensions( ), CHECK_PER_ELEMENT );
+    BOOST_TEST( dimensions_answer == *interp.getDimensions( ), CHECK_PER_ELEMENT );
+
+    BOOST_TEST( strides_answer == *interp.getStrides( ), CHECK_PER_ELEMENT );
 
 }
