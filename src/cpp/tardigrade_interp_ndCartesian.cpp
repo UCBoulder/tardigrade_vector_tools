@@ -200,12 +200,14 @@ namespace tardigradeVectorTools{
 
         }
 
-        floatType ndCartesian::interpolateFunction( const std::vector< floatType > &p, const std::vector< unsigned int > &current_bounds, const unsigned int col, const unsigned int index, const unsigned int offset ){
+        floatType ndCartesian::interpolateFunction( const std::vector< floatType > &p, const std::vector< unsigned int > &current_bounds, const std::vector< floatType > &current_weights,
+                                                    const unsigned int col, const unsigned int index, const unsigned int offset ){
             /*!
              * Interpolate the function at the given point
              *
              * \param &p: The incoming point
              * \param &current_bounds: The current bounds of the given point
+             * \param &current_weights: The current weights of the given point
              * \param &col: The column of D after the points to interpolate
              * \param index: The index to be exploring
              * \param offset: The offset for the access to the D vector
@@ -217,14 +219,14 @@ namespace tardigradeVectorTools{
 
             if ( ( index + 1 ) < _spatial_dimension ){
 
-                return _current_weights[ 2 * index + 0 ] * interpolateFunction( p, current_bounds, col, index + 1, ilb )
-                     + _current_weights[ 2 * index + 1 ] * interpolateFunction( p, current_bounds, col, index + 1, iub );
+                return current_weights[ 2 * index + 0 ] * interpolateFunction( p, current_bounds, current_weights, col, index + 1, ilb )
+                     + current_weights[ 2 * index + 1 ] * interpolateFunction( p, current_bounds, current_weights, col, index + 1, iub );
 
             }
             else{
 
-                return _current_weights[ 2 * index + 0 ] * ( *( _D + ilb + _spatial_dimension + col ) )
-                     + _current_weights[ 2 * index + 1 ] * ( *( _D + iub + _spatial_dimension + col ) );
+                return current_weights[ 2 * index + 0 ] * ( *( _D + ilb + _spatial_dimension + col ) )
+                     + current_weights[ 2 * index + 1 ] * ( *( _D + iub + _spatial_dimension + col ) );
 
             }
 
@@ -240,9 +242,9 @@ namespace tardigradeVectorTools{
 
             std::vector< unsigned int > current_bounds = getBoundingBoxIndices( p, _npts );
 
-            _current_weights = getWeights( p, current_bounds, _npts );
+            std::vector< floatType > current_weights = getWeights( p, current_bounds, _npts );
 
-            return interpolateFunction( p, current_bounds, col );
+            return interpolateFunction( p, current_bounds, current_weights, col );
 
         }
 
