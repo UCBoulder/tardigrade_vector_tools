@@ -44,9 +44,9 @@ namespace tardigradeVectorTools{
 
                 const std::vector< unsigned int > * getStrides( ){ return &_strides; }
 
-                const std::vector< unsigned int > * getCurrentBounds( ){ return &_current_bounds; }
+                const std::vector< unsigned int > getCurrentBounds( const std::vector< floatType > &p, const unsigned int &insize ){ return getBoundingBoxIndices( p, insize ); }
 
-                const std::vector< floatType > * getCurrentWeights( ){ return &_current_weights; }
+                const std::vector< floatType > getCurrentWeights( const std::vector< floatType > &p, const unsigned int &insize ){ std::vector< unsigned int > current_bounds = getCurrentBounds( p, insize ); return getWeights( p, current_bounds, insize ); }
 
                 floatType eval( std::vector< floatType > &p, const unsigned int col=0 );
 
@@ -60,15 +60,14 @@ namespace tardigradeVectorTools{
 
                 std::vector< unsigned int > getBoundingBoxIndices( const std::vector< floatType > &p, const unsigned int insize, const unsigned int index = 0 );
 
-                std::vector< floatType > getWeights( const std::vector< floatType > &p, const unsigned int insize, const unsigned int index = 0 );
+                std::vector< floatType > getWeights( const std::vector< floatType > &p, const std::vector< unsigned int > &current_bounds, const unsigned int insize, const unsigned int index = 0 );
 
-                floatType interpolateFunction( const std::vector< floatType > &p, const unsigned int col = 0, const unsigned int index = 0, const unsigned int offset = 0 );
+                floatType interpolateFunction( const std::vector< floatType > &p, const std::vector< unsigned int > &current_bounds, const std::vector< floatType > &current_weights,
+                                               const unsigned int col = 0, const unsigned int index = 0, const unsigned int offset = 0 );
 
                 std::vector< unsigned int > _dimensions;
 
                 std::vector< unsigned int > _strides;
-
-                std::vector< unsigned int > _current_bounds;
 
                 std::vector< floatType > _current_weights;
 

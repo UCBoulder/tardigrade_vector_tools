@@ -281,14 +281,14 @@ BOOST_AUTO_TEST_CASE( test_eval, * boost::unit_test::tolerance( DEFAULT_TEST_TOL
 
     BOOST_TEST( answer_1 == interp.eval( p_1 ) );
 
-    BOOST_TEST( current_bounds_answer_1 == *interp.getCurrentBounds( ), CHECK_PER_ELEMENT );
+    BOOST_TEST( current_bounds_answer_1 == interp.getCurrentBounds( p_1, npts ), CHECK_PER_ELEMENT );
 
-    BOOST_TEST( weights_answer_1 == *interp.getCurrentWeights( ), CHECK_PER_ELEMENT );
+    BOOST_TEST( weights_answer_1 == interp.getCurrentWeights( p_1, npts ), CHECK_PER_ELEMENT );
 
     BOOST_TEST( answer_2 == interp.eval( p_2 ) );
 
-    BOOST_TEST( current_bounds_answer_2 == *interp.getCurrentBounds( ), CHECK_PER_ELEMENT );
+    BOOST_TEST( current_bounds_answer_2 == interp.getCurrentBounds( p_2, npts ), CHECK_PER_ELEMENT );
 
-    BOOST_TEST( weights_answer_2 == *interp.getCurrentWeights( ), CHECK_PER_ELEMENT );
+    BOOST_TEST( weights_answer_2 == interp.getCurrentWeights( p_2, npts ), CHECK_PER_ELEMENT );
 
 }
