@@ -547,9 +547,10 @@ namespace tardigradeVectorTools{
 
         TARDIGRADE_ERROR_TOOLS_CHECK( size == b.size(), "A and b are incompatible shapes");
 
-        std::vector< T > c(A[0].size(), 0);
+        const unsigned int col = A[0].size();
+        std::vector< T > c(col, 0);
 
-        for ( unsigned int i = 0; i < A[0].size(); i++ ){
+        for ( unsigned int i = 0; i < col; i++ ){
             for ( unsigned int j = 0; j < size; j++ ){
                 c[i] += A[j][i] * b[j];
             }
@@ -1919,10 +1920,7 @@ namespace tardigradeVectorTools{
              * \param ncols: The number of columns
              */
 
-            if (Avec.size() != (nrows*ncols)){
-                std::cerr << "Error: The size of Avec and the dimensions nrows and ncols do not align.\n";
-                assert(1==0);
-            }
+            TARDIGRADE_ERROR_TOOLS_CHECK( Avec.size() == nrows*ncols, "Error: The size of Avec and the dimensions nrows and ncols do not align." );
 
             //Set up the Eigen map for A
             Eigen::Map < const Eigen::Matrix<T, -1, -1, Eigen::RowMajor> > Amat(Avec.data(), nrows, ncols);
