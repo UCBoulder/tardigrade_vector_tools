@@ -324,6 +324,14 @@ BOOST_AUTO_TEST_CASE( test_dot, * boost::unit_test::tolerance( DEFAULT_TEST_TOLE
 
     BOOST_TEST( d == d_answer_1, CHECK_PER_ELEMENT );
 
+    vectorType flat_A = tardigradeVectorTools::appendVectors( A );
+
+    d = vectorType( 3, 0. );
+
+    tardigradeVectorTools::rowMajorDot<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( a ), std::end( a ), std::begin( d ), std::end( d ) );
+
+    BOOST_TEST( d == d_answer_1, CHECK_PER_ELEMENT );
+
     matrixType B = { { 10, 11, 12 },
                      { 13, 14, 15 },
                      { 16, 17, 18 } };

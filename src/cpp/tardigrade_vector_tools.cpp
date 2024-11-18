@@ -554,8 +554,7 @@ namespace tardigradeVectorTools{
          */
 
         //Get the size and perform error handling
-        size_type size = a.size();
-        TARDIGRADE_ERROR_TOOLS_CHECK( size == b.size(), "vectors must be the same size to compute the dot product" )
+        TARDIGRADE_ERROR_TOOLS_CHECK( a.size() == b.size(), "vectors must be the same size to compute the dot product" )
 
         //Set v to zero
         v = std::inner_product(a.begin(), a.end(), b.begin(), T());
@@ -577,6 +576,57 @@ namespace tardigradeVectorTools{
         return v;
     }
 
+    template<typename T, class M_in, class v_in, class v_out>
+    void rowMajorDot(const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end){
+        /*!
+         * Compute the dot product between a matrix and a vector i.e. c_i = A_ij b_j
+         * when A is in row-major form
+         * 
+         * \param &A_begin: The starting iterator of matrix A
+         * \param &A_end: The stopping iterator of matrix A
+         * \param &b_begin: The starting iterator of vector b
+         * \param &b_end: The stopping iterator of vector b
+         * \param &c_begin: The starting iterator of vector c
+         * \param &c_end: The stopping iterator of vector c
+         */
+
+        std::fill( c_begin, c_end, 0 );
+
+        size_type cols = ( size_type )( b_end - b_begin );
+        size_type rows = ( size_type )( A_end - A_begin ) / cols;
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            *( c_begin + row ) = std::inner_product( A_begin + cols * row, A_begin + cols * ( row + 1 ), b_begin, T( ) );
+
+        }
+
+    }
+
+    template<typename T, class M_in, class v_in, class v_out>
+    void dot(const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end){
+        /*!
+         * Compute the dot product between a matrix and a vector i.e. c_i = A_ij b_j
+         * 
+         * \param &A_begin: The starting iterator of matrix A
+         * \param &A_end: The stopping iterator of matrix A
+         * \param &b_begin: The starting iterator of vector b
+         * \param &b_end: The stopping iterator of vector b
+         * \param &c_begin: The starting iterator of vector c
+         * \param &c_end: The stopping iterator of vector c
+         */
+
+        std::fill( c_begin, c_end, 0 );
+
+        size_type size = ( size_type )( A_end - A_begin );
+        for ( unsigned int i = 0; i < size; i++ ){
+
+            *( c_begin + i ) = std::inner_product( std::begin( *( A_begin + i ) ), std::end( *( A_begin + i ) ), b_begin, T( ) );
+
+        }
+
+    }
+
     template<typename T>
     std::vector< T > dot(const std::vector< std::vector< T > > &A, const std::vector< T > &b){
         /*!
@@ -590,10 +640,8 @@ namespace tardigradeVectorTools{
 
         std::vector< T > c(size);
 
-        unsigned int i=0;
-        for (auto A_i=A.begin(); A_i!=A.end(); A_i++, i++){
-            c[i] = dot(*A_i, b);
-        }
+        dot<T>( std::begin( A ), std::end( A ), std::begin( b ), std::end( b ), std::begin( c ), std::end( c ) );
+
         return c;
     }
 

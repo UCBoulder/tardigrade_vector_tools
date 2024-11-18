@@ -127,6 +127,12 @@ namespace tardigradeVectorTools{
     template<typename T>
     T dot(const std::vector< T > &a, const std::vector< T > &b);
 
+    template<typename T, class M_in, class v_in, class v_out>
+    void rowMajorDot(const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end);
+
+    template<typename T, class M_in, class v_in, class v_out>
+    void dot(const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end);
+
     template<typename T>
     std::vector< T > dot(const std::vector< std::vector< T > > &A, const std::vector< T > &b);
 
