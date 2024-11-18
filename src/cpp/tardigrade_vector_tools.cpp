@@ -473,6 +473,40 @@ namespace tardigradeVectorTools{
         return v;
     }
 
+    template<class v_in, class v_out>
+    int cross(const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end){
+        /*!
+         * Compute the cross product of two vectors i.e. a x b. Note: c must always be a 3D vector.
+         *
+         * TODO: Generalize this to n dimensions.
+         *
+         * \param &a_begin: The starting iterator of the first vector
+         * \param &a_end: The stopping iterator of the first vector
+         * \param &b_begin: The starting iterator of the second vector
+         * \param &b_end: The stopping iterator of the second vector
+         * \param &c_begin: The starting iterator of the resulting vector
+         * \param &c_end: The stopping iterator of the resulting vector
+         */
+
+        size_type size = ( size_type )( a_end - a_begin );
+
+        if (size == 2){
+            std::fill( c_begin, c_end, 0 );
+            *( c_begin + 2 ) =  ( *( a_begin + 0 ) ) * ( *( b_begin + 1 ) ) - ( *( a_begin + 1 ) ) * ( *( b_begin + 0 ) );
+        }
+        else if (size == 3){
+            *( c_begin + 0 ) =  ( *( a_begin + 1 ) ) * ( *( b_begin + 2 ) ) - ( *( a_begin + 2 ) ) * ( *( b_begin + 1 ) );
+            *( c_begin + 1 ) =  ( *( a_begin + 0 ) ) * ( *( b_begin + 2 ) ) - ( *( a_begin + 2 ) ) * ( *( b_begin + 0 ) );
+            *( c_begin + 2 ) =  ( *( a_begin + 0 ) ) * ( *( b_begin + 1 ) ) - ( *( a_begin + 1 ) ) * ( *( b_begin + 0 ) );
+        }
+        else{
+            return 1;
+        }
+
+        return 0;
+
+    }
+
     template<typename T>
     int cross(const std::vector< T > &a, const std::vector< T > &b, std::vector< T > &c){
         /*!
@@ -486,23 +520,10 @@ namespace tardigradeVectorTools{
          * \param &c: The resulting vector
          */
 
-        size_type size = a.size();
-        c = std::vector< T >(size, 0);
+        c = std::vector< T >(3, 0);
 
-        if (size == 2){
-            c.resize(3);
-            c[2] =  a[0]*b[1] - a[1]*b[0];
-        }
-        else if (size == 3){
-            c[0] =  a[1]*b[2] - a[2]*b[1];
-            c[1] = -a[0]*b[2] + a[2]*b[0];
-            c[2] =  a[0]*b[1] - a[1]*b[0];
-        }
-        else{
-            TARDIGRADE_ERROR_TOOLS_CHECK( false, "Only 2D and 3D vectors are accepted");
-        }
+        return cross( std::begin( a ), std::end( a ), std::begin( b ), std::end( b ), std::begin( c ), std::end( c ) );
 
-        return 0;
     }
 
     template<typename T>

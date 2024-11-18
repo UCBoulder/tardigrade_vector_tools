@@ -112,6 +112,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     std::vector< T > computeMean(const std::vector< std::vector< T > > &A);
 
+    template<class v_in, class v_out>
+    int cross(const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end);
+
     template<typename T>
     int cross(const std::vector< T > &a, const std::vector< T > &b, std::vector< T > &c);
 
