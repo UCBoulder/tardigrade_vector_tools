@@ -391,6 +391,54 @@ std::vector<std::vector<T>> operator+(const T &lhs, std::vector<std::vector<T>> 
 namespace tardigradeVectorTools{
 
     //Computation Utilities
+    template<typename T, class M_in, class v_out>
+    void computeRowMajorMean(const M_in &A_begin, const M_in &A_end, v_out v_begin, v_out v_end){
+        /*!
+         * Compute the column-wise mean of A when A is in row-major form
+         * 
+         * \param &A_begin: Starting iterator for matrix A
+         * \param &A_end:   Stopping iterator for matrix A
+         * \param &v_begin: Starting iterator for mean vector
+         * \param &v_end:   Stopping iterator for mean vector
+         */
+
+        const unsigned int cols = ( unsigned int )( v_end - v_begin );
+        const unsigned int rows = ( unsigned int )( A_end - A_begin ) / cols;
+
+        std::fill(v_begin, v_end, 0.);
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            std::transform( A_begin + cols * row, A_begin + cols * ( row + 1 ), v_begin, v_begin, std::plus<T>( ) );
+
+        }
+
+        std::transform(v_begin, v_end, v_begin, std::bind(std::multiplies<T>(), std::placeholders::_1, 1. / rows ) ); 
+
+    }
+
+    template<typename T, class M_in, class v_out>
+    void computeMean(const M_in &A_begin, const M_in &A_end, v_out v_begin, v_out v_end){
+        /*!
+         * Compute the column-wise mean of A
+         * 
+         * \param &A_begin: Starting iterator for matrix A
+         * \param &A_end:   Stopping iterator for matrix A
+         * \param &v_begin: Starting iterator for mean vector
+         * \param &v_end:   Stopping iterator for mean vector
+         */
+
+        
+        std::fill(v_begin, v_end, 0.);
+
+        for ( auto row = A_begin; row != A_end; row++ ){
+            std::transform(std::begin(*row), std::end(*row), v_begin, v_begin, std::plus<T>( ) );
+        }
+
+        std::transform(v_begin, v_end, v_begin, std::bind(std::multiplies<T>(), std::placeholders::_1, 1. / ( unsigned int )( A_end - A_begin ) ) );
+
+    }
+
     template<typename T>
     int computeMean(const std::vector< std::vector< T > > &A, std::vector< T > &v){
         /*!
@@ -407,11 +455,7 @@ namespace tardigradeVectorTools{
         //Size the output vector
         v = std::vector<T>(A[0].size(), 0);
 
-        for ( auto Ai = A.begin( ); Ai != A.end( ); Ai++ ){
-            v += *Ai;
-        }
-
-        v /= A_size;
+        computeMean<T>( std::begin( A ), std::end( A ), std::begin( v ), std::end( v ) );
 
         return 0;
     }

@@ -259,6 +259,11 @@ BOOST_AUTO_TEST_CASE( test_computeMean, * boost::unit_test::tolerance( DEFAULT_T
     result = tardigradeVectorTools::computeMean( A );
     BOOST_TEST( result == answer, CHECK_PER_ELEMENT );
 
+    vectorType A_flat = tardigradeVectorTools::appendVectors( A );
+    result = vectorType( 4, 0. );
+    tardigradeVectorTools::computeRowMajorMean<floatType>( std::begin( A_flat ), std::end( A_flat ), std::begin( result ), std::end( result ) );
+    BOOST_TEST( result == answer, CHECK_PER_ELEMENT );
+
 }
 
 BOOST_AUTO_TEST_CASE( test_cross, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){

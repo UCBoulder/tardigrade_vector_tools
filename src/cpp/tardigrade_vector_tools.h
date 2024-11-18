@@ -100,6 +100,12 @@ namespace tardigradeVectorTools{
     typedef unsigned int size_type;
 
     //Computation Utilities
+    template<typename T, class M_in, class v_out>
+    void computeRowMajorMean(const M_in &A_begin, const M_in &A_end, v_out v_begin, v_out v_end);
+
+    template<class M_in, class v_out>
+    void computeMean(const M_in &A_begin, const M_in &A_end, v_out v_begin, v_out v_end);
+
     template<typename T>
     int computeMean(const std::vector<std::vector< T > > &A, std::vector< T > &v);
 
