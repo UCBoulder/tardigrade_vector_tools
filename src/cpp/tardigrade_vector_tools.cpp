@@ -592,8 +592,8 @@ namespace tardigradeVectorTools{
 
         std::fill( c_begin, c_end, 0 );
 
-        size_type cols = ( size_type )( b_end - b_begin );
-        size_type rows = ( size_type )( A_end - A_begin ) / cols;
+        const size_type cols = ( size_type )( b_end - b_begin );
+        const size_type rows = ( size_type )( A_end - A_begin ) / cols;
 
         for ( unsigned int row = 0; row < rows; row++ ){
 
@@ -618,7 +618,7 @@ namespace tardigradeVectorTools{
 
         std::fill( c_begin, c_end, 0 );
 
-        size_type size = ( size_type )( A_end - A_begin );
+        const size_type size = ( size_type )( A_end - A_begin );
         for ( unsigned int i = 0; i < size; i++ ){
 
             *( c_begin + i ) = std::inner_product( std::begin( *( A_begin + i ) ), std::end( *( A_begin + i ) ), b_begin, T( ) );
@@ -645,6 +645,66 @@ namespace tardigradeVectorTools{
         return c;
     }
 
+    template<typename T, class M_in, class v_in, class v_out>
+    void Tdot( const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end ){
+        /*!
+         * Compute the dot product between a transposed matrix and a vector i.e., c_i = A_ji b_j
+         *
+         * \param &A_begin: The starting iterator of matrix A
+         * \param &A_end: The stopping iterator of matrix A
+         * \param &b_begin: The starting iterator of vector b
+         * \param &b_end: The stopping iterator of vector b
+         * \param &c_begin: The starting iterator of vector c
+         * \param &c_end: The stopping iterator of vector c
+         */
+
+        std::fill( c_begin, c_end, 0 );
+
+        const size_type rows = ( size_type )( b_end - b_begin );
+        const size_type cols = ( size_type )( c_end - c_begin );
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            for ( unsigned int col = 0; col < cols; col++ ){
+
+                *( c_begin + col ) += ( *( A_begin + row ) )[ col ] * ( *( b_begin + row ) );
+
+            }
+
+        }
+
+    }
+
+    template<typename T, class M_in, class v_in, class v_out>
+    void rowMajorTdot( const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end ){
+        /*!
+         * Compute the dot product between a transposed matrix and a vector i.e., c_i = A_ji b_j
+         *
+         * \param &A_begin: The starting iterator of matrix A
+         * \param &A_end: The stopping iterator of matrix A
+         * \param &b_begin: The starting iterator of vector b
+         * \param &b_end: The stopping iterator of vector b
+         * \param &c_begin: The starting iterator of vector c
+         * \param &c_end: The stopping iterator of vector c
+         */
+
+        std::fill( c_begin, c_end, 0 );
+
+        const size_type rows = ( size_type )( b_end - b_begin );
+        const size_type cols = ( size_type )( c_end - c_begin );
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            for ( unsigned int col = 0; col < cols; col++ ){
+
+                *( c_begin + col ) += ( *( A_begin + cols * row + col ) ) * ( *( b_begin + row ) );
+
+            }
+
+        }
+
+    }
+
     template<typename T>
     std::vector< T > Tdot(const std::vector< std::vector< T > > &A, const std::vector< T > &b){
         /*!
@@ -654,7 +714,7 @@ namespace tardigradeVectorTools{
          * \param &b: The vector
          */
 
-        size_type size = A.size();
+        const size_type size = A.size();
 
         TARDIGRADE_ERROR_TOOLS_CHECK( size != 0, "A has no rows")
 
@@ -662,12 +722,84 @@ namespace tardigradeVectorTools{
 
         std::vector< T > c(A[0].size(), 0);
 
-        for ( unsigned int i = 0; i < A[0].size(); i++ ){
-            for ( unsigned int j = 0; j < size; j++ ){
-                c[i] += A[j][i] * b[j];
-            }
-        }
+        Tdot<T>( std::begin( A ), std::end( A ), std::begin( b ), std::end( b ), std::begin( c ), std::end( c ) );
+
         return c;
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void dot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end ){
+        /*!
+         * Compute the dot product between two matrices i.e. C_{ij} = A_{ik} B_{kj}
+         *
+         * \param &A_begin: The starting iterator of the first matrix
+         * \param &A_end: The stopping iterator of the first matrix
+         * \param &B_begin: The starting iterator of the second matrix
+         * \param &B_end: The stopping iterator of the second matrix
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &C_end: The stopping iterator of the result matrix
+         */
+
+        const size_type rows  = ( size_type )( A_end - A_begin );
+        const size_type inner = ( size_type )( B_end - B_begin );
+        const size_type cols  = ( size_type )( std::end( *B_begin ) - std::begin( *B_begin ) );
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) ) == ( size_type )( B_end - B_begin ), "A and B have incompatible shapes" );
+
+        for ( unsigned int I = 0; I < rows; I++ ){
+
+            std::fill( std::begin( *( C_begin + I ) ), std::end( *( C_begin + I ) ), 0 );
+
+            for ( unsigned int K = 0; K < inner; K++ ){
+
+                for ( unsigned int J = 0; J < cols; J++ ){
+
+                    ( *( C_begin + I ) )[ J ] += ( *( A_begin + I ) )[ K ] * ( *( B_begin + K ) )[ J ];
+
+                }
+
+            }
+
+        }
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorDot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end ){
+        /*!
+         * Compute the dot product between two matrices i.e. C_{ij} = A_{ik} B_{kj}
+         *
+         * \param &A_begin: The starting iterator of the first matrix
+         * \param &A_end: The stopping iterator of the first matrix
+         * \param &B_begin: The starting iterator of the second matrix
+         * \param &B_end: The stopping iterator of the second matrix
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &rows: The number of rows in A
+         * \param &cols: The number of columns in B
+         * \param &B_end: The stopping iterator of the result matrix
+         */
+
+        const size_type inner = ( size_type )( A_end - A_begin ) / rows;
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( inner == ( size_type )( B_end - B_begin ) / cols, "The shapes of A and B are inconsistent" );
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            std::fill( C_begin + cols * row, C_begin + cols * ( row + 1 ), 0 );
+
+            for ( unsigned int K = 0; K < inner; K++ ){
+
+                for ( unsigned int col = 0; col < cols; col++ ){
+
+                    *( C_begin + cols * row + col ) += ( *( A_begin + inner * row + K ) ) * ( *( B_begin + cols * K + col ) );
+
+                }
+
+            }
+
+        }
+
     }
 
     template<typename T>
@@ -679,31 +811,77 @@ namespace tardigradeVectorTools{
          * \param &B: The second matrix
          */
 
-        size_type rows = A.size();
+        const size_type rows = A.size();
 
         TARDIGRADE_ERROR_TOOLS_CHECK( B.size() != 0, "B has no rows")
 
-        size_type inner = B.size();
-        size_type cols = B[0].size();
+        const size_type cols = B[0].size();
 
         //Perform the matrix multiplication
         std::vector< std::vector< T > > C(rows, std::vector< T >(cols, 0));
 
-        for (unsigned int I=0; I<rows; I++){
+        dot<T>( std::begin( A ), std::end( A ), std::begin( B ), std::end( B ), std::begin( C ), std::end( C ) );
 
-            TARDIGRADE_ERROR_TOOLS_CHECK( A[I].size( ) == inner, "A and B have incompatible shapes" )
-
-            for (unsigned int K=0; K<inner; K++){
-
-                TARDIGRADE_ERROR_TOOLS_CHECK( B[K].size() == cols, "B is not a regular matrix" )
-
-                for (unsigned int J=0; J<cols; J++){
-
-                    C[I][J] += A[I][K] * B[K][J];
-                }
-            }
-        }
         return C;
+    }
+
+    template<typename T, class M_in, class M_out>
+    void dotT( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end ){
+        /*!
+         * Compute the dot product between two matrices where the second is transposed i.e. C_{ij} = A_{ik} B_{jk}
+         *
+         * \param &A_begin: The starting iterator of the first matrix
+         * \param &A_end: The stopping iterator of the first matrix
+         * \param &B_begin: The starting iterator of the second matrix
+         * \param &B_end: The stopping iterator of the second matrix
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &B_end: The stopping iterator of the result matrix
+         */
+
+        const size_type rows = ( size_type )( A_end - A_begin );
+        const size_type cols = ( size_type )( B_end - B_begin );
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            for ( unsigned int col = 0; col < cols; col++ ){
+
+                ( *( C_begin + row ) )[ col ] = std::inner_product( std::begin( *( A_begin + row ) ), std::end( *( A_begin + row ) ),
+                                                                    std::begin( *( B_begin + col ) ), T( ) );
+
+            }
+
+        }
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorDotT( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end ){
+        /*!
+         * Compute the dot product between two matrices where the second is transposed i.e. C_{ij} = A_{ik} B_{jk}
+         *
+         * \param &A_begin: The starting iterator of the first matrix
+         * \param &A_end: The stopping iterator of the first matrix
+         * \param &B_begin: The starting iterator of the second matrix
+         * \param &B_end: The stopping iterator of the second matrix
+         * \param &rows: The number of rows in A
+         * \param &cols: The number of rows in B
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &C_end: The stopping iterator of the result matrix
+         */
+
+        const size_type inner = ( size_type )( A_end - A_begin ) / rows;
+
+        for ( unsigned int row = 0; row < rows; row++ ){
+
+            for ( unsigned int col = 0; col < cols; col++ ){
+
+                *( C_begin + cols * row + col ) = std::inner_product( A_begin + inner * row, A_begin + inner * ( row + 1 ),
+                                                                      B_begin + inner * col, T( ) );
+
+            }
+
+        }
+
     }
 
     template<typename T>
@@ -720,26 +898,91 @@ namespace tardigradeVectorTools{
         TARDIGRADE_ERROR_TOOLS_CHECK( B.size( ) != 0, "B has no rows" );
 
         size_type Brows = B.size();
-        size_type Bcols = B[0].size();
 
         //Perform the matrix multiplication
         std::vector< std::vector< T > > C(Arows, std::vector< T >(Brows, 0));
 
-        for (unsigned int I=0; I<Arows; I++){
+        dotT<T>( std::begin( A ), std::end( A ), std::begin( B ), std::end( B ), std::begin( C ), std::end( C ) );
 
-            TARDIGRADE_ERROR_TOOLS_CHECK( A[I].size() == Bcols, "A and B have incompatible shapes" );
-
-            for (unsigned int J=0; J<Brows; J++){
-
-                TARDIGRADE_ERROR_TOOLS_CHECK( B[J].size() == Bcols, "B is not a regular matrix" );
-
-                for (unsigned int K=0; K<Bcols; K++){
-
-                    C[I][J] += A[I][K] * B[J][K];
-                }
-            }
-        }
         return C;
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void Tdot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end ){
+        /*!
+         * Compute the dot product between two matrices where the first is transposed i.e. C_{ij} = A_{ki} B_{kj}
+         *
+         * \param &A_begin: The starting iterator first matrix
+         * \param &A_end: The stopping iterator first matrix
+         * \param &B_begin: The starting iterator second matrix
+         * \param &B_end: The stopping iterator second matrix
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &C_end: The starting iterator of the result matrix
+         */
+
+        const size_type inner = ( size_type )( A_end - A_begin );
+        TARDIGRADE_ERROR_TOOLS_CHECK( inner == ( size_type )( B_end - B_begin ), "A and B have incompatible shapes" );
+
+        const size_type rows  = ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) );
+        const size_type cols  = ( size_type )( std::end( *B_begin ) - std::begin( *B_begin ) );
+
+        for ( auto Ci = C_begin; Ci != C_end; Ci++ ){
+
+            std::fill( std::begin( *Ci ), std::end( *Ci ), 0 );
+
+        }
+
+        for ( unsigned int K = 0; K < inner; K++ ){
+
+            for ( unsigned int I = 0; I < rows; I++ ){
+
+                for ( unsigned int J = 0; J < cols; J++ ){
+
+                    ( *( C_begin + I ) )[ J ] += ( *( A_begin + K ) )[ I ] * ( *( B_begin + K ) )[ J ];
+
+                }
+
+            }
+
+        }
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorTDot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end ){
+        /*!
+         * Compute the dot product between two matrices where the first is transposed i.e. C_{ij} = A_{ki} B_{kj}
+         *
+         * \param &A_begin: The starting iterator first matrix
+         * \param &A_end: The stopping iterator first matrix
+         * \param &B_begin: The starting iterator second matrix
+         * \param &B_end: The stopping iterator second matrix
+         * \param &rows: The number of columns in A
+         * \param &cols: the number of columns in B
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &C_end: The starting iterator of the result matrix
+         */
+
+        const size_type inner = ( size_type )( A_end - A_begin ) / rows;
+        TARDIGRADE_ERROR_TOOLS_CHECK( inner == ( size_type )( B_end - B_begin ) / cols, "A and B have incompatible shapes" );
+
+        std::fill( C_begin, C_end, 0 );
+
+        for ( unsigned int K = 0; K < inner; K++ ){
+
+            for ( unsigned int I = 0; I < rows; I++ ){
+
+                for ( unsigned int J = 0; J < cols; J++ ){
+
+                    *( C_begin + cols * I + J ) += ( *( A_begin + rows * K + I ) ) * ( *( B_begin + cols * K + J ) );
+
+                }
+
+            }
+
+        }
+
     }
 
     template<typename T>
@@ -759,29 +1002,89 @@ namespace tardigradeVectorTools{
 
         TARDIGRADE_ERROR_TOOLS_CHECK( B.size( ) != 0, "B has no rows" );
 
-        size_type Brows = B.size();
         size_type Bcols = B[0].size();
-
-        TARDIGRADE_ERROR_TOOLS_CHECK( Arows == Brows, "A and B have incompatible shapes" );
 
         //Perform the matrix multiplication
         std::vector< std::vector< T > > C(Acols, std::vector< T >(Bcols, 0));
 
-        for (unsigned int I=0; I<Acols; I++){
+        Tdot<T>( std::begin( A ), std::end( A ), std::begin( B ), std::end( B ), std::begin( C ), std::end( C ) );
 
-            for (unsigned int J=0; J<Bcols; J++){
-
-                for (unsigned int K=0; K<Brows; K++){
-
-                    TARDIGRADE_ERROR_TOOLS_CHECK( B[K].size() == Bcols, "B is not a regular matrix" )
-
-                    TARDIGRADE_ERROR_TOOLS_CHECK( A[K].size() == Acols, "A is not a regular matrix" )
-
-                    C[I][J] += A[K][I] * B[K][J];
-                }
-            }
-        }
         return C;
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void TdotT(const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end){
+        /*!
+         * Compute the dot product between two matrices where both are transposed i.e. C_{ij} = A_{ki} B_{jk}
+         *
+         * \param &A_begin: The starting iterator for the first matrix
+         * \param &A_end: The starting iterator for the first matrix
+         * \param &B_begin: The starting iterator for the second matrix
+         * \param &B_end: The starting iterator for the second matrix
+         * \param &C_begin: The starting iterator for the result matrix
+         * \param &C_end: The starting iterator for the result matrix
+         */
+
+        const size_type inner = ( size_type )( A_end - A_begin );
+        const size_type rows  = ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) );
+        const size_type cols  = ( size_type )( B_end - B_begin );
+
+        for ( auto Ci = C_begin; Ci != C_end; Ci++ ){
+
+            std::fill( std::begin( *Ci ), std::end( *Ci ), 0 );
+
+        }
+
+        for ( unsigned int J = 0; J < cols; J++ ){
+
+            for ( unsigned int K = 0; K < inner; K++ ){
+
+                for ( unsigned int I = 0; I < rows; I++ ){
+
+                    ( *( C_begin + I ) )[ J ] += ( *( A_begin + K ) )[ I ] * ( *( B_begin + J ) )[ K ];
+
+                }
+
+            }
+
+        }    
+
+    }
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorTdotT(const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end){
+        /*!
+         * Compute the dot product between two matrices where both are transposed i.e. C_{ij} = A_{ki} B_{jk}
+         *
+         * \param &A_begin: The starting iterator for the first matrix
+         * \param &A_end: The starting iterator for the first matrix
+         * \param &B_begin: The starting iterator for the second matrix
+         * \param &B_end: The starting iterator for the second matrix
+         * \param rows: The number of columns in A
+         * \param cols: the number of rows in B
+         * \param &C_begin: The starting iterator for the result matrix
+         * \param &C_end: The starting iterator for the result matrix
+         */
+
+        const size_type inner = ( size_type )( A_end - A_begin ) / rows;
+
+        std::fill( C_begin, C_end, 0 );
+
+        for ( unsigned int J = 0; J < cols; J++ ){
+
+            for ( unsigned int K = 0; K < inner; K++ ){
+
+                for ( unsigned int I = 0; I < rows; I++ ){
+
+                    *( C_begin + cols * I + J ) += ( *( A_begin + rows * K + I ) ) * ( *( B_begin + inner * J + K ) );
+
+                }
+
+            }
+
+        }    
+
     }
 
     template<typename T>
@@ -793,16 +1096,14 @@ namespace tardigradeVectorTools{
          * \param &B: The second matrix
          */
 
-        std::vector< std::vector< T > > CT = dot(B, A);
+        TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) > 0, "A has no size" );
 
-        std::vector< std::vector< T > > C(CT[0].size(), std::vector< T > (CT.size()));
+        std::vector< std::vector< T > > C( A[ 0 ].size( ), std::vector< T >( B.size( ), 0 ) );
 
-        for (unsigned int i=0; i<C.size(); i++){
-            for (unsigned int j=0; j<C[i].size(); j++){
-                C[i][j] = CT[j][i];
-            }
-        }
+        TdotT<T>( std::begin( A ), std::end( A ), std::begin( B ), std::end( B ), std::begin( C ), std::end( C ) );
+
         return C;
+
     }
 
     template<typename T>

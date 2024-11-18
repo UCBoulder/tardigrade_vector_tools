@@ -136,17 +136,47 @@ namespace tardigradeVectorTools{
     template<typename T>
     std::vector< T > dot(const std::vector< std::vector< T > > &A, const std::vector< T > &b);
 
+    template<typename T, class M_in, class v_in, class v_out>
+    void Tdot( const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end );
+
+    template<typename T, class M_in, class v_in, class v_out>
+    void rowMajorTdot( const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end, v_out c_begin, v_out c_end );
+
     template<typename T>
     std::vector< T > Tdot(const std::vector< std::vector< T > > &A, const std::vector< T > &b);
+
+    template<typename T, class M_in, class M_out>
+    void dot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end );
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorDot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end );
 
     template<typename T>
     std::vector< std::vector< T > > dot(const std::vector< std::vector< T > > &A, const std::vector< std::vector< T > > &B);
 
+    template<typename T, class M_in, class M_out>
+    void dotT( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end );
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorDotT( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end );
+
     template<typename T>
     std::vector< std::vector< T > > dotT(const std::vector< std::vector< T > > &A, const std::vector< std::vector< T > > &B);
 
+    template<typename T, class M_in, class M_out>
+    void Tdot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end );
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorTDot( const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end );
+
     template<typename T>
     std::vector< std::vector< T > > Tdot(const std::vector< std::vector< T > > &A, const std::vector< std::vector< T > > &B);
+
+    template<typename T, class M_in, class M_out>
+    void rowMajorTdotT(const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, const size_type rows, const size_type cols, M_out C_begin, M_out C_end);
+
+    template<typename T, class M_in, class M_out>
+    void TdotT(const M_in &A_begin, const M_in &A_end, const M_in &B_begin, const M_in &B_end, M_out C_begin, M_out C_end);
 
     template<typename T>
     std::vector< std::vector< T > > TdotT(const std::vector< std::vector< T > > &A, const std::vector< std::vector< T > > &B);
