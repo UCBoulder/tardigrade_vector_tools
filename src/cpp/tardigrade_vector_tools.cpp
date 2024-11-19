@@ -1189,6 +1189,59 @@ namespace tardigradeVectorTools{
         return result;
     }
 
+    template<typename T, class M_in>
+    void rowMajorTrace(const M_in &A_begin, const M_in &A_end, const size_type rows, T &v){
+        /*!
+         * Compute the trace of a matrix ( \f$A\f$ ) in row major format:
+         *
+         * \f$v = A_{ii}\f$
+         * 
+         * If \f$A\f$ is non-square it will sum the values on the diagonal
+         *
+         * \param &A_begin: The starting iterator of the matrix in row major format ( \f$A\f$ )
+         * \param &A_end: The stopping iterator of the matrix in row major format ( \f$A\f$ )
+         * \param &rows: The number of rows in the matrix
+         * \param &v: The scalar output quantity ( \f$v\f$ )
+         */
+
+        const size_type cols  = ( size_type )( A_end - A_begin ) / rows;
+        const size_type bound = std::min( rows, cols );
+
+        v = 0;
+
+        for ( unsigned int i = 0; i < bound; i++ ){
+
+            v += *( A_begin + cols * i + i );
+
+        }
+        
+    }
+
+    template<typename T, class M_in>
+    void trace(const M_in &A_begin, const M_in &A_end, T &v){
+        /*!
+         * Compute the trace of a matrix
+         *
+         * \f$v = A_{ii}\f$
+         * 
+         * If \f$A\f$ is non-square it will sum the values on the diagonal
+         *
+         * \param &A: The matrix
+         * \param &v: The scalar output quantity
+         */
+
+        const size_type cols  = ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) );
+        const size_type bound = std::min( ( size_type )( A_end - A_begin ), cols );
+
+        v = 0;
+
+        for ( unsigned int i = 0; i < bound; i++ ){
+
+            v += ( *( A_begin + i ) )[ i ];
+
+        }
+
+    }
 
     template<typename T>
     int trace(const std::vector< T > &A, T &v){
@@ -1206,13 +1259,7 @@ namespace tardigradeVectorTools{
         unsigned int dimension = std::round(std::sqrt(length));
         TARDIGRADE_ERROR_TOOLS_CHECK( dimension*dimension == length, "The trace can only be computed for square matrices.")
 
-        //Set v to zero
-        v = 0;
-
-        //Compute the trace
-        for (size_type i=0; i<dimension; i++){
-            v += A[dimension*i + i];
-        }
+        rowMajorTrace( std::begin( A ), std::end( A ), dimension, v );
 
         return 0;
     }
@@ -1244,9 +1291,7 @@ namespace tardigradeVectorTools{
          */
 
         //Convert matrix to row major vector format
-        std::vector< T > Avec = appendVectors(A);
-
-        trace(Avec, v);
+        trace( std::begin( A ), std::end( A ), v );
         return 0;
     }
 
