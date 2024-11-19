@@ -1349,6 +1349,24 @@ namespace tardigradeVectorTools{
         return std::sqrt(v);
     }
 
+    template<typename T, class v_in, class v_out>
+    void unitVector(const v_in &v_begin, const v_in &v_end, v_out unit_begin, v_out unit_end){
+        /*!
+         * Compute the unit vector v i.e. \f$v_j / (v_i v_i)^(0.5)\f$
+         *
+         * \param &v_begin: The starting iterator of the vector
+         * \param &v_end:   The stopping iterator of the vector
+         * \param &unit_begin: The starting iterator of the unit vector
+         * \param &unit_end:   The stopping iterator of the unit vector
+         */
+
+        T norm = l2norm<T>(v_begin, v_end);
+
+        std::transform( v_begin, v_end, unit_begin, std::bind( std::multiplies<T>( ), std::placeholders::_1, 1 / norm ) );
+
+    }
+
+
     template<typename T>
     std::vector< double > unitVector(const std::vector< T > &v){
         /*!
@@ -1356,9 +1374,12 @@ namespace tardigradeVectorTools{
          *
          * \param &v: The vector to compute the norm of
          */
-        //Recast the incoming vectors as double
-        std::vector< double > vDouble(v.begin(), v.end());
-        return vDouble / l2norm(vDouble);
+
+        std::vector< double > unit( v.size( ) );
+
+        unitVector<double>( std::begin( v ), std::end( v ), std::begin( unit ), std::end( unit ) );
+
+        return unit;
     }
 
     template<typename T>

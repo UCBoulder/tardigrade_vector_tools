@@ -220,6 +220,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     double l2norm(const std::vector< std::vector< T > > &A);
 
+    template<typename T, class v_in, class v_out>
+    void unitVector(const v_in &v_begin, const v_in &v_end, v_out unit_begin, v_out unit_end);
+
     template<typename T>
     std::vector< double > unitVector(const std::vector< T > &v);
 
