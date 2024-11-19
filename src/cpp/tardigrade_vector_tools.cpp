@@ -1382,14 +1382,60 @@ namespace tardigradeVectorTools{
         return unit;
     }
 
+    template<typename T, class v_in, class M_out>
+    void dyadic( const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, M_out A_begin, M_out A_end ){
+        /*!
+         * Compute the dyadic product between two vectors i.e., \f$ A_{ij} = a_i b_j \f$
+         *
+         * \param &a_begin: The starting iterator for vector a
+         * \param &a_end: The stopping iterator for vector a
+         * \param &b_begin: The starting iterator for vector b
+         * \param &b_end: The stopping iterator for vector b
+         * \param &A_begin: The starting iterator for matrix A
+         * \param &A_end: The stopping iterator for matrix A
+         */
+
+        for ( auto ai = a_begin; ai != a_end; ai++ ){
+
+            std::transform( b_begin, b_end, std::begin( *( A_begin + ( size_type )( ai - a_begin ) ) ), std::bind( std::multiplies<T>( ), std::placeholders::_1, *ai ) );
+
+        }
+
+    }
+
+    template<typename T, class v_in, class M_out>
+    void rowMajorDyadic( const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, M_out A_begin, M_out A_end ){
+        /*!
+         * Compute the dyadic product between two vectors i.e., \f$ A_{ij} = a_i b_j \f$
+         *
+         * \param &a_begin: The starting iterator for vector a
+         * \param &a_end: The stopping iterator for vector a
+         * \param &b_begin: The starting iterator for vector b
+         * \param &b_end: The stopping iterator for vector b
+         * \param &A_begin: The starting iterator for matrix A
+         * \param &A_end: The stopping iterator for matrix A
+         */
+
+        const size_type cols = ( size_type )( b_end - b_begin );
+
+        for ( auto ai = a_begin; ai != a_end; ai++ ){
+
+            std::transform( b_begin, b_end, A_begin + cols * ( size_type )( ai - a_begin ), std::bind( std::multiplies<T>( ), std::placeholders::_1, *ai ) );
+
+        } 
+
+    }
+
     template<typename T>
     std::vector< std::vector< T > > dyadic(const std::vector< T > &a, const std::vector< T > &b){
         /*!
          * Compute the dyadic product between two vectors returning a matrix i.e. A_ij = a_i b_j;
          */
 
-        std::vector< std::vector< T > > A;
-        dyadic(a, b, A);
+        std::vector< std::vector< T > > A( a.size( ), std::vector< T >( b.size( ) ) );
+
+        dyadic<T>( std::begin( a ), std::end( a ), std::begin( b ), std::end( b ), std::begin( A ), std::end( A ) );
+
         return A;
     }
 

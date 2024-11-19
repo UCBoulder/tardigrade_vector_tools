@@ -226,6 +226,12 @@ namespace tardigradeVectorTools{
     template<typename T>
     std::vector< double > unitVector(const std::vector< T > &v);
 
+    template<typename T, class v_in, class M_out>
+    void dyadic( const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, M_out A_begin, M_out A_end );
+
+    template<typename T, class v_in, class M_out>
+    void rowMajorDyadic( const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, M_out A_begin, M_out A_end );
+
     template<typename T>
     std::vector< std::vector< T > > dyadic(const std::vector< T > &a, const std::vector< T > &b);
 

@@ -1104,6 +1104,12 @@ BOOST_AUTO_TEST_CASE( test_dyadic, * boost::unit_test::tolerance( DEFAULT_TEST_T
 
     BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == answer, CHECK_PER_ELEMENT );
 
+    vectorType flat_A( 9, 0 );
+
+    tardigradeVectorTools::rowMajorDyadic<floatType>( std::begin( v1 ), std::end( v1 ), std::begin( v2 ), std::end( v2 ), std::begin( flat_A ), std::end( flat_A ) );
+
+    BOOST_TEST( flat_A == answer, CHECK_PER_ELEMENT );
+
 }
 
 BOOST_AUTO_TEST_CASE( test_eye, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
