@@ -1310,6 +1310,19 @@ namespace tardigradeVectorTools{
         return v;
     }
 
+    template<typename T, class v_in>
+    T l2norm(const v_in &v_begin, const v_in &v_end){
+        /*!
+         * Compute the l2 norm of the vector v i.e. \f$ \sqrt{ v_i v_i } \f$
+         * 
+         * \param &v_begin: The starting iterator of v
+         * \param &v_end: The ending iterator of v
+         */
+
+        return std::sqrt( std::inner_product( v_begin, v_end, v_begin, T( ) ) );
+
+    }
+
     template<typename T>
     double l2norm(const std::vector< T > &v){
         /*!
@@ -1318,7 +1331,7 @@ namespace tardigradeVectorTools{
          * \param &v: The vector to compute the norm of
          */
 
-        return std::sqrt(dot(v, v));
+        return l2norm<double>( std::begin( v ), std::end( v ) );
     }
 
     template<typename T>
@@ -1330,8 +1343,8 @@ namespace tardigradeVectorTools{
          */
 
         double v=0;
-        for (auto it=A.begin(); it!=A.end(); it++){
-            v += dot(*it, *it);
+        for (auto it=std::begin(A); it!=std::end(A); it++){
+            v += std::inner_product(std::begin(*it), std::end(*it), std::begin(*it),T());
         }
         return std::sqrt(v);
     }

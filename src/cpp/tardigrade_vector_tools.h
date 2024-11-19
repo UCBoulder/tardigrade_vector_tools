@@ -211,6 +211,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     T trace(const std::vector< std::vector< T > > &A);
 
+    template<typename T, class v_in>
+    T l2norm(const v_in &v_begin, const v_in &v_end);
+
     template<typename T>
     double l2norm(const std::vector< T > &v);
 
