@@ -1673,10 +1673,10 @@ namespace tardigradeVectorTools{
         /*!
          * Compare two matrices to determine if they are equal within a tolerance
          *
-         * \param &a_begin: The starting iterator for the first vector
-         * \param &a_end: The stopping iterator for the first vector
-         * \param &b_begin: The starting iterator for the second vector
-         * \param &b_end: The stopping iterator for the second vector
+         * \param &a_begin: The starting iterator for the first matrix
+         * \param &a_end: The stopping iterator for the first matrix
+         * \param &b_begin: The starting iterator for the second matrix
+         * \param &b_end: The stopping iterator for the second matrix
          * \param tolr: The relative tolerance
          * \param tola: The absolute tolerance
          */
@@ -1736,6 +1736,56 @@ namespace tardigradeVectorTools{
          return a == b;
     }
 
+    template<class v_in>
+    bool vectorEquals(const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end){
+        /*!
+         * Compare two vectors for exact equality
+         *
+         * \param &a_begin: The starting iterator for vector a
+         * \param &a_end: The stopping iterator for vector a
+         * \param &b_begin: The starting iterator for vector b
+         * \param &b_end: The stopping iterator for vector b
+         */
+
+        for ( std::pair< v_in, v_in > i( a_begin, b_begin ); i.first != a_end; ++i.first, ++i.second ){
+
+            if ( !equals( *i.first, *i.second ) ){
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
+    template<class M_in>
+    bool matrixEquals(const M_in &a_begin, const M_in &a_end, const M_in &b_begin, const M_in &b_end){
+        /*!
+         * Compare two matrices for exact equality
+         *
+         * \param &a_begin: The starting iterator for matrix a
+         * \param &a_end: The stopping iterator for matrix a
+         * \param &b_begin: The starting iterator for matrix b
+         * \param &b_end: The stopping iterator for matrix b
+         */
+
+        for ( std::pair< M_in, M_in > i( a_begin, b_begin ); i.first != a_end; ++i.first, ++i.second ){
+
+            if ( !vectorEquals( std::begin( *i.first ), std::end( *i.first ), std::begin( *i.second ), std::end( *i.second ) ) ){
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
     template<typename T>
     bool equals(const std::vector< T > &a, const std::vector< T > &b){
         /*!
@@ -1744,16 +1794,9 @@ namespace tardigradeVectorTools{
          * \param &a: The first vector to compare
          * \param &b: The second vector to compare
          */
-        unsigned int size = a.size();
-        if (size != b.size()){
-            return false;
-        }
-        for (unsigned int i=0; i<size; i++){
-            if (!equals(a[i], b[i])){
-                return false;
-            }
-        }
-        return true;
+
+        return vectorEquals( std::begin( a ), std::end( a ), std::begin( b ), std::end( b ) );
+
     }
 
     template<typename T>
@@ -1765,16 +1808,8 @@ namespace tardigradeVectorTools{
          * \param &b: The second matrix to compare
          */
 
-        unsigned int size = a.size();
-        if (size != b.size()){
-            return false;
-        }
-        for (unsigned int i=0; i<size; i++){
-            if (!equals(a[i], b[i])){
-                return false;
-            }
-        }
-        return true;
+        return matrixEquals( std::begin( a ), std::end( a ), std::begin( b ), std::end( b ) );
+
     }
 
     template<typename T>
