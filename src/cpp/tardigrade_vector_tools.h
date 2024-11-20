@@ -285,6 +285,12 @@ namespace tardigradeVectorTools{
     template<typename T>
     bool equals(const T &a, const T &b);
 
+    template<class v_in>
+    bool vectorEquals(const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end);
+
+    template<class M_in>
+    bool matrixEquals(const M_in &a_begin, const M_in &a_end, const M_in &b_begin, const M_in &b_end);
+
     template<typename T>
     bool equals(const std::vector< T > &a, const std::vector< T > &b);
 
