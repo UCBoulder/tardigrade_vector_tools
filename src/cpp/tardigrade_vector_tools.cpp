@@ -1643,6 +1643,58 @@ namespace tardigradeVectorTools{
         return fabs(a-b)<tol;
     }
 
+    template<class v_in>
+    bool vectorFuzzyEquals(const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, double tolr, double tola){
+        /*!
+         * Compare two vectors to determine if they are equal within a tolerance
+         *
+         * \param &a_begin: The starting iterator for the first vector
+         * \param &a_end: The stopping iterator for the first vector
+         * \param &b_begin: The starting iterator for the second vector
+         * \param &b_end: The stopping iterator for the second vector
+         * \param tolr: The relative tolerance
+         * \param tola: The absolute tolerance
+         */
+
+        for ( std::pair<v_in, v_in> i( a_begin, b_begin ); i.first != a_end; ++i.first, ++i.second ){
+
+            if ( !fuzzyEquals( *i.first, *i.second, tolr, tola ) ){
+                return false;
+            }
+
+        }
+
+        return true;
+
+    }
+
+    template<class M_in>
+    bool matrixFuzzyEquals(const M_in &a_begin, const M_in &a_end, const M_in &b_begin, const M_in &b_end, double tolr, double tola){
+        /*!
+         * Compare two matrices to determine if they are equal within a tolerance
+         *
+         * \param &a_begin: The starting iterator for the first vector
+         * \param &a_end: The stopping iterator for the first vector
+         * \param &b_begin: The starting iterator for the second vector
+         * \param &b_end: The stopping iterator for the second vector
+         * \param tolr: The relative tolerance
+         * \param tola: The absolute tolerance
+         */
+
+        for ( std::pair<M_in, M_in> i( a_begin, b_begin ); i.first != a_end; ++i.first, ++i.second ){
+
+            if ( !vectorFuzzyEquals( std::begin( *i.first ), std::end( *i.first ), std::begin( *i.second ), std::end( *i.second ), tolr, tola ) ){
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
     template< typename T >
     bool fuzzyEquals(const std::vector< T > &a, const std::vector< T > &b, double tolr, double tola){
         /*!
@@ -1655,16 +1707,8 @@ namespace tardigradeVectorTools{
          * \param tola: The absolute tolerance
          */
 
-        if (a.size() != b.size()){
-            return false;
-        }
+        return vectorFuzzyEquals( std::begin( a ), std::end( a ), std::begin( b ), std::end( b ), tolr, tola );
 
-        for (unsigned int i=0; i<a.size(); i++){
-            if (!fuzzyEquals(a[i], b[i], tolr, tola)){
-                return false;
-            }
-        }
-        return true;
     }
 
     template< typename T >
@@ -1679,16 +1723,7 @@ namespace tardigradeVectorTools{
          * \param tola: The absolute tolerance
          */
 
-        if (A.size() != B.size()){
-            return false;
-        }
-
-        for (unsigned int i=0; i<A.size(); i++){
-            if (!fuzzyEquals(A[i], B[i], tolr, tola)){
-                return false;
-            }
-        }
-        return true;
+        return matrixFuzzyEquals( std::begin( A ), std::end( A ), std::begin( B ), std::end( B ), tolr, tola );
     }
 
     template<typename T>

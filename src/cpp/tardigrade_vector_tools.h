@@ -269,6 +269,12 @@ namespace tardigradeVectorTools{
     template<typename T>
     bool fuzzyEquals(const T &a, const T &b, double tolr=1e-6, double tola=1e-6);
 
+    template<class v_in>
+    bool vectorFuzzyEquals(const v_in &a_begin, const v_in &a_end, const v_in &b_begin, const v_in &b_end, double tolr=1e-6, double tola=1e-6);
+
+    template<class M_in>
+    bool matrixFuzzyEquals(const M_in &a_begin, const M_in &a_end, const M_in &b_begin, const M_in &b_end, double tolr=1e-6, double tola=1e-6);
+
     template<typename T>
     bool fuzzyEquals(const std::vector< T > &a, const std::vector< T > &b, double tolr=1e-6, double tola=1e-6);
 
