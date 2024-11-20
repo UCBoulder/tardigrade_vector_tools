@@ -1597,6 +1597,22 @@ namespace tardigradeVectorTools{
         return median<T>( std::begin( xcopy ), std::end( xcopy ) );
     }
 
+    template<class v_in>
+    void abs(v_in v_begin, v_in v_end){
+        /*!
+         * Take the absolute value of a vector
+         *
+         * \param v_begin: The starting iterator of the vector
+         * \param v_end: The stopping iterator of the vector
+         */
+
+        auto abs_val = [](auto val){return std::sqrt(val*val);};
+
+        std::transform( v_begin, v_end, v_begin, abs_val );
+
+    }
+        
+
     template< typename T >
     std::vector< T > abs(const std::vector< T > &x){
         /*!
@@ -1606,9 +1622,7 @@ namespace tardigradeVectorTools{
          */
 
         std::vector< T > xcopy = x;
-        for (unsigned int i=0; i<xcopy.size(); i++){
-            xcopy[i] = std::abs(xcopy[i]);
-        }
+        abs(std::begin(xcopy), std::end(xcopy));
         return xcopy;
     }
 

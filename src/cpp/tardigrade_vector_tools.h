@@ -259,6 +259,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     T median(const std::vector< T > &x);
 
+    template<class v_in>
+    void abs(v_in v_begin, v_in v_end);
+
     template<typename T>
     std::vector< T > abs(const std::vector< T > &x);
 
