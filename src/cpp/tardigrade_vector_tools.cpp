@@ -270,7 +270,7 @@ std::vector< std::vector < T > >& operator-=(std::vector< std::vector< T > > &lh
 
     TARDIGRADE_ERROR_TOOLS_CHECK( lhs_size == rhs_size, "matrices must have the same numbers of rows to add")
 
-    for (unsigned int i=0; i<lhs_size; i++){
+    for (unsigned int i=0; i<lhs_size; ++i){
         lhs[i] += -rhs[i];
     }
 
@@ -296,7 +296,7 @@ std::vector<std::vector<T>>& operator*=(std::vector<std::vector<T>> &lhs, const 
      * \param lhs: The left-hand side matrix
      * \param rhs: The right-hand side scalar
      */
-    for ( auto li=lhs.begin(); li!=lhs.end(); li++ ){
+    for ( auto li=lhs.begin(); li!=lhs.end(); ++li ){
         *li *= rhs;
     }
 
@@ -357,7 +357,7 @@ std::vector<std::vector<T>>& operator+=(std::vector<std::vector<T>> &lhs, const 
      * \param &rhs: The scalar being added to the matrix
      */
 
-    for ( auto li = lhs.begin( ); li != lhs.end( ); li++ ){
+    for ( auto li = lhs.begin( ); li != lhs.end( ); ++li ){
         *li += rhs;
     }
 
@@ -407,7 +407,7 @@ namespace tardigradeVectorTools{
 
         std::fill(v_begin, v_end, 0.);
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
             std::transform( A_begin + cols * row, A_begin + cols * ( row + 1 ), v_begin, v_begin, std::plus<T>( ) );
 
@@ -431,7 +431,7 @@ namespace tardigradeVectorTools{
         
         std::fill(v_begin, v_end, 0.);
 
-        for ( auto row = A_begin; row != A_end; row++ ){
+        for ( auto row = A_begin; row != A_end; ++row ){
             std::transform(std::begin(*row), std::end(*row), v_begin, v_begin, std::plus<T>( ) );
         }
 
@@ -595,7 +595,7 @@ namespace tardigradeVectorTools{
         const size_type cols = ( size_type )( b_end - b_begin );
         const size_type rows = ( size_type )( A_end - A_begin ) / cols;
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
             *( c_begin + row ) = std::inner_product( A_begin + cols * row, A_begin + cols * ( row + 1 ), b_begin, T( ) );
 
@@ -619,7 +619,7 @@ namespace tardigradeVectorTools{
         std::fill( c_begin, c_end, 0 );
 
         const size_type size = ( size_type )( A_end - A_begin );
-        for ( unsigned int i = 0; i < size; i++ ){
+        for ( unsigned int i = 0; i < size; ++i ){
 
             *( c_begin + i ) = std::inner_product( std::begin( *( A_begin + i ) ), std::end( *( A_begin + i ) ), b_begin, T( ) );
 
@@ -663,9 +663,9 @@ namespace tardigradeVectorTools{
         const size_type rows = ( size_type )( b_end - b_begin );
         const size_type cols = ( size_type )( c_end - c_begin );
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
-            for ( unsigned int col = 0; col < cols; col++ ){
+            for ( unsigned int col = 0; col < cols; ++col ){
 
                 *( c_begin + col ) += ( *( A_begin + row ) )[ col ] * ( *( b_begin + row ) );
 
@@ -693,9 +693,9 @@ namespace tardigradeVectorTools{
         const size_type rows = ( size_type )( b_end - b_begin );
         const size_type cols = ( size_type )( c_end - c_begin );
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
-            for ( unsigned int col = 0; col < cols; col++ ){
+            for ( unsigned int col = 0; col < cols; ++col ){
 
                 *( c_begin + col ) += ( *( A_begin + cols * row + col ) ) * ( *( b_begin + row ) );
 
@@ -747,13 +747,13 @@ namespace tardigradeVectorTools{
 
         TARDIGRADE_ERROR_TOOLS_CHECK( ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) ) == ( size_type )( B_end - B_begin ), "A and B have incompatible shapes" );
 
-        for ( unsigned int I = 0; I < rows; I++ ){
+        for ( unsigned int I = 0; I < rows; ++I ){
 
             std::fill( std::begin( *( C_begin + I ) ), std::end( *( C_begin + I ) ), 0 );
 
-            for ( unsigned int K = 0; K < inner; K++ ){
+            for ( unsigned int K = 0; K < inner; ++K ){
 
-                for ( unsigned int J = 0; J < cols; J++ ){
+                for ( unsigned int J = 0; J < cols; ++J ){
 
                     ( *( C_begin + I ) )[ J ] += ( *( A_begin + I ) )[ K ] * ( *( B_begin + K ) )[ J ];
 
@@ -784,13 +784,13 @@ namespace tardigradeVectorTools{
 
         TARDIGRADE_ERROR_TOOLS_CHECK( inner == ( size_type )( B_end - B_begin ) / cols, "The shapes of A and B are inconsistent" );
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
             std::fill( C_begin + cols * row, C_begin + cols * ( row + 1 ), 0 );
 
-            for ( unsigned int K = 0; K < inner; K++ ){
+            for ( unsigned int K = 0; K < inner; ++K ){
 
-                for ( unsigned int col = 0; col < cols; col++ ){
+                for ( unsigned int col = 0; col < cols; ++col ){
 
                     *( C_begin + cols * row + col ) += ( *( A_begin + inner * row + K ) ) * ( *( B_begin + cols * K + col ) );
 
@@ -841,9 +841,9 @@ namespace tardigradeVectorTools{
         const size_type rows = ( size_type )( A_end - A_begin );
         const size_type cols = ( size_type )( B_end - B_begin );
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
-            for ( unsigned int col = 0; col < cols; col++ ){
+            for ( unsigned int col = 0; col < cols; ++col ){
 
                 ( *( C_begin + row ) )[ col ] = std::inner_product( std::begin( *( A_begin + row ) ), std::end( *( A_begin + row ) ),
                                                                     std::begin( *( B_begin + col ) ), T( ) );
@@ -871,9 +871,9 @@ namespace tardigradeVectorTools{
 
         const size_type inner = ( size_type )( A_end - A_begin ) / rows;
 
-        for ( unsigned int row = 0; row < rows; row++ ){
+        for ( unsigned int row = 0; row < rows; ++row ){
 
-            for ( unsigned int col = 0; col < cols; col++ ){
+            for ( unsigned int col = 0; col < cols; ++col ){
 
                 *( C_begin + cols * row + col ) = std::inner_product( A_begin + inner * row, A_begin + inner * ( row + 1 ),
                                                                       B_begin + inner * col, T( ) );
@@ -927,17 +927,17 @@ namespace tardigradeVectorTools{
         const size_type rows  = ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) );
         const size_type cols  = ( size_type )( std::end( *B_begin ) - std::begin( *B_begin ) );
 
-        for ( auto Ci = C_begin; Ci != C_end; Ci++ ){
+        for ( auto Ci = C_begin; Ci != C_end; ++Ci ){
 
             std::fill( std::begin( *Ci ), std::end( *Ci ), 0 );
 
         }
 
-        for ( unsigned int K = 0; K < inner; K++ ){
+        for ( unsigned int K = 0; K < inner; ++K ){
 
-            for ( unsigned int I = 0; I < rows; I++ ){
+            for ( unsigned int I = 0; I < rows; ++I ){
 
-                for ( unsigned int J = 0; J < cols; J++ ){
+                for ( unsigned int J = 0; J < cols; ++J ){
 
                     ( *( C_begin + I ) )[ J ] += ( *( A_begin + K ) )[ I ] * ( *( B_begin + K ) )[ J ];
 
@@ -969,11 +969,11 @@ namespace tardigradeVectorTools{
 
         std::fill( C_begin, C_end, 0 );
 
-        for ( unsigned int K = 0; K < inner; K++ ){
+        for ( unsigned int K = 0; K < inner; ++K ){
 
-            for ( unsigned int I = 0; I < rows; I++ ){
+            for ( unsigned int I = 0; I < rows; ++I ){
 
-                for ( unsigned int J = 0; J < cols; J++ ){
+                for ( unsigned int J = 0; J < cols; ++J ){
 
                     *( C_begin + cols * I + J ) += ( *( A_begin + rows * K + I ) ) * ( *( B_begin + cols * K + J ) );
 
@@ -1030,17 +1030,17 @@ namespace tardigradeVectorTools{
         const size_type rows  = ( size_type )( std::end( *A_begin ) - std::begin( *A_begin ) );
         const size_type cols  = ( size_type )( B_end - B_begin );
 
-        for ( auto Ci = C_begin; Ci != C_end; Ci++ ){
+        for ( auto Ci = C_begin; Ci != C_end; ++Ci ){
 
             std::fill( std::begin( *Ci ), std::end( *Ci ), 0 );
 
         }
 
-        for ( unsigned int J = 0; J < cols; J++ ){
+        for ( unsigned int J = 0; J < cols; ++J ){
 
-            for ( unsigned int K = 0; K < inner; K++ ){
+            for ( unsigned int K = 0; K < inner; ++K ){
 
-                for ( unsigned int I = 0; I < rows; I++ ){
+                for ( unsigned int I = 0; I < rows; ++I ){
 
                     ( *( C_begin + I ) )[ J ] += ( *( A_begin + K ) )[ I ] * ( *( B_begin + J ) )[ K ];
 
@@ -1071,11 +1071,11 @@ namespace tardigradeVectorTools{
 
         std::fill( C_begin, C_end, 0 );
 
-        for ( unsigned int J = 0; J < cols; J++ ){
+        for ( unsigned int J = 0; J < cols; ++J ){
 
-            for ( unsigned int K = 0; K < inner; K++ ){
+            for ( unsigned int K = 0; K < inner; ++K ){
 
-                for ( unsigned int I = 0; I < rows; I++ ){
+                for ( unsigned int I = 0; I < rows; ++I ){
 
                     *( C_begin + cols * I + J ) += ( *( A_begin + rows * K + I ) ) * ( *( B_begin + inner * J + K ) );
 
@@ -1209,7 +1209,7 @@ namespace tardigradeVectorTools{
 
         v = 0;
 
-        for ( unsigned int i = 0; i < bound; i++ ){
+        for ( unsigned int i = 0; i < bound; ++i ){
 
             v += *( A_begin + cols * i + i );
 
@@ -1235,7 +1235,7 @@ namespace tardigradeVectorTools{
 
         v = 0;
 
-        for ( unsigned int i = 0; i < bound; i++ ){
+        for ( unsigned int i = 0; i < bound; ++i ){
 
             v += ( *( A_begin + i ) )[ i ];
 
@@ -1343,7 +1343,7 @@ namespace tardigradeVectorTools{
          */
 
         double v=0;
-        for (auto it=std::begin(A); it!=std::end(A); it++){
+        for (auto it=std::begin(A); it!=std::end(A); ++it){
             v += std::inner_product(std::begin(*it), std::end(*it), std::begin(*it),T());
         }
         return std::sqrt(v);
@@ -1395,7 +1395,7 @@ namespace tardigradeVectorTools{
          * \param &A_end: The stopping iterator for matrix A
          */
 
-        for ( auto ai = a_begin; ai != a_end; ai++ ){
+        for ( auto ai = a_begin; ai != a_end; ++ai ){
 
             std::transform( b_begin, b_end, std::begin( *( A_begin + ( size_type )( ai - a_begin ) ) ), std::bind( std::multiplies<T>( ), std::placeholders::_1, *ai ) );
 
@@ -1418,7 +1418,7 @@ namespace tardigradeVectorTools{
 
         const size_type cols = ( size_type )( b_end - b_begin );
 
-        for ( auto ai = a_begin; ai != a_end; ai++ ){
+        for ( auto ai = a_begin; ai != a_end; ++ai ){
 
             std::transform( b_begin, b_end, A_begin + cols * ( size_type )( ai - a_begin ), std::bind( std::multiplies<T>( ), std::placeholders::_1, *ai ) );
 
@@ -1449,16 +1449,12 @@ namespace tardigradeVectorTools{
          * \param &A: The returned matrix
          */
 
-        A.resize(a.size());
-        unsigned int i=0;
-        for (auto ai=a.begin(); ai!=a.end(); ai++, i++){
-            A[i].resize(b.size());
-            unsigned int j=0;
-            for (auto bj=b.begin(); bj!=b.end(); bj++, j++){
-                A[i][j] = (*ai)*(*bj);
-            }
-        }
+        A = std::vector< std::vector< T > >( a.size( ), std::vector< T >( b.size( ), 0 ) );
+
+        dyadic( std::begin( a ), std::end( a ), std::begin( b ), std::end( b ), std::begin( A ), std::end( A ) );
+
         return 0;
+
     }
 
     template<class v_in>
@@ -1475,7 +1471,7 @@ namespace tardigradeVectorTools{
 
         std::fill( v_begin, v_end, 0 );
 
-        for ( unsigned int i = 0; i < bound; i++ ){
+        for ( unsigned int i = 0; i < bound; ++i ){
 
             *( v_begin + cols * i + i ) = 1;
 
@@ -1494,7 +1490,7 @@ namespace tardigradeVectorTools{
 
         const size_type bound = std::min( ( size_type )( M_end - M_begin ), ( size_type )( std::end( *M_begin ) - std::begin( *M_end ) ) );
 
-        for ( unsigned int row = 0; row < bound; row++ ){
+        for ( unsigned int row = 0; row < bound; ++row ){
 
             ( *( M_begin + row ) )[ row] = 1;
 
@@ -1920,7 +1916,7 @@ namespace tardigradeVectorTools{
             }
         )
         TARDIGRADE_ERROR_TOOLS_CATCH(
-            for ( unsigned int row=0; row<verifyVectorOne.size( ); row++ ){
+            for ( unsigned int row=0; row<verifyVectorOne.size( ); ++row ){
                 verifyLength( verifyVectorOne[ row ], verifyVectorTwo[ row ] );
             }
         )
@@ -1942,7 +1938,7 @@ namespace tardigradeVectorTools{
         subv.resize(indices.size());
 
         unsigned int i=0;
-        for (auto it=indices.begin(); it!=indices.end(); it++, i++){
+        for (auto it=indices.begin(); it!=indices.end(); ++it, ++i){
             subv[i] = v[*it];
         }
         return 0;
@@ -1985,7 +1981,7 @@ namespace tardigradeVectorTools{
 
         std::vector< T > v( rows, 0 );
 
-        for ( unsigned int i = 0; i < rows; i++ ){
+        for ( unsigned int i = 0; i < rows; ++i ){
 
             v[ i ] += A[ cols * i + col ];
 
@@ -2005,7 +2001,7 @@ namespace tardigradeVectorTools{
 
         std::vector< T > Avec;
 
-        for (auto Ai=A.begin(); Ai!=A.end(); Ai++){
+        for (auto Ai=A.begin(); Ai!=A.end(); ++Ai){
             Avec.insert(Avec.end(), (*Ai).begin(), (*Ai).end());
         }
         return Avec;
@@ -2020,7 +2016,7 @@ namespace tardigradeVectorTools{
          */
 
         std::vector< T > Avec;
-        for (auto li=list.begin(); li!=list.end(); li++){
+        for (auto li=list.begin(); li!=list.end(); ++li){
             Avec.insert(Avec.end(), (*li).begin(), (*li).end());
         }
         return Avec;
@@ -2040,8 +2036,8 @@ namespace tardigradeVectorTools{
 
         std::vector< std::vector< T > > A( nrows, std::vector< T >( ncols ) );
 
-        for ( unsigned int i = 0; i < nrows; i++ ){
-            for ( unsigned int j = 0; j < ncols; j++ ){
+        for ( unsigned int i = 0; i < nrows; ++i ){
+            for ( unsigned int j = 0; j < ncols; ++j ){
                 A[i][j] = Avec[ i * ncols + j ];
             }
         }
@@ -2078,7 +2074,7 @@ namespace tardigradeVectorTools{
          * \param &v: The vector to be displayed
          */
 
-        for (auto it = v.begin(); it!=v.end(); it++){
+        for (auto it = v.begin(); it!=v.end(); ++it){
             std::cout << *it << " ";
         }
         std::cout << "\n";
@@ -2093,7 +2089,7 @@ namespace tardigradeVectorTools{
          * \param &A: The matrix to be displayed
          */
 
-        for (auto it = A.begin(); it!=A.end(); it++){
+        for (auto it = A.begin(); it!=A.end(); ++it){
             print(*it);
         }
         return 0;
@@ -2249,21 +2245,21 @@ namespace tardigradeVectorTools{
                                                               "\n  dim * dim: " + std::to_string( dim ) + "\n" )
 
         std::vector< T > X( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; i++ ){ X[ dim * i + i ] = 1; }
+        for ( unsigned int i = 0; i < dim; ++i ){ X[ dim * i + i ] = 1; }
 
         expA = X;
 
         double tol = tola * std::fabs( l2norm( A ) ) + tolr;
 
-        for ( unsigned int n = 1; n < nmax; n++ ){
+        for ( unsigned int n = 1; n < nmax; ++n ){
 
             std::vector< T > Xn( dim * dim, 0 );
 
-            for ( unsigned int i = 0; i < dim; i++ ){
+            for ( unsigned int i = 0; i < dim; ++i ){
 
-                for ( unsigned int j = 0; j < dim; j++ ){
+                for ( unsigned int j = 0; j < dim; ++j ){
 
-                    for ( unsigned int k = 0; k < dim; k++ ){
+                    for ( unsigned int k = 0; k < dim; ++k ){
 
                         Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
 
@@ -2307,7 +2303,7 @@ namespace tardigradeVectorTools{
                                                               "\n  dim * dim: " + std::to_string( dim ) + "\n" )
 
         std::vector< T > X( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; i++ ){ X[ dim * i + i ] = 1; }
+        for ( unsigned int i = 0; i < dim; ++i ){ X[ dim * i + i ] = 1; }
 
         expA = X;
 
@@ -2317,23 +2313,23 @@ namespace tardigradeVectorTools{
 
         double tol = tola * std::fabs( l2norm( A ) ) + tolr;
 
-        for ( unsigned int n = 1; n < nmax; n++ ){
+        for ( unsigned int n = 1; n < nmax; ++n ){
 
             std::vector< T > Xn( dim * dim, 0 );
 
             std::vector< T > dXndA( dim * dim * dim * dim, 0 );
 
-            for ( unsigned int i = 0; i < dim; i++ ){
+            for ( unsigned int i = 0; i < dim; ++i ){
 
-                for ( unsigned int j = 0; j < dim; j++ ){
+                for ( unsigned int j = 0; j < dim; ++j ){
 
-                    for ( unsigned int k = 0; k < dim; k++ ){
+                    for ( unsigned int k = 0; k < dim; ++k ){
 
                         Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
 
                         dXndA[ dim * dim * dim * i + dim * dim * j + dim * k + j ] += X[ dim * i + k ];
 
-                        for ( unsigned int ab = 0; ab < dim * dim; ab++ ){
+                        for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
 
                             dXndA[ dim * dim * dim * i + dim * dim * k + ab ] += dXdA[ dim * dim * dim * i + dim * dim * j + ab ] * A[ dim * j + k ];
 
@@ -2386,17 +2382,17 @@ namespace tardigradeVectorTools{
         TARDIGRADE_ERROR_TOOLS_CATCH( computeMatrixExponential( A / m, dim, expAoverm, nmax, tola, tolr ) )
 
         expA = std::vector< T >( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; i++ ){ expA[ dim * i + i ] = 1; }
+        for ( unsigned int i = 0; i < dim; ++i ){ expA[ dim * i + i ] = 1; }
 
-        for ( unsigned int i = 0; i < m; i++ ){
+        for ( unsigned int i = 0; i < m; ++i ){
 
             std::vector< T > expAi( dim * dim, 0 );
 
-            for ( unsigned int j = 0; j < dim; j++ ){
+            for ( unsigned int j = 0; j < dim; ++j ){
 
-                for ( unsigned int k = 0; k < dim; k++ ){
+                for ( unsigned int k = 0; k < dim; ++k ){
 
-                    for ( unsigned int l = 0; l < dim; l++ ){
+                    for ( unsigned int l = 0; l < dim; ++l ){
 
                         expAi[ dim * j + l ] += expA[ dim * j + k ] * expAoverm[ dim * k + l ];
 
@@ -2439,25 +2435,25 @@ namespace tardigradeVectorTools{
         dExpAovermdA /= m;
 
         expA = std::vector< T >( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; i++ ){ expA[ dim * i + i ] = 1; }
+        for ( unsigned int i = 0; i < dim; ++i ){ expA[ dim * i + i ] = 1; }
 
         dExpAdA = std::vector< T >( dim * dim * dim * dim, 0 );
 
-        for ( unsigned int i = 0; i < m; i++ ){
+        for ( unsigned int i = 0; i < m; ++i ){
 
             std::vector< T > expAi( dim * dim, 0 );
 
             std::vector< T > dExpAidA( dim * dim * dim * dim, 0 );
 
-            for ( unsigned int j = 0; j < dim; j++ ){
+            for ( unsigned int j = 0; j < dim; ++j ){
 
-                for ( unsigned int k = 0; k < dim; k++ ){
+                for ( unsigned int k = 0; k < dim; ++k ){
 
-                    for ( unsigned int l = 0; l < dim; l++ ){
+                    for ( unsigned int l = 0; l < dim; ++l ){
 
                         expAi[ dim * j + l ] += expA[ dim * j + k ] * expAoverm[ dim * k + l ];
 
-                        for ( unsigned int ab = 0; ab < dim * dim; ab++ ){
+                        for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
 
                             dExpAidA[ dim * dim * dim * j + dim * dim * l + ab ] += dExpAdA[ dim * dim * dim * j + dim * dim * k + ab ] * expAoverm[ dim * k + l ]
                                                                                   + expA[ dim * j + k ] * dExpAovermdA[ dim * dim * dim * k + dim * dim * l + ab ];
@@ -2696,13 +2692,13 @@ namespace tardigradeVectorTools{
 
             std::vector< double > result( nrows * ncols * nrows * ncols, 0 );
 
-            for ( unsigned int i = 0; i < nrows; i++ ){
+            for ( unsigned int i = 0; i < nrows; ++i ){
 
-                for ( unsigned int j = 0; j < ncols; j++ ){
+                for ( unsigned int j = 0; j < ncols; ++j ){
 
-                    for ( unsigned int a = 0; a < nrows; a++ ){
+                    for ( unsigned int a = 0; a < nrows; ++a ){
 
-                        for ( unsigned int b = 0; b < ncols; b++ ){
+                        for ( unsigned int b = 0; b < ncols; ++b ){
 
                             result[ ncols * nrows * ncols * i + nrows * ncols * j + nrows * a + b ] = -invA[ ncols * i + a ] * invA[ ncols * b + j ];
 
@@ -2839,10 +2835,10 @@ namespace tardigradeVectorTools{
             temp *= Xmat;
             Rmat = Amat - temp;
 
-            for (unsigned int i=0; i<Arows; i++){
-                for (unsigned int j=0; j<Arows; j++){
-                    for (unsigned int k=0; k<Arows; k++){
-                         for (unsigned int l=0; l<Arows; l++){
+            for (unsigned int i=0; i<Arows; ++i){
+                for (unsigned int j=0; j<Arows; ++j){
+                    for (unsigned int k=0; k<Arows; ++k){
+                         for (unsigned int l=0; l<Arows; ++l){
                              J[Arows*i + j][Arows*k + l] = -eyeVec[Arows*i + k]*X[Arows*l + j]
                                                            -X[Arows*i + k]*eyeVec[Arows*j + l];
                          }
