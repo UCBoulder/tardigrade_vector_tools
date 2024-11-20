@@ -253,6 +253,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     int eye(const unsigned int dim, std::vector< std::vector< T > > &I);
 
+    template<typename T, class v_in>
+    T median(v_in v_begin, v_in v_end);
+
     template<typename T>
     T median(const std::vector< T > &x);
 

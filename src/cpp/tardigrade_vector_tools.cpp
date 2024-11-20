@@ -1551,6 +1551,39 @@ namespace tardigradeVectorTools{
         return 0;
     }
 
+    template<typename T, class v_in>
+    T median(v_in v_begin, v_in v_end){
+        /*!
+         * Compute the median of a vector v
+         *
+         * NOTE: This will partially re-arrange the values of the vector
+         *     If the order of the original vector is important, then a
+         *     copy should be used.
+         *
+         * \param &v_begin: The starting iterator of the vector v
+         * \param &v_end: The stopping iterator of the vector v
+         */
+
+        if ( ( v_end - v_begin ) == 0 ){
+            return 0;
+        }
+
+        const size_type n = ( size_type )( v_end - v_begin );
+
+        std::nth_element( v_begin, v_begin + n / 2, v_end );
+
+        T med = *( v_begin + n / 2 );
+
+        if ( !( n & 1 ) ){
+
+            med = ( *std::max_element( v_begin, v_begin + n / 2 ) + med ) / 2;
+
+        }
+
+        return med;
+
+    }
+
     template< typename T >
     T median(const std::vector< T > &x){
         /*!
@@ -1559,16 +1592,9 @@ namespace tardigradeVectorTools{
          * \param &x: The vector to compute the median of.
          */
 
-        unsigned int n = x.size();
         std::vector< T > xcopy = x;
-        std::sort(xcopy.begin(), xcopy.end());
 
-        if ( (n & 2) == 0){
-            return xcopy[n / 2];
-        }
-        else{
-            return 0.5*( xcopy[(n - 1)/2] + xcopy[n / 2] );
-        }
+        return median<T>( std::begin( xcopy ), std::end( xcopy ) );
     }
 
     template< typename T >
