@@ -297,6 +297,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     bool equals(const std::vector< std::vector< T > > &a, const std::vector< std::vector< T > > &b);
 
+    template<typename T, class v_in>
+    bool isParallel( v_in v1_begin, v_in v1_end, v_in v2_begin, v_in v2_end );
+
     template<typename T>
     bool isParallel( const std::vector< T > &v1, const std::vector< T > &v2 );
 

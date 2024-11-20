@@ -1808,6 +1808,26 @@ namespace tardigradeVectorTools{
 
     }
 
+    template<typename T, class v_in>
+    bool isParallel( v_in v1_begin, v_in v1_end, v_in v2_begin, v_in v2_end ){
+        /*!
+         * Compare two vecrtors and determine if they are parallel
+         *
+         * Note: The function will modify the incoming vectors
+         *
+         * \param &v1_begin: The starting iterator of vector 1
+         * \param &v1_end: The stopping iterator of vector 1
+         * \param &v2_begin: The starting iterator of vector 2
+         * \param &v2_end: The stopping iterator of vector 2
+         */
+
+        unitVector( v1_begin, v1_end );
+        unitVector( v2_begin, v2_end );
+
+        return fuzzyEquals( std::inner_product( v1_begin, v1_end, v2_begin, T( ) ), 1. );
+
+    }
+
     template<typename T>
     bool isParallel( const std::vector< T > &v1, const std::vector< T > &v2 ){
         /*!
@@ -1817,14 +1837,11 @@ namespace tardigradeVectorTools{
          * \param &v2: The second vector
          */
 
-        //Compute the unit vector for each
-        std::vector< double > nv1 = unitVector( v1 );
-        std::vector< double > nv2 = unitVector( v2 );
+        std::vector< T > cv1 = v1;
+        std::vector< T > cv2 = v2;
 
-        //Compute the distance
-        double d = std::abs(dot(nv1, nv2));
+        return isParallel<T>( std::begin( v1 ), std::end( v1 ), std::begin( v2 ), std::end( v2 ) );
 
-        return fuzzyEquals(d, 1.);
     }
 
     template<typename T>
