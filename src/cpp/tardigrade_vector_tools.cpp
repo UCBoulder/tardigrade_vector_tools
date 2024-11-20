@@ -1461,6 +1461,47 @@ namespace tardigradeVectorTools{
         return 0;
     }
 
+    template<class v_in>
+    void eye(const size_type cols, v_in v_begin, v_in v_end){
+        /*!
+         * Construct an identity tensor in row major format
+         *
+         * \param cols: The number of columns in the matrix
+         * \param v_begin: The starting iterator for the row-major identity matrix
+         * \param v_end: The stopping iterator for the row-major identiy matrix
+         */
+
+        const size_type bound = std::min( cols, ( size_type )( v_end - v_begin ) / cols );
+
+        std::fill( v_begin, v_end, 0 );
+
+        for ( unsigned int i = 0; i < bound; i++ ){
+
+            *( v_begin + cols * i + i ) = 1;
+
+        }
+
+    }
+
+    template<class M_in>
+    void eye(M_in M_begin, M_in M_end){
+        /*!
+         * Construct an identity tensor in the provided regular matrix
+         *
+         * \param &M_begin: The starting iterator for the matrix (i.e., row 0)
+         * \param &M_end: The stopping iterator for the matrix
+         */
+
+        const size_type bound = std::min( ( size_type )( M_end - M_begin ), ( size_type )( std::end( *M_begin ) - std::begin( *M_end ) ) );
+
+        for ( unsigned int row = 0; row < bound; row++ ){
+
+            ( *( M_begin + row ) )[ row] = 1;
+
+        }
+
+    }
+
     template<typename T>
     int eye(std::vector< T > &I){
         /*!
@@ -1474,11 +1515,7 @@ namespace tardigradeVectorTools{
         unsigned int dimension = std::round(std::sqrt(length));
         TARDIGRADE_ERROR_TOOLS_CHECK( dimension*dimension == length, "The identity tensor can only be constructed for square matrices.")
 
-        //Construct the identity matrix
-        I = std::vector< T >(I.size(), 0);
-        for (size_type i=0; i<dimension; i++){
-            I[dimension*i + i] = 1;
-        }
+        eye( dimension, std::begin( I ), std::end( I ) );
 
         return 0;
     }
@@ -1492,9 +1529,9 @@ namespace tardigradeVectorTools{
          */
 
         std::vector< std::vector< T > > I(dim, std::vector< T >(dim, 0));
-        for (unsigned int i=0; i<dim; i++){
-            I[i][i] = 1;
-        }
+
+        eye( std::begin( I ), std::end( I ) );
+
         return I;
     }
 
@@ -1507,7 +1544,9 @@ namespace tardigradeVectorTools{
          * \param &I: The resulting identity matrix
          */
 
-        I = eye<T>(dim);
+        I = std::vector< std::vector< T > >( dim, std::vector< T >( dim, 0 ) );
+
+        eye( std::begin( I ), std::end( I ) );
 
         return 0;
     }

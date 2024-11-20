@@ -238,6 +238,12 @@ namespace tardigradeVectorTools{
     template<typename T>
     int dyadic(const std::vector< T > &a, const std::vector< T > &b, std::vector< std::vector< T > > &A);
 
+    template<class v_in>
+    void eye(const size_type cols, v_in v_begin, v_in v_end);
+
+    template<class M_in>
+    void eye(M_in M_begin, M_in M_end);
+
     template<typename T>
     int eye(std::vector< T > &I);
 
