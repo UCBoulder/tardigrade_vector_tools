@@ -1349,6 +1349,23 @@ namespace tardigradeVectorTools{
         return std::sqrt(v);
     }
 
+    template<typename T, class v_in>
+    void unitVector(v_in v_begin, v_in v_end){
+        /*!
+         * Compute the unit vector v in place i.e. \f$v_j / (v_i v_i)^(0.5)\f$
+         *
+         * \param &v_begin: The starting iterator of the vector
+         * \param &v_end:   The stopping iterator of the vector
+         * \param &unit_begin: The starting iterator of the unit vector
+         * \param &unit_end:   The stopping iterator of the unit vector
+         */
+
+        T norm = l2norm<T>(v_begin, v_end);
+
+        std::transform( v_begin, v_end, v_begin, std::bind( std::multiplies<T>( ), std::placeholders::_1, 1 / norm ) );
+
+    }
+
     template<typename T, class v_in, class v_out>
     void unitVector(const v_in &v_begin, const v_in &v_end, v_out unit_begin, v_out unit_end){
         /*!
@@ -1811,7 +1828,7 @@ namespace tardigradeVectorTools{
     template<typename T, class v_in>
     bool isParallel( v_in v1_begin, v_in v1_end, v_in v2_begin, v_in v2_end ){
         /*!
-         * Compare two vecrtors and determine if they are parallel
+         * Compare two vectors and determine if they are parallel
          *
          * Note: The function will modify the incoming vectors
          *
@@ -1821,14 +1838,16 @@ namespace tardigradeVectorTools{
          * \param &v2_end: The stopping iterator of vector 2
          */
 
-        unitVector( v1_begin, v1_end );
-        unitVector( v2_begin, v2_end );
+        // Compute the unit vector for each
+        unitVector<T>( v1_begin, v1_end );
+        unitVector<T>( v2_begin, v2_end );
 
+        // Compare the vectors
         return fuzzyEquals( std::inner_product( v1_begin, v1_end, v2_begin, T( ) ), 1. );
 
     }
 
-    template<typename T>
+    template<typename T, typename U>
     bool isParallel( const std::vector< T > &v1, const std::vector< T > &v2 ){
         /*!
          * Compare two vectors and determine if they are parallel
@@ -1837,14 +1856,36 @@ namespace tardigradeVectorTools{
          * \param &v2: The second vector
          */
 
-        std::vector< T > cv1 = v1;
-        std::vector< T > cv2 = v2;
+        std::vector< U > cv1( std::begin( v1 ), std::end( v1 ) );
+        std::vector< U > cv2( std::begin( v2 ), std::end( v2 ) );
 
-        return isParallel<T>( std::begin( v1 ), std::end( v1 ), std::begin( v2 ), std::end( v2 ) );
+        return isParallel<U>( std::begin( cv1 ), std::end( cv1 ), std::begin( cv2 ), std::end( cv2 ) );
 
     }
 
-    template<typename T>
+    template<typename T, class v_in>
+    bool isOrthogonal( v_in v1_begin, v_in v1_end, v_in v2_begin, v_in v2_end ){
+        /*!
+         * Compare two vectors and determine if they are orthogonal
+         * 
+         * Note: The function will modify the incoming vectors
+         * 
+         * \param &v1_begin: The starting iterator of vector 1
+         * \param &v1_end: The stopping iterator of vector 1
+         * \param &v2_begin: The starting iterator of vector 2
+         * \param &v2_end: The stopping iterator of vector 2
+         */
+
+        // Compute the unit vector for each
+        unitVector<T>( v1_begin, v1_end );
+        unitVector<T>( v2_begin, v2_end );
+
+        // Compare the vectors
+        return fuzzyEquals( std::inner_product( v1_begin, v1_end, v2_begin, T( ) ), 0. );
+     
+    }
+
+    template<typename T, typename U>
     bool isOrthogonal( const std::vector< T > &v1, const std::vector< T > &v2 ){
         /*!
          * Compare two vectors and determine if they are orthogonal
@@ -1853,14 +1894,11 @@ namespace tardigradeVectorTools{
          * \param &v2: The second vector
          */
 
-        //Compute the unit vector for each
-        std::vector< double > nv1 = unitVector( v1 );
-        std::vector< double > nv2 = unitVector( v2 );
+        std::vector< U > cv1( std::begin( v1 ), std::end( v1 ) );
+        std::vector< U > cv2( std::begin( v2 ), std::end( v2 ) );
 
-        //Compute the distance
-        double d = std::abs(dot(nv1, nv2));
+        return isOrthogonal<U>( std::begin( cv1 ), std::end( cv1 ), std::begin( cv2 ), std::end( cv2 ) );
 
-        return fuzzyEquals(d, 0.);
     }
 
     template<typename T>

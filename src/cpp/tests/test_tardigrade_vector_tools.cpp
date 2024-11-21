@@ -587,6 +587,11 @@ BOOST_AUTO_TEST_CASE( test_unitVector, * boost::unit_test::tolerance( DEFAULT_TE
         vector_double = std::vector< double >( vector_int[ i ].begin( ), vector_int[ i ].end( ) );
         answer = tardigradeVectorTools::unitVector( vector_double );
         BOOST_TEST( answer == expected[ i ], boost::test_tools::per_element( ) );
+
+        std::vector< double > unit_in_place = { ( double )vector_int[ i ][ 0 ], ( double )vector_int[ i ][ 1 ], ( double )vector_int[ i ][ 2 ] };
+        tardigradeVectorTools::unitVector<double>( std::begin( unit_in_place ), std::end( unit_in_place ) );
+        BOOST_TEST( unit_in_place == expected[ i ], boost::test_tools::per_element( ) );
+
     }
 }
 

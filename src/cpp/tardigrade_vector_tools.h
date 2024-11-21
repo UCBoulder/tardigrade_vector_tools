@@ -220,6 +220,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     double l2norm(const std::vector< std::vector< T > > &A);
 
+    template<typename T, class v_in>
+    void unitVector(v_in v_begin, v_in v_end);
+
     template<typename T, class v_in, class v_out>
     void unitVector(const v_in &v_begin, const v_in &v_end, v_out unit_begin, v_out unit_end);
 
@@ -300,10 +303,13 @@ namespace tardigradeVectorTools{
     template<typename T, class v_in>
     bool isParallel( v_in v1_begin, v_in v1_end, v_in v2_begin, v_in v2_end );
 
-    template<typename T>
+    template<typename T, typename U=double>
     bool isParallel( const std::vector< T > &v1, const std::vector< T > &v2 );
 
-    template<typename T>
+    template<typename T, class v_in>
+    bool isOrthogonal( v_in v1_begin, v_in v1_end, v_in v2_begin, v_in v2_end );
+
+    template<typename T, typename U=double>
     bool isOrthogonal( const std::vector< T > &v1, const std::vector< T > &v2 );
 
     template<typename T>
