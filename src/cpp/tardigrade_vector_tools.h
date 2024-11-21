@@ -396,11 +396,28 @@ namespace tardigradeVectorTools{
     template<typename T>
     int print(const std::vector< std::vector< T > > &A);
 
+    template< class v_in, class v_out >
+    void rotationMatrix( const v_in &bungeEulerAngles_begin, const v_in &bungeEulerAngles_end,
+                         v_out directionCosines_begin,       v_out directionCosines_end );
+
+    template< class v_in, class v_out >
+    void rotationMatrix( const v_in &bungeEulerAngles_begin,  const v_in &bungeEulerAngles_end,
+                         v_out directionCosines_begin,        v_out directionCosines_end,
+                         v_out dDirectionCosinesdAlpha_begin, v_out dDirectionCosinesdAlpha_end,
+                         v_out dDirectionCosinesdBeta_begin,  v_out dDirectionCosinesdBeta_end,
+                         v_out dDirectionCosinesdGamma_begin, v_out dDirectionCosinesdGamma_end );
+
     template<typename T>
     int rotationMatrix( const std::vector< T > &bungeEulerAngles, std::vector< T > &rotationMatrix );
 
     template<typename T>
     int rotationMatrix( const std::vector< T > &bungeEulerAngles, std::vector < std::vector< T > > &directionCosines );
+
+    template<typename T>
+    int rotationMatrix( const std::vector< T > &bungeEulerAngles, std::vector < T > &directionCosines,
+                        std::vector< T > &dDirectionCosinesdAlpha,
+                        std::vector< T > &dDirectionCosinesdBeta,
+                        std::vector< T > &dDirectionCosinesdGamma );
 
     template<typename T>
     int rotationMatrix( const std::vector< T > &bungeEulerAngles, std::vector < std::vector< T > > &directionCosines,

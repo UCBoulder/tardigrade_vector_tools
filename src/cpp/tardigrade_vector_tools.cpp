@@ -2359,11 +2359,59 @@ namespace tardigradeVectorTools{
          * \param &directionCosines: Row-major vector containing the 3x3 rotation matrix
          */
 
-        std::vector< std::vector< T > > matrix;
-        int return_value;
-        return_value = rotationMatrix( bungeEulerAngles, matrix );
-        directionCosines = appendVectors( matrix );
-        return return_value;
+        directionCosines = std::vector< T >( 9, 0 );
+        rotationMatrix( std::begin( bungeEulerAngles ), std::end( bungeEulerAngles ),
+                        std::begin( directionCosines ), std::end( directionCosines ) );
+        return 0;
+    }
+
+    template< class v_in, class v_out >
+    void rotationMatrix( const v_in &bungeEulerAngles_begin, const v_in &bungeEulerAngles_end,
+                         v_out directionCosines_begin,       v_out directionCosines_end ){
+        /*!
+         * Calculate the pre-multiplying direction cosines rotation matrix from Euler angles - Bunge convention:
+         *
+         * 1. rotate around z-axis: \f$ \alpha \f$
+         * 2. rotate around new x'-axis: \f$ \beta \f$
+         * 3. rotate around new z'-axis: \f$ \gamma \f$
+         *
+         * Conventions:
+         *
+         * * Premultiply column vectors, \f$ v' = Rv \f$. Implies post-muliplying for row vectors, \f$ v' = vR \f$
+         * * Represent active rotation. Returns rotated vectors defined in the original reference frame coordinate
+         *   system.
+         *
+         * Used as:
+         *
+         * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
+         *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
+         *
+         * \param &bungeEulerAngles_begin: Starting iterator of the vector containing three Bunge-Euler angles in radians
+         * \param &bungeEulerAngles_end: Stopping iterator of the vector containing three Bunge-Euler angles in radians
+         * \param &directionCosines_begin: Starting iterator of the row-major matrix containing the 3x3 rotation matrix
+         * \param &directionCosines_end: Stopping iterator of the row-major matrix containing the 3x3 rotation matrix
+         */
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( ( size_type )( bungeEulerAngles_end - bungeEulerAngles_begin ) == ( 3 ), "There must be exactly three (3) Bunge-Euler angles." )
+
+        double s1 = std::sin( *( bungeEulerAngles_begin + 0 ) );
+        double c1 = std::cos( *( bungeEulerAngles_begin + 0 ) );
+        double s2 = std::sin( *( bungeEulerAngles_begin + 1 ) );
+        double c2 = std::cos( *( bungeEulerAngles_begin + 1 ) );
+        double s3 = std::sin( *( bungeEulerAngles_begin + 2 ) );
+        double c3 = std::cos( *( bungeEulerAngles_begin + 2 ) );
+
+        *( directionCosines_begin + 0 ) =  c1*c3-c2*s1*s3;
+        *( directionCosines_begin + 1 ) = -c1*s3-c2*c3*s1;
+        *( directionCosines_begin + 2 ) =           s1*s2;
+        *( directionCosines_begin + 3 ) =  c3*s1+c1*c2*s3;
+        *( directionCosines_begin + 4 ) = -s1*s3+c1*c2*c3;
+        *( directionCosines_begin + 5 ) =          -c1*s2;
+        *( directionCosines_begin + 6 ) =           s2*s3;
+        *( directionCosines_begin + 7 ) =           c3*s2;
+        *( directionCosines_begin + 8 ) =              c2;
     }
 
     template< typename T >
@@ -2391,18 +2439,145 @@ namespace tardigradeVectorTools{
          * \param &bungeEulerAngles: Vector containing three Bunge-Euler angles in radians
          * \param &directionCosines: Matrix containing the 3x3 rotation matrix
          */
-        TARDIGRADE_ERROR_TOOLS_CHECK( bungeEulerAngles.size( ) == ( 3 ), "There must be exactly three (3) Bunge-Euler angles." )
 
-        double s1 = std::sin( bungeEulerAngles[ 0 ] );
-        double c1 = std::cos( bungeEulerAngles[ 0 ] );
-        double s2 = std::sin( bungeEulerAngles[ 1 ] );
-        double c2 = std::cos( bungeEulerAngles[ 1 ] );
-        double s3 = std::sin( bungeEulerAngles[ 2 ] );
-        double c3 = std::cos( bungeEulerAngles[ 2 ] );
+        std::vector< T > flatDirectionCosines;
+        TARDIGRADE_ERROR_TOOLS_CATCH( rotationMatrix( bungeEulerAngles, flatDirectionCosines ) );
+        directionCosines = inflate( flatDirectionCosines, 3, 3 );
+        return 0;
+    }
 
-        directionCosines = { { c1*c3-c2*s1*s3, -c1*s3-c2*c3*s1,  s1*s2 },
-                             { c3*s1+c1*c2*s3, -s1*s3+c1*c2*c3, -c1*s2 },
-                             {          s2*s3,           c3*s2,     c2 } };
+    template< class v_in, class v_out >
+    void rotationMatrix( const v_in &bungeEulerAngles_begin,  const v_in &bungeEulerAngles_end,
+                         v_out directionCosines_begin,        v_out directionCosines_end,
+                         v_out dDirectionCosinesdAlpha_begin, v_out dDirectionCosinesdAlpha_end,
+                         v_out dDirectionCosinesdBeta_begin,  v_out dDirectionCosinesdBeta_end,
+                         v_out dDirectionCosinesdGamma_begin, v_out dDirectionCosinesdGamma_end ){
+        /*!
+         * Calculate the pre-multiplying direction cosines rotation matrix from Euler angles - Bunge convention:
+         *
+         * 1. rotate around z-axis: \f$ \alpha \f$
+         * 2. rotate around new x'-axis: \f$ \beta \f$
+         * 3. rotate around new z'-axis: \f$ \gamma \f$
+         *
+         * Conventions:
+         *
+         * * Premultiply column vectors, \f$ v' = Rv \f$. Implies post-muliplying for row vectors, \f$ v' = vR \f$
+         * * Represent active rotation. Returns rotated vectors defined in the original reference frame coordinate
+         *   system.
+         *
+         * Used as:
+         *
+         * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
+         *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
+         *
+         * \param &bungeEulerAngles_begin: Starting iterator of the vector containing three Bunge-Euler angles in radians
+         * \param &bungeEulerAngles_end: Stopping iterator of the vector containing three Bunge-Euler angles in radians
+         * \param &directionCosines_begin: Starting iterator of the row-major matrix containing the 3x3 rotation matrix
+         * \param &directionCosines_end: Stopping iterator of the row-major matrix containing the 3x3 rotation matrix
+         * \param &dDirectionCosinesdAlpha_begin: Starting iterator of the row-major matrix partial derivative of the rotation matrix with respect to the first
+         *     Euler angle: \f$ \alpha \f$.
+         * \param &dDirectionCosinesdAlpha_end: Stopping iterator of the row-major matrix partial derivative of the rotation matrix with respect to the first
+         *     Euler angle: \f$ \alpha \f$.
+         * \param &dDirectionCosinesdBeta_begin: Starting iterator of the row-major matrix partial derivative of the rotation matrix with respect to the second
+         *     Euler angle: \f$ \beta \f$.
+         * \param &dDirectionCosinesdBeta_end: Stopping iterator of the row-major matrix partial derivative of the rotation matrix with respect to the second
+         *     Euler angle: \f$ \beta \f$.
+         * \param &dDirectionCosinesdGamma_begin: Starting iterator of the row-major matrix partial derivative of the rotation matrix with respect to the third
+         *     Euler angle: \f$ \gamma \f$.
+         * \param &dDirectionCosinesdGamma_end: Stopping iterator of the row-major matrix partial derivative of the rotation matrix with respect to the third
+         *     Euler angle: \f$ \gamma \f$.
+         */
+
+        double s1 = std::sin( *( bungeEulerAngles_begin + 0 ) );
+        double c1 = std::cos( *( bungeEulerAngles_begin + 0 ) );
+        double s2 = std::sin( *( bungeEulerAngles_begin + 1 ) );
+        double c2 = std::cos( *( bungeEulerAngles_begin + 1 ) );
+        double s3 = std::sin( *( bungeEulerAngles_begin + 2 ) );
+        double c3 = std::cos( *( bungeEulerAngles_begin + 2 ) );
+
+        rotationMatrix( bungeEulerAngles_begin, bungeEulerAngles_end, directionCosines_begin, directionCosines_end );
+
+        *( dDirectionCosinesdAlpha_begin + 0 ) = -s1*c3-c1*c2*s3;
+        *( dDirectionCosinesdAlpha_begin + 1 ) =  s1*s3-c1*c2*c3;
+        *( dDirectionCosinesdAlpha_begin + 2 ) =           c1*s2;
+        *( dDirectionCosinesdAlpha_begin + 3 ) =  c1*c3-s1*c2*s3;
+        *( dDirectionCosinesdAlpha_begin + 4 ) = -s1*c2*c3-c1*s3;
+        *( dDirectionCosinesdAlpha_begin + 5 ) =           s1*s2;
+        *( dDirectionCosinesdAlpha_begin + 6 ) =               0;
+        *( dDirectionCosinesdAlpha_begin + 7 ) =               0;
+        *( dDirectionCosinesdAlpha_begin + 8 ) =               0;
+
+        *( dDirectionCosinesdBeta_begin + 0 )  =  s2*s1*s3;
+        *( dDirectionCosinesdBeta_begin + 1 )  =  s2*c3*s1;
+        *( dDirectionCosinesdBeta_begin + 2 )  =     c2*s1;
+        *( dDirectionCosinesdBeta_begin + 3 )  = -s2*c1*s3;
+        *( dDirectionCosinesdBeta_begin + 4 )  = -s2*c1*c3;
+        *( dDirectionCosinesdBeta_begin + 5 )  =    -c1*c2;
+        *( dDirectionCosinesdBeta_begin + 6 )  =     c2*s3;
+        *( dDirectionCosinesdBeta_begin + 7 )  =     c2*c3;
+        *( dDirectionCosinesdBeta_begin + 8 )  =       -s2;
+
+        *( dDirectionCosinesdGamma_begin + 0 )  = -c1*s3-c2*s1*c3;
+        *( dDirectionCosinesdGamma_begin + 1 )  = -c1*c3+c2*s3*s1;
+        *( dDirectionCosinesdGamma_begin + 2 )  =               0;
+        *( dDirectionCosinesdGamma_begin + 3 )  = -s3*s1+c1*c2*c3;
+        *( dDirectionCosinesdGamma_begin + 4 )  = -c1*c2*s3-s1*c3;
+        *( dDirectionCosinesdGamma_begin + 5 )  =               0;
+        *( dDirectionCosinesdGamma_begin + 6 )  =           s2*c3;
+        *( dDirectionCosinesdGamma_begin + 7 )  =          -s3*s2;
+        *( dDirectionCosinesdGamma_begin + 8 )  =               0;
+
+    }
+
+    template<typename T>
+    int rotationMatrix( const std::vector< T > &bungeEulerAngles, std::vector < T > &directionCosines,
+                        std::vector< T > &dDirectionCosinesdAlpha,
+                        std::vector< T > &dDirectionCosinesdBeta,
+                        std::vector< T > &dDirectionCosinesdGamma ){
+        /*!
+         * Calculate the pre-multiplying direction cosines rotation matrix from Euler angles - Bunge convention:
+         *
+         * 1. rotate around z-axis: \f$ \alpha \f$
+         * 2. rotate around new x'-axis: \f$ \beta \f$
+         * 3. rotate around new z'-axis: \f$ \gamma \f$
+         *
+         * Conventions:
+         *
+         * * Premultiply column vectors, \f$ v' = Rv \f$. Implies post-muliplying for row vectors, \f$ v' = vR \f$
+         * * Represent active rotation. Returns rotated vectors defined in the original reference frame coordinate
+         *   system.
+         *
+         * Used as:
+         *
+         * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
+         *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
+         *
+         * \param &bungeEulerAngles: Vector containing three Bunge-Euler angles in radians
+         * \param &directionCosines: Matrix containing the 3x3 rotation matrix
+         * \param &dDirectionCosinesdAlpha: Matrix partial derivative of the rotation matrix with respect to the first
+         *     Euler angle: \f$ \alpha \f$.
+         * \param &dDirectionCosinesdBeta: Matrix partial derivative of the rotation matrix with respect to the second
+         *     Euler angle: \f$ \beta \f$.
+         * \param &dDirectionCosinesdGamma: Matrix partial derivative of the rotation matrix with respect to the third
+         *     Euler angle: \f$ \gamma \f$.
+         */
+
+        directionCosines        = std::vector< T >( 9, 0 );
+        dDirectionCosinesdAlpha = std::vector< T >( 9, 0 );
+        dDirectionCosinesdBeta  = std::vector< T >( 9, 0 );
+        dDirectionCosinesdGamma = std::vector< T >( 9, 0 );
+
+        rotationMatrix( std::begin( bungeEulerAngles ), std::end( bungeEulerAngles ),
+                        std::begin( directionCosines ), std::end( directionCosines ),
+                        std::begin( dDirectionCosinesdAlpha ), std::end( dDirectionCosinesdAlpha ),
+                        std::begin( dDirectionCosinesdBeta  ), std::end( dDirectionCosinesdBeta  ),
+                        std::begin( dDirectionCosinesdGamma ), std::end( dDirectionCosinesdGamma ) );
+
+
         return 0;
     }
 
@@ -2435,33 +2610,20 @@ namespace tardigradeVectorTools{
          * \param &directionCosines: Matrix containing the 3x3 rotation matrix
          * \param &dDirectionCosinesdAlpha: Matrix partial derivative of the rotation matrix with respect to the first
          *     Euler angle: \f$ \alpha \f$.
-         * \param &dDirectionCosinesdAlpha: Matrix partial derivative of the rotation matrix with respect to the second
+         * \param &dDirectionCosinesdBeta: Matrix partial derivative of the rotation matrix with respect to the second
          *     Euler angle: \f$ \beta \f$.
          * \param &dDirectionCosinesdGamma: Matrix partial derivative of the rotation matrix with respect to the third
          *     Euler angle: \f$ \gamma \f$.
          */
 
-        double s1 = std::sin( bungeEulerAngles[ 0 ] );
-        double c1 = std::cos( bungeEulerAngles[ 0 ] );
-        double s2 = std::sin( bungeEulerAngles[ 1 ] );
-        double c2 = std::cos( bungeEulerAngles[ 1 ] );
-        double s3 = std::sin( bungeEulerAngles[ 2 ] );
-        double c3 = std::cos( bungeEulerAngles[ 2 ] );
+        std::vector< double > flatDirectionCosines, flatdDirectionCosinesdAlpha, flatdDirectionCosinesdBeta, flatdDirectionCosinesdGamma;
 
-        int return_value;
-        return_value = rotationMatrix( bungeEulerAngles, directionCosines );
+        int return_value = rotationMatrix( bungeEulerAngles, flatDirectionCosines, flatdDirectionCosinesdAlpha, flatdDirectionCosinesdBeta, flatdDirectionCosinesdGamma );
 
-        dDirectionCosinesdAlpha = { { -s1*c3-c1*c2*s3,  s1*s3-c1*c2*c3, c1*s2 },
-                                    {  c1*c3-s1*c2*s3, -s1*c2*c3-c1*s3, s1*s2 },
-                                    {              0.,              0.,    0. } };
-
-        dDirectionCosinesdBeta = { {  s2*s1*s3,  s2*c3*s1,  c2*s1 },
-                                   { -s2*c1*s3, -s2*c1*c3, -c1*c2 },
-                                   {     c2*s3,     c2*c3,    -s2 } };
-
-        dDirectionCosinesdGamma = { { -c1*s3-c2*s1*c3, -c1*c3+c2*s3*s1, 0. },
-                                    { -s3*s1+c1*c2*c3, -c1*c2*s3-s1*c3, 0. },
-                                    {           s2*c3,          -s3*s2, 0. } };
+        directionCosines = inflate( flatDirectionCosines, 3, 3 );
+        dDirectionCosinesdAlpha = inflate( flatdDirectionCosinesdAlpha, 3, 3 );
+        dDirectionCosinesdBeta  = inflate( flatdDirectionCosinesdBeta,  3, 3 );
+        dDirectionCosinesdGamma = inflate( flatdDirectionCosinesdGamma, 3, 3 );
 
         return return_value;
     }
