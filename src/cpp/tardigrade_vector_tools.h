@@ -377,6 +377,9 @@ namespace tardigradeVectorTools{
     std::vector< std::vector< T > > inflate( const std::vector< T > &Avec, const unsigned int &nrows, const unsigned int &ncols );
 
     //Sorting utilities
+    template<class v_in, class v_out>
+    void argsort( const v_in &v_begin, const v_in &v_end, v_out r_begin, v_out r_end );
+
     template <typename T>
     std::vector< size_type > argsort(const std::vector< T > &v);
 

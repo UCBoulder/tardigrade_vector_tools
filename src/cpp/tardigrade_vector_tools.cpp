@@ -2237,6 +2237,26 @@ namespace tardigradeVectorTools{
     }
 
     //Sorting Utilities
+    template<class v_in, class v_out>
+    void argsort( const v_in &v_begin, const v_in &v_end, v_out r_begin, v_out r_end ){
+        /*!
+         * Find the indices required to sort a vector
+         * Code from: https://stackoverflow.com/questions/1577475/c-sorting-and-keeping-track-of-indexes
+         *
+         * \param &v_begin: The starting iterator of the vector to get the index sorted properties.
+         * \param &v_end: The stopping iterator of the vector to get the index sorted properties.
+         * \param &r_begin: The starting iterator of the resulting indices
+         * \param &r_end: The stopping iterator of the resulting indices
+         */
+
+        // initialize original index locations
+        std::iota( r_begin, r_end, 0 );
+
+        std::sort( r_begin, r_end,
+                   [&v_begin](size_type i1, size_type i2){return *(v_begin + i1) < *(v_begin + i2);});
+
+    }
+
     template<typename T>
     std::vector< size_type > argsort(const std::vector< T > &v){
         /*!
@@ -2248,11 +2268,8 @@ namespace tardigradeVectorTools{
 
         // initialize original index locations
         std::vector< size_type > idx(v.size());
-        std::iota(idx.begin(), idx.end(), 0);
 
-        // sort indices based on comparing values in v
-        std::sort(idx.begin(), idx.end(),
-                  [&v](size_type i1, size_type i2) {return v[i1] < v[i2];});
+        argsort( std::begin( v ), std::end( v ), std::begin( idx ), std::end( idx ) );
 
         return idx;
     }
