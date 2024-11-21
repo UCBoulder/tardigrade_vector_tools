@@ -443,6 +443,23 @@ namespace tardigradeVectorTools{
     template<typename T>
     void computeMatrixExponential( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, std::vector< T > & dExpAdA, const unsigned int nmax=40, double tola=1e-9, double tolr=1e-9);
 
+    template<class v_in, class v_out, typename T=double>
+    void computeMatrixExponentialScalingAndSquaring( const v_in &A_begin, const v_in &A_end, const size_type &dim,
+                                                     v_out tempVector1_begin, v_out tempVector1_end,
+                                                     v_out tempVector2_begin, v_out tempVector2_end,
+                                                     v_out tempVector3_begin, v_out tempVector3_end,
+                                                     v_out expA_begin, v_out expA_end,
+                                                     const unsigned int nmax=40, double tola=1e-9, double tolr=1e-9 );
+
+    template<class v_in, class v_out, class M_out, typename T=double>
+    void computeMatrixExponentialScalingAndSquaring( const v_in &A_begin, const v_in &A_end, const size_type &dim,
+                                                     v_out tempVector1_begin, v_out tempVector1_end,
+                                                     v_out tempVector2_begin, v_out tempVector2_end,
+                                                     v_out tempMatrix1_begin, v_out tempMatrix1_end,
+                                                     v_out tempMatrix2_begin, v_out tempMatrix2_end,
+                                                     v_out expA_begin, v_out expA_end, M_out dExpAdA_begin, M_out dExpAdA_end,
+                                                     const unsigned int nmaxi=40, double tola=1e-9, double tolr=1e-9 );
+
     template<typename T>
     void computeMatrixExponentialScalingAndSquaring( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, const unsigned int nmax=40, double tola=1e-9, double tolr=1e-9);
 

@@ -2839,7 +2839,84 @@ namespace tardigradeVectorTools{
                                   nmax, tola, tolr );
 
     }
-    
+
+    template<class v_in, class v_out, typename T>
+    void computeMatrixExponentialScalingAndSquaring( const v_in &A_begin, const v_in &A_end, const size_type &dim,
+                                                     v_out tempVector1_begin, v_out tempVector1_end,
+                                                     v_out tempVector2_begin, v_out tempVector2_end,
+                                                     v_out tempVector3_begin, v_out tempVector3_end,
+                                                     v_out expA_begin, v_out expA_end,
+                                                     const unsigned int nmax, double tola, double tolr ){
+        /*!
+         * Compute the matrix exponential using scaling-and-squaring
+         * 
+         * \param &A_begin: The starting iterator of the matrix to compute the exponential of
+         * \param &A_end: The starting iterator of the matrix to compute the exponential of
+         * \param &dim: The number of rows and columns in A
+         * \param &tempVector1_begin: The starting iterator of a temporary vector of the same size as A
+         * \param &tempVector1_end: The starting iterator of a temporary vector of the same size as A
+         * \param &tempVector2_begin: The starting iterator of a temporary vector of the same size as A
+         * \param &tempVector2_end: The starting iterator of a temporary vector of the same size as A
+         * \param &tempVector3_begin: The starting iterator of a temporary vector of the same size as A
+         * \param &tempVector3_end: The starting iterator of a temporary vector of the same size as A
+         * \param &expA_begin: The starting iterator of a matrix exponential of A
+         * \param &expA_end: The stopping iterator of a matrix exponential of A
+         * \param nmax: The maximum number of allowable iterations
+         * \param tola: The absolute tolerance
+         * \param tolr: The relative tolerance
+         */
+
+        T normA = std::sqrt( std::inner_product( A_begin, A_end, A_begin, T( ) ) );
+
+        unsigned int m = std::max( ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 ), ( unsigned int )( 1 ) );
+
+        std::transform( A_begin, A_end, tempVector1_begin, std::bind( std::multiplies<T>( ), std::placeholders::_1, 1. / m ) );
+        std::vector< T > expAoverm;
+
+        TARDIGRADE_ERROR_TOOLS_CATCH( computeMatrixExponential( tempVector1_begin, tempVector1_end, dim,
+                                                                tempVector2_begin, tempVector2_end,
+                                                                expA_begin,        expA_end,
+                                                                tempVector3_begin, tempVector3_end, nmax, tola, tolr ) )
+
+        std::fill( expA_begin, expA_end, 0 );
+        for ( unsigned int i = 0; i < dim; ++i ){ *( expA_begin + dim * i + i ) = 1; }
+
+        for ( unsigned int i = 0; i < m; ++i ){
+
+            std::fill( tempVector1_begin, tempVector1_end, 0 );
+
+            for ( unsigned int j = 0; j < dim; ++j ){
+
+                for ( unsigned int k = 0; k < dim; ++k ){
+
+                    for ( unsigned int l = 0; l < dim; ++l ){
+
+                        *( tempVector1_begin + dim * j + l ) += ( *( expA_begin + dim * j + k ) ) * ( *( tempVector3_begin + dim * k + l ) );
+
+                    }
+
+                }
+
+            }
+
+            std::copy( tempVector1_begin, tempVector1_end, expA_begin );
+
+        }
+
+    }
+
+//    template<class v_in, class v_out, class M_out, typename T>
+//    void computeMatrixExponentialScalingAndSquaring( const v_in &A_begin, const v_in &A_end, const size_type &dim,
+//                                                     v_out tempVector1_begin, v_out tempVector1_end,
+//                                                     v_out tempVector2_begin, v_out tempVector2_end,
+//                                                     v_out tempVector3_begin, v_out tempVector3_end,
+//                                                     v_out tempMatrix1_begin, v_out tempMatrix1_end,
+//                                                     v_out tempMatrix2_begin, v_out tempMatrix2_end,
+//                                                     v_out expA_begin, v_out expA_end, M_out dExpAdA_begin, M_out dExpAdA_end,
+//                                                     const unsigned int nmaxi=40, double tola=1e-9, double tolr=1e-9 ){
+//
+//    }
+//    
     template<typename T>
     void computeMatrixExponentialScalingAndSquaring( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, const unsigned int nmax, double tola, double tolr ){
         /*!
@@ -2853,38 +2930,18 @@ namespace tardigradeVectorTools{
          * \param tolr: The relative tolerance
          */
 
-        double normA = l2norm( A );
-
-        unsigned int m = std::max( ( unsigned int )( std::ceil( std::sqrt( normA ) ) + 0.5 ), ( unsigned int )( 1 ) );
-
-        std::vector< T > expAoverm;
-
-        TARDIGRADE_ERROR_TOOLS_CATCH( computeMatrixExponential( A / m, dim, expAoverm, nmax, tola, tolr ) )
+        std::vector< T > tempVector1( dim * dim, 0 );
+        std::vector< T > tempVector2( dim * dim, 0 );
+        std::vector< T > tempVector3( dim * dim, 0 );
 
         expA = std::vector< T >( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; ++i ){ expA[ dim * i + i ] = 1; }
 
-        for ( unsigned int i = 0; i < m; ++i ){
-
-            std::vector< T > expAi( dim * dim, 0 );
-
-            for ( unsigned int j = 0; j < dim; ++j ){
-
-                for ( unsigned int k = 0; k < dim; ++k ){
-
-                    for ( unsigned int l = 0; l < dim; ++l ){
-
-                        expAi[ dim * j + l ] += expA[ dim * j + k ] * expAoverm[ dim * k + l ];
-
-                    }
-
-                }
-
-            }
-
-            expA = expAi;
-
-        }
+        computeMatrixExponentialScalingAndSquaring( std::begin( A ),           std::end( A ), dim,
+                                                    std::begin( tempVector1 ), std::end( tempVector1 ),
+                                                    std::begin( tempVector2 ), std::end( tempVector2 ),
+                                                    std::begin( tempVector3 ), std::end( tempVector3 ),
+                                                    std::begin( expA ),        std::end( expA ),
+                                                    nmax, tola, tolr );
 
     }
 
