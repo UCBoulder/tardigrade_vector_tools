@@ -2132,6 +2132,26 @@ namespace tardigradeVectorTools{
     }
 
     //Appending Utilities
+
+    template<class M_in, class v_out>
+    void appendVectors( const M_in &M_begin, const M_in &M_end, v_out v_begin, v_out v_end ){
+        /*!
+         * Append a matrix into a row-major vector.
+         *
+         * \param &A_begin: The starting iterator of the matrix to be appended
+         * \param &A_end: The stopping iterator of the matrix to be appended
+         * \param &v_begin: The starting iterator of the resulting vector
+         * \param &v_end: The stopping iterator of the resulting vector
+         */
+
+        for ( std::pair< unsigned int, M_in > i( 0, M_begin ); i.second != M_end; i.first += ( size_type )( std::end( *i.second ) - std::begin( *i.second ) ), ++i.second ){
+
+            std::copy( std::begin( *i.second ), std::end( *i.second ), v_begin + i.first );
+
+        }
+
+    }
+
     template<typename T>
     std::vector< T > appendVectors(const std::vector< std::vector< T > > &A){
         /*!
@@ -2140,11 +2160,15 @@ namespace tardigradeVectorTools{
          * \param &A: The matrix to be appended
          */
 
-        std::vector< T > Avec;
-
-        for (auto Ai=A.begin(); Ai!=A.end(); ++Ai){
-            Avec.insert(Avec.end(), (*Ai).begin(), (*Ai).end());
+        size_type count = 0;
+        for ( auto Ai = std::begin( A ); Ai != std::end( A ); ++Ai ){
+            count += Ai->size( );
         }
+
+        std::vector< T > Avec( count );
+
+        appendVectors( std::begin( A ), std::end( A ), std::begin( Avec ), std::end( Avec ) );
+
         return Avec;
     }
 
@@ -2156,11 +2180,40 @@ namespace tardigradeVectorTools{
          * \param list: The list of vectors to append
          */
 
-        std::vector< T > Avec;
-        for (auto li=list.begin(); li!=list.end(); ++li){
-            Avec.insert(Avec.end(), (*li).begin(), (*li).end());
+        size_type count = 0;
+        for ( auto Ai = std::begin( list ); Ai != std::end( list ); ++Ai ){
+            count += Ai->size( );
         }
+
+        std::vector< T > Avec( count );
+
+        appendVectors( std::begin( list ), std::end( list ), std::begin( Avec ), std::end( Avec ) );
+
         return Avec;
+
+    }
+
+    template< class v_in, class M_out >
+    void inflate( const v_in &v_begin, const v_in &v_end, M_out M_begin, M_out M_end ){
+        /*!
+         * Inflate the provided row-major vector into a 2D matrix.
+         *
+         * \param &v_begin: The starting iterator of the row-major matrix
+         * \param &v_end: The stopping iterator of the row-major matrix
+         * \param &M_begin: The starting iterator of the matrix
+         * \param &M_end: The stopping iterator of the matrix
+         */
+
+        for ( std::pair< size_type, M_out > i( 0, M_begin ); i.second != M_end; ++i.second ){
+
+            size_type offset = ( size_type )( std::end( *i.second ) - std::begin( *i.second ) );
+
+            std::copy( v_begin + i.first, v_begin + i.first + offset, std::begin( *i.second ) );
+
+            i.first += offset;
+
+        }
+
     }
 
     template< typename T >
@@ -2177,12 +2230,10 @@ namespace tardigradeVectorTools{
 
         std::vector< std::vector< T > > A( nrows, std::vector< T >( ncols ) );
 
-        for ( unsigned int i = 0; i < nrows; ++i ){
-            for ( unsigned int j = 0; j < ncols; ++j ){
-                A[i][j] = Avec[ i * ncols + j ];
-            }
-        }
+        inflate( std::begin( Avec ), std::end( Avec ), std::begin( A ), std::end( A ) );
+
         return A;
+
     }
 
     //Sorting Utilities

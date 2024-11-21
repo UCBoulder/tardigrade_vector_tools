@@ -360,11 +360,18 @@ namespace tardigradeVectorTools{
     std::vector< T > getCol( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int col );
 
     //Appending utilities
+
+    template<class M_in, class v_out>
+    void appendVectors( const M_in &M_begin, const M_in &M_end, v_out v_begin, v_out v_end );
+
     template<typename T>
     std::vector< T > appendVectors(const std::vector< std::vector< T > > &A);
 
     template<typename T>
     std::vector< T > appendVectors(const std::initializer_list< std::vector< T > > &list);
+
+    template< class v_in, class M_out >
+    void inflate( const v_in &v_begin, const v_in &v_end, M_out M_begin, M_out M_end );
 
     template< typename T >
     std::vector< std::vector< T > > inflate( const std::vector< T > &Avec, const unsigned int &nrows, const unsigned int &ncols );
