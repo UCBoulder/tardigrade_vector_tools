@@ -316,6 +316,12 @@ namespace tardigradeVectorTools{
     void verifyOrthogonal( const std::vector< T > &v1, const std::vector< T > &v2,
                            std::string message = "Vectors are not orthogonal" );
 
+    template<class v_in>
+    bool iteratorVerifyLength( const v_in &v_begin, const v_in &v_end, const unsigned int &expectedLength );
+
+    template<class v_in>
+    bool verifyLength( const v_in &v1_begin, const v_in &v1_end, const v_in &v2_begin, const v_in &v2_end );
+
     template<typename T>
     void verifyLength( const std::vector< T > &verifyVector, const unsigned int &expectedLength,
                        std::string message = "Vector does not have expected length" );

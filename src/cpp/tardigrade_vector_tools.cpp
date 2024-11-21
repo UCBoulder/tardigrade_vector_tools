@@ -1919,6 +1919,35 @@ namespace tardigradeVectorTools{
 
     }
 
+    template<class v_in>
+    bool iteratorVerifyLength( const v_in &v_begin, const v_in &v_end, const unsigned int &expectedLength ){
+        /*!
+         * Return a boolean based on if the provided vector doesn't match the expected length.
+         *
+         * \param &v_begin: The starting iterator of the vector
+         * \param &v_end: The stopping iterator of the vector
+         * \param &expectedLength: The expected length of the vector
+         */
+
+        return ( unsigned int )( v_end - v_begin ) == expectedLength;
+
+    }
+
+    template<class v_in>
+    bool verifyLength( const v_in &v1_begin, const v_in &v1_end, const v_in &v2_begin, const v_in &v2_end ){
+        /*!
+         * Return a boolean based on if the two vectors have the same length.
+         *
+         * \param &v1_begin: The starting iterator of the first vector
+         * \param &v1_end: The stopping iterator of the first vector
+         * \param &v2_begin: The starting iterator of the second vector
+         * \param &v2_end: The stopping iterator of the second vector
+         */
+
+        return ( unsigned int )( v1_end - v1_begin ) == ( unsigned int )( v2_end - v2_begin );
+
+    }
+
     template<typename T>
     void verifyLength( const std::vector< T > &verifyVector, const unsigned int &expectedLength,
                        std::string message ){
@@ -1930,7 +1959,7 @@ namespace tardigradeVectorTools{
          * \param &message: An optional message for the ``std::length_error`` exception
          */
         TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( verifyVector.size( ) != expectedLength ){
+            if ( !iteratorVerifyLength( std::begin( verifyVector ), std::end( verifyVector ), expectedLength ) ){
                 throw std::length_error( message );
             }
         )
@@ -1948,7 +1977,8 @@ namespace tardigradeVectorTools{
          * \param &message: An optional message for the ``std::length_error`` exception
          */
         TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( verifyVectorOne.size( ) != verifyVectorTwo.size( ) ){
+            if ( !verifyLength( std::begin( verifyVectorOne ), std::end( verifyVectorOne ),
+                                std::begin( verifyVectorTwo ), std::end( verifyVectorTwo ) ) ){
                 throw std::length_error( message );
             }
         )
@@ -1966,13 +1996,14 @@ namespace tardigradeVectorTools{
          * \param &message: An optional message for the ``std::length_error`` exception
          */
         TARDIGRADE_ERROR_TOOLS_CATCH(
-            if ( verifyVectorOne.size( ) != verifyVectorTwo.size( ) ){
+            if ( !verifyLength( std::begin( verifyVectorOne ), std::end( verifyVectorOne ),
+                                std::begin( verifyVectorTwo ), std::end( verifyVectorTwo ) ) ){
                 throw std::length_error( message );
             }
         )
         TARDIGRADE_ERROR_TOOLS_CATCH(
-            for ( unsigned int row=0; row<verifyVectorOne.size( ); ++row ){
-                verifyLength( verifyVectorOne[ row ], verifyVectorTwo[ row ] );
+            for ( unsigned int i = 0; i < verifyVectorOne.size( ); ++i ){
+                verifyLength( verifyVectorOne[ i ], verifyVectorTwo[ i ], message );
             }
         )
     }
