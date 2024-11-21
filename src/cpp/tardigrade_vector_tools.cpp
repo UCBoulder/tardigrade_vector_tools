@@ -2628,6 +2628,73 @@ namespace tardigradeVectorTools{
         return return_value;
     }
 
+    template<class v_in, class v_out, typename T>
+    void computeMatrixExponential( const v_in &A_begin, const v_in &A_end, const size_type &dim, v_out X_begin, v_out X_end,
+                                   v_out Xn_begin, v_out Xn_end, v_out expA_begin, v_out expA_end,
+                                   const unsigned int nmax, double tola, double tolr ){
+        /*!
+         * Compute the matrix exponential
+         * 
+         * \param &A_begin: The starting iterator of the matrix to compute the exponential of
+         * \param &A_end: The stopping iterator of the matrix to compute the exponential of
+         * \param &dim: The number of rows in A
+         * \param &X_begin: The starting iterator of the temporary storage vector X
+         * \param &X_end: The stopping iterator of the temporary storage vector X
+         * \param &Xn_begin: The starting iterator of the temporary storage vector Xn
+         * \param &Xn_end: The stopping iterator of the temporary storage vector Xn
+         * \param &expA_begin: The starting iterator of the matrix exponential of A
+         * \param &expA_end: The stopping iterator of the matrix exponential of A
+         * \param nmax: The maximum number of allowable iterations
+         * \param tola: The absolute tolerance
+         * \param tolr: The relative tolerance
+         */
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( ( size_type )( A_end - A_begin ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( ( size_type )( A_end - A_begin ) ) +
+                                                                                     "\n  dim * dim: " + std::to_string( dim ) + "\n" )
+
+        std::fill( X_begin, X_end, 0 );
+        for ( unsigned int i = 0; i < dim; ++i ){ *( X_begin + dim * i + i ) = 1; }
+
+        std::copy( X_begin, X_end, expA_begin );
+
+        double tol = tola * std::sqrt( std::inner_product( A_begin, A_end, A_begin, 0 ) ) + tolr;
+
+        for ( unsigned int n = 1; n < nmax; ++n ){
+
+            std::fill( Xn_begin, Xn_end, 0 );
+
+            for ( unsigned int i = 0; i < dim; ++i ){
+
+                for ( unsigned int j = 0; j < dim; ++j ){
+
+                    for ( unsigned int k = 0; k < dim; ++k ){
+
+                        *( Xn_begin + dim * i + k ) += ( *( X_begin + dim * i + j ) ) * ( *( A_begin + dim * j + k ) );
+
+                    }
+
+                }
+
+            }
+
+            std::copy( Xn_begin, Xn_end, X_begin );
+
+            std::transform( Xn_begin, Xn_end, Xn_begin, std::bind( std::multiplies<T>(), std::placeholders::_1, 1. / std::tgamma( n + 1 ) ) );
+
+            std::transform( expA_begin, expA_end, Xn_begin, expA_begin, std::plus<T>( ) );
+                    
+            T delta = std::sqrt( std::inner_product( Xn_begin, Xn_end, Xn_begin, T() ) );
+
+            if ( delta < tol ){
+
+                break;
+
+            }
+
+        }
+
+    }
+
     template<typename T>
     void computeMatrixExponential( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, const unsigned int nmax, double tola, double tolr ){
         /*!
@@ -2641,19 +2708,62 @@ namespace tardigradeVectorTools{
          * \param tolr: The relative tolerance
          */
 
-        TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( A.size( ) ) +
-                                                              "\n  dim * dim: " + std::to_string( dim ) + "\n" )
+        std::vector< T >  X( dim * dim, 0 );
+        std::vector< T > Xn( dim * dim, 0 );
+        expA = std::vector< T >( dim * dim, 0 );
 
-        std::vector< T > X( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; ++i ){ X[ dim * i + i ] = 1; }
+        computeMatrixExponential( std::begin( A ), std::end( A ), dim, std::begin( X ), std::end( X ), std::begin( Xn ), std::end( Xn ), std::begin( expA ), std::end( expA ), nmax, tola, tolr );
 
-        expA = X;
+    }
 
-        double tol = tola * std::fabs( l2norm( A ) ) + tolr;
+    template<class v_in, class v_out, class M_out, typename T>
+    void computeMatrixExponential( const v_in &A_begin, const v_in &A_end, const size_type &dim, v_out X_begin, v_out X_end,
+                                   v_out Xn_begin, v_out Xn_end,
+                                   M_out dXdA_begin, M_out dXdA_end, M_out dXndA_begin, M_out dXndA_end,
+                                   v_out expA_begin, v_out expA_end, M_out dExpAdA_begin, M_out dExpAdA_end,
+                                   const unsigned int nmax, double tola, double tolr ){
+        /*!
+         * Compute the matrix exponential
+         * 
+         * \param &A_begin: The starting iterator of the matrix to compute the exponential of
+         * \param &A_end: The stopping iterator of the matrix to compute the exponential of
+         * \param &dim: The number of rows in A
+         * \param &X_begin: The starting iterator of the temporary storage vector X
+         * \param &X_end: The stopping iterator of the temporary storage vector X
+         * \param &Xn_begin: The starting iterator of the temporary storage vector Xn
+         * \param &Xn_end: The stopping iterator of the temporary storage vector Xn
+         * \param &dXdA_begin: The starting iterator of the temporary storage vector dXdA
+         * \param &dXdA_end: The stopping iterator of the temporary storage vector dXdA
+         * \param &dXndA_begin: The starting iterator of the temporary storage vector dXndA
+         * \param &dXndA_end: The stopping iterator of the temporary storage vector dXndA
+         * \param &expA_begin: The starting iterator of the matrix exponential of A
+         * \param &expA_end: The stopping iterator of the matrix exponential of A
+         * \param &dExpAdA_begin: The starting iterator of the derivative of the matrix exponential of A w.r.t. A
+         * \param &dExpAdA_end: The stopping iterator of the derivative of the matrix exponential of A w.r.t. A
+         * \param nmax: The maximum number of allowable iterations
+         * \param tola: The absolute tolerance
+         * \param tolr: The relative tolerance
+         */
+
+        TARDIGRADE_ERROR_TOOLS_CHECK( ( size_type )( A_end - A_begin ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( ( size_type )( A_end - A_begin ) ) +
+                                                                                     "\n  dim * dim: " + std::to_string( dim ) + "\n" )
+
+        std::fill( X_begin, X_end, 0 );
+        for ( unsigned int i = 0; i < dim; ++i ){ *( X_begin + dim * i + i ) = 1; }
+
+        std::copy( X_begin, X_end, expA_begin );
+
+        std::fill( dExpAdA_begin, dExpAdA_end, 0 );
+
+        std::fill( dXdA_begin, dXdA_end, 0 );
+
+        double tol = tola * std::sqrt( std::inner_product( A_begin, A_end, A_begin, T( ) ) ) + tolr;
 
         for ( unsigned int n = 1; n < nmax; ++n ){
 
-            std::vector< T > Xn( dim * dim, 0 );
+            std::fill( Xn_begin, Xn_end, 0 );
+
+            std::fill( dXndA_begin, dXndA_end, 0 );
 
             for ( unsigned int i = 0; i < dim; ++i ){
 
@@ -2661,7 +2771,15 @@ namespace tardigradeVectorTools{
 
                     for ( unsigned int k = 0; k < dim; ++k ){
 
-                        Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
+                        *( Xn_begin + dim * i + k ) += ( *( X_begin + dim * i + j ) ) * ( *( A_begin + dim * j + k ) );
+
+                        *( dXndA_begin + dim * dim * dim * i + dim * dim * j + dim * k + j ) += ( *( X_begin + dim * i + k ) );
+
+                        for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
+
+                            *( dXndA_begin + dim * dim * dim * i + dim * dim * k + ab ) += ( *( dXdA_begin + dim * dim * dim * i + dim * dim * j + ab ) ) * ( *( A_begin + dim * j + k ) );
+
+                        }
 
                     }
 
@@ -2669,17 +2787,25 @@ namespace tardigradeVectorTools{
 
             }
 
-            expA += Xn / std::tgamma( n + 1 );
+            std::copy( Xn_begin, Xn_end, X_begin );
 
-            double delta = l2norm( Xn ) / std::tgamma( n + 1 );
+            std::copy( dXndA_begin, dXndA_end, dXdA_begin );
+
+            std::transform(    Xn_begin,    Xn_end,    Xn_begin, std::bind( std::multiplies<T>( ), std::placeholders::_1, 1. / std::tgamma( n + 1 ) ) );
+
+            std::transform( dXndA_begin, dXndA_end, dXndA_begin, std::bind( std::multiplies<T>( ), std::placeholders::_1, 1. / std::tgamma( n + 1 ) ) );
+
+            std::transform( expA_begin, expA_end, Xn_begin, expA_begin, std::plus<T>( ) );
+
+            std::transform( dExpAdA_begin, dExpAdA_end, dXndA_begin, dExpAdA_begin, std::plus<T>( ) );
+
+            double delta = std::sqrt( std::inner_product( Xn_begin, Xn_end, Xn_begin, T( ) ) );
 
             if ( delta < tol ){
 
                 break;
 
             }
-
-            X = Xn;
 
         }
 
@@ -2699,64 +2825,77 @@ namespace tardigradeVectorTools{
          * \param tolr: The relative tolerance
          */
 
-        TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( A.size( ) ) +
-                                                              "\n  dim * dim: " + std::to_string( dim ) + "\n" )
+        std::vector< T >     X(             dim * dim, 0 );
+        std::vector< T >    Xn(             dim * dim, 0 );
+        std::vector< T >  dXdA( dim * dim * dim * dim, 0 );
+        std::vector< T > dXndA( dim * dim * dim * dim, 0 );
 
-        std::vector< T > X( dim * dim, 0 );
-        for ( unsigned int i = 0; i < dim; ++i ){ X[ dim * i + i ] = 1; }
-
-        expA = X;
-
+        expA    = std::vector< T >( dim * dim, 0 );
         dExpAdA = std::vector< T >( dim * dim * dim * dim, 0 );
 
-        std::vector< T > dXdA( dim * dim * dim * dim, 0 );
+        computeMatrixExponential( std::begin( A ), std::end( A ), dim, std::begin( X ), std::end( X ), std::begin( Xn ), std::end( Xn ),
+                                  std::begin( dXdA ), std::end( dXdA ), std::begin( dXndA ), std::end( dXndA ),
+                                  std::begin( expA ), std::end( expA ), std::begin( dExpAdA ), std::end( dExpAdA ),
+                                  nmax, tola, tolr );
 
-        double tol = tola * std::fabs( l2norm( A ) ) + tolr;
-
-        for ( unsigned int n = 1; n < nmax; ++n ){
-
-            std::vector< T > Xn( dim * dim, 0 );
-
-            std::vector< T > dXndA( dim * dim * dim * dim, 0 );
-
-            for ( unsigned int i = 0; i < dim; ++i ){
-
-                for ( unsigned int j = 0; j < dim; ++j ){
-
-                    for ( unsigned int k = 0; k < dim; ++k ){
-
-                        Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
-
-                        dXndA[ dim * dim * dim * i + dim * dim * j + dim * k + j ] += X[ dim * i + k ];
-
-                        for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
-
-                            dXndA[ dim * dim * dim * i + dim * dim * k + ab ] += dXdA[ dim * dim * dim * i + dim * dim * j + ab ] * A[ dim * j + k ];
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            expA += Xn / std::tgamma( n + 1 );
-
-            dExpAdA += dXndA / std::tgamma( n + 1 );
-
-            double delta = l2norm( Xn ) / std::tgamma( n + 1 );
-
-            if ( delta < tol ){
-
-                break;
-
-            }
-
-            X = Xn;
-            dXdA = dXndA;
-
-        }
+//        TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( A.size( ) ) +
+//                                                              "\n  dim * dim: " + std::to_string( dim ) + "\n" )
+//
+//        std::vector< T > X( dim * dim, 0 );
+//        for ( unsigned int i = 0; i < dim; ++i ){ X[ dim * i + i ] = 1; }
+//
+//        expA = X;
+//
+//        dExpAdA = std::vector< T >( dim * dim * dim * dim, 0 );
+//
+//        std::vector< T > dXdA( dim * dim * dim * dim, 0 );
+//
+//        double tol = tola * std::fabs( l2norm( A ) ) + tolr;
+//
+//        for ( unsigned int n = 1; n < nmax; ++n ){
+//
+//            std::vector< T > Xn( dim * dim, 0 );
+//
+//            std::vector< T > dXndA( dim * dim * dim * dim, 0 );
+//
+//            for ( unsigned int i = 0; i < dim; ++i ){
+//
+//                for ( unsigned int j = 0; j < dim; ++j ){
+//
+//                    for ( unsigned int k = 0; k < dim; ++k ){
+//
+//                        Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
+//
+//                        dXndA[ dim * dim * dim * i + dim * dim * j + dim * k + j ] += X[ dim * i + k ];
+//
+//                        for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
+//
+//                            dXndA[ dim * dim * dim * i + dim * dim * k + ab ] += dXdA[ dim * dim * dim * i + dim * dim * j + ab ] * A[ dim * j + k ];
+//
+//                        }
+//
+//                    }
+//
+//                }
+//
+//            }
+//
+//            expA += Xn / std::tgamma( n + 1 );
+//
+//            dExpAdA += dXndA / std::tgamma( n + 1 );
+//
+//            double delta = l2norm( Xn ) / std::tgamma( n + 1 );
+//
+//            if ( delta < tol ){
+//
+//                break;
+//
+//            }
+//
+//            X = Xn;
+//            dXdA = dXndA;
+//
+//        }
 
     }
     

@@ -425,6 +425,18 @@ namespace tardigradeVectorTools{
                         std::vector< std::vector< T > > &dDirectionCosinesdBeta,
                         std::vector< std::vector< T > > &dDirectionCosinesdGamma );
 
+    template<class v_in, class v_out, typename T=double>
+    void computeMatrixExponential( const v_in &A_begin, const v_in &A_end, const size_type &dim, v_out X_begin, v_out X_end,
+                                   v_out Xn_begin, v_out Xn_end, v_out expA_begin, v_out expA_end,
+                                   const unsigned int nmax=40, double tola=1e-9, double tolr=1e-9 );
+
+    template<class v_in, class v_out, class M_out, typename T=double>
+    void computeMatrixExponential( const v_in &A_begin, const v_in &A_end, const size_type &dim, v_out X_begin, v_out X_end,
+                                   v_out Xn_begin, v_out Xn_end,
+                                   M_out dXdA_begin, M_out dXdA_end, M_out dXndA_begin, M_out dXndA_end,
+                                   v_out expA_begin, v_out expA_end, M_out dExpAdA_begin, M_out dExpAdA_end,
+                                   const unsigned int nmaxi=40, double tola=1e-9, double tolr=1e-9 );
+
     template<typename T>
     void computeMatrixExponential( const std::vector< T > &A, const unsigned int &dim, std::vector< T > &expA, const unsigned int nmax=40, double tola=1e-9, double tolr=1e-9);
 
