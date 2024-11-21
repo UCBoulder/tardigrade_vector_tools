@@ -2838,65 +2838,6 @@ namespace tardigradeVectorTools{
                                   std::begin( expA ), std::end( expA ), std::begin( dExpAdA ), std::end( dExpAdA ),
                                   nmax, tola, tolr );
 
-//        TARDIGRADE_ERROR_TOOLS_CHECK( A.size( ) == dim * dim, "The matrix A's size is inconsistent with the dimension\n  A.size( ): " + std::to_string( A.size( ) ) +
-//                                                              "\n  dim * dim: " + std::to_string( dim ) + "\n" )
-//
-//        std::vector< T > X( dim * dim, 0 );
-//        for ( unsigned int i = 0; i < dim; ++i ){ X[ dim * i + i ] = 1; }
-//
-//        expA = X;
-//
-//        dExpAdA = std::vector< T >( dim * dim * dim * dim, 0 );
-//
-//        std::vector< T > dXdA( dim * dim * dim * dim, 0 );
-//
-//        double tol = tola * std::fabs( l2norm( A ) ) + tolr;
-//
-//        for ( unsigned int n = 1; n < nmax; ++n ){
-//
-//            std::vector< T > Xn( dim * dim, 0 );
-//
-//            std::vector< T > dXndA( dim * dim * dim * dim, 0 );
-//
-//            for ( unsigned int i = 0; i < dim; ++i ){
-//
-//                for ( unsigned int j = 0; j < dim; ++j ){
-//
-//                    for ( unsigned int k = 0; k < dim; ++k ){
-//
-//                        Xn[ dim * i + k ] += X[ dim * i + j ] * A[ dim * j + k ];
-//
-//                        dXndA[ dim * dim * dim * i + dim * dim * j + dim * k + j ] += X[ dim * i + k ];
-//
-//                        for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
-//
-//                            dXndA[ dim * dim * dim * i + dim * dim * k + ab ] += dXdA[ dim * dim * dim * i + dim * dim * j + ab ] * A[ dim * j + k ];
-//
-//                        }
-//
-//                    }
-//
-//                }
-//
-//            }
-//
-//            expA += Xn / std::tgamma( n + 1 );
-//
-//            dExpAdA += dXndA / std::tgamma( n + 1 );
-//
-//            double delta = l2norm( Xn ) / std::tgamma( n + 1 );
-//
-//            if ( delta < tol ){
-//
-//                break;
-//
-//            }
-//
-//            X = Xn;
-//            dXdA = dXndA;
-//
-//        }
-
     }
     
     template<typename T>
