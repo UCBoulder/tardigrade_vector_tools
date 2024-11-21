@@ -2258,6 +2258,40 @@ namespace tardigradeVectorTools{
     }
 
     //Printing Utilities
+    template<class v_in>
+    void print(const v_in &v_begin, const v_in &v_end){
+        /*!
+         * Print the contents of the vector to the terminal assuming << has been defined for each component
+         *
+         * \param &v_begin: The starting iterator of the vector
+         * \param &v_end: The stopping iterator of the vector
+         */
+
+        for ( auto val = v_begin; val != v_end; ++val ){
+
+            std::cout << *val << " ";
+
+        }
+        std::cout << "\n";
+
+    }
+
+    template<class M_in>
+    void printMatrix(const M_in &M_begin, const M_in &M_end){
+        /*!
+         * Print the contents of the matrix to the terminal assuming << has been defined for each component
+         *
+         * \param &M_begin: The starting iterator of the matrix
+         * \param &M_end: The stopping iterator of the matrix
+         */
+
+        for ( auto val = M_begin; val != M_end; ++val ){
+
+            print( std::begin( *val ), std::end( *val ) );
+
+        }
+
+    }
     template<typename T>
     int print(const std::vector< T > &v){
         /*!
@@ -2266,10 +2300,7 @@ namespace tardigradeVectorTools{
          * \param &v: The vector to be displayed
          */
 
-        for (auto it = v.begin(); it!=v.end(); ++it){
-            std::cout << *it << " ";
-        }
-        std::cout << "\n";
+        print( std::begin( v ), std::end( v ) );
         return 0;
     }
 
@@ -2281,9 +2312,7 @@ namespace tardigradeVectorTools{
          * \param &A: The matrix to be displayed
          */
 
-        for (auto it = A.begin(); it!=A.end(); ++it){
-            print(*it);
-        }
+        printMatrix( std::begin( A ), std::end( A ) );
         return 0;
     }
 

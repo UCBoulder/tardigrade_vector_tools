@@ -381,6 +381,12 @@ namespace tardigradeVectorTools{
     std::vector< size_type > argsort(const std::vector< T > &v);
 
     //Printing Utilities
+    template<class v_in>
+    void print(const v_in &v_begin, const v_in &v_end);
+
+    template<class M_in>
+    void printMatrix(const M_in &M_begin, const M_in &M_end);
+
     template<typename T>
     int print(const std::vector< T > &v);
 
