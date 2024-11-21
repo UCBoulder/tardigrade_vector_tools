@@ -2009,6 +2009,29 @@ namespace tardigradeVectorTools{
     }
 
     //Access Utilities
+
+    template<class v_in, class i_in, class v_out>
+    void getValuesByIndex( const v_in &v_begin, const v_in &v_end, const i_in &indices_begin, const i_in &indices_end,
+                           v_out subv_begin, v_out subv_end ){
+        /*!
+         * Get the values of a vector referenced by index
+         *
+         * \param &v_begin: The starting iterator of the vector containing all of the values
+         * \param &v_end: The stopping iterator of the vector containing all of the values
+         * \param &indices_begin: The starting iterator of the vector containing the indices to access
+         * \param &indices_end: The stopping iterator of the vector containing the indices to access
+         * \param &subv_begin: The starting iterator of the resulting sub-vector
+         * \param &subv_end: the stopping iterator of the resulting sub-vector
+         */
+
+        for ( std::pair< i_in, v_out > i( indices_begin, subv_begin ); i.first != indices_end; ++i.first, ++i.second ){
+
+            *i.second = *( v_begin + *i.first );
+
+        }
+
+    }
+
     template <typename T>
     int getValuesByIndex(const std::vector< T > &v, const std::vector< size_type > &indices,
         std::vector< T > &subv){
@@ -2023,11 +2046,24 @@ namespace tardigradeVectorTools{
         //Resize subv
         subv.resize(indices.size());
 
-        unsigned int i=0;
-        for (auto it=indices.begin(); it!=indices.end(); ++it, ++i){
-            subv[i] = v[*it];
-        }
+        getValuesByIndex( std::begin( v ), std::end( v ), std::begin( indices ), std::end( indices ), std::begin( subv ), std::end( subv ) );
         return 0;
+    }
+
+    template<class v_in, class v_out>
+    void getRow( const v_in &A_begin, const v_in &A_end, const unsigned int cols, const unsigned int row, v_out row_begin ){
+        /*!
+         * Get the row from the row-major storage matrix A
+         *
+         * \param &A_begin: The starting iterator of A
+         * \param &A_end: The stopping iterator of A
+         * \param cols: The number of columns in A
+         * \param row:  The row to access
+         * \param row_begin: The starting iterator of the accessed row
+         */
+
+        std::copy( A_begin + cols * row, A_begin + cols * ( row + 1 ), row_begin );
+
     }
 
     template <typename T>
@@ -2045,9 +2081,32 @@ namespace tardigradeVectorTools{
 
         TARDIGRADE_ERROR_TOOLS_CHECK( row < rows, "row cannot be greater than or equal to the number of rows" )
 
-        std::vector< T > v( A.begin( ) + cols * row, A.begin( ) + cols * ( row + 1 ) );
+        std::vector< T > v( cols, 0 );
+        getRow( std::begin( A ), std::end( A ), cols, row, std::begin( v ) );
 
         return v;
+    }
+
+    template<class v_in, class v_out>
+    void getCol( const v_in &A_begin, const v_in &A_end, const unsigned int col, v_out col_begin, v_out col_end ){
+        /*! 
+         * Get the row from the row-major storage matrix A
+         *
+         * \param &A_begin: The starting iterator of A
+         * \param &A_end: The stopping iterator of A
+         * \param col:  The column to access
+         * \param col_begin: The starting iterator of the accessed column
+         * \param col_end: The stopping iterator of the accessed column
+         */
+
+        const size_type cols = ( size_type )( A_end - A_begin ) / ( size_type )( col_end - col_begin );
+
+        for ( std::pair< size_type, v_out > i( 0, col_begin ); i.second != col_end; ++i.first, ++i.second ){
+
+            *i.second = *( A_begin + cols * i.first + col );
+
+        }
+
     }
 
     template <typename T>
@@ -2067,11 +2126,7 @@ namespace tardigradeVectorTools{
 
         std::vector< T > v( rows, 0 );
 
-        for ( unsigned int i = 0; i < rows; ++i ){
-
-            v[ i ] += A[ cols * i + col ];
-
-        }
+        getCol( std::begin( A ), std::end( A ), col, std::begin( v ), std::end( v ) );
 
         return v;
     }

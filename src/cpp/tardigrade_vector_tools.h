@@ -335,12 +335,26 @@ namespace tardigradeVectorTools{
                        std::string message = "Vector lengths do not match" );
 
     //Access Utilities
+
+    template<class v_in, class i_in, class v_out>
+    void getValuesByIndex( const v_in &v_begin, const v_in &v_end, const i_in &indices_begin, const i_in &indices_end,
+                           v_out subv_begin, v_out subv_end );
+
     template <typename T>
     int getValuesByIndex(const std::vector< T > &v, const std::vector< size_type > &indices,
         std::vector< T > &subv);
 
+    template<class v_in, class v_out>
+    void getRow( const v_in &A_begin, const v_in &A_end, const unsigned int cols, const unsigned int row, v_out row_begin, v_out row_end );
+
     template <typename T>
     std::vector< T > getRow( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int row );
+
+    template<class v_in, class v_out>
+    void getCol( const v_in &A_begin, const v_in &A_end, const unsigned int col, v_out col_begin, v_out col_end );
+
+    template<class v_in, class v_out>
+    void getCol( const v_in &A_begin, const v_in &A_end, const unsigned int cols, const unsigned int col, v_out row_begin, v_out row_end );
 
     template <typename T>
     std::vector< T > getCol( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int col );
