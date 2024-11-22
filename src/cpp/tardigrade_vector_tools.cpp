@@ -3171,13 +3171,46 @@ namespace tardigradeVectorTools{
 
             TARDIGRADE_ERROR_TOOLS_CHECK( b.size( ) == ncols, "The b vector's size is not consistent with A's dimension" )
 
+            std::vector< double >x( nrows );
+
+            solveLinearSystem( std::begin( Avec ), std::end( Avec ), std::begin( b ), std::end( b ),
+                               nrows, ncols, std::begin( x ), std::end( x ), rank, linearSolver );
+
+            return x;
+
+        }
+
+        template<class M_in, class v_in, class v_out, typename T, int R, int C>
+        void solveLinearSystem( const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end,
+                                const unsigned int nrows, const unsigned int ncols, v_out x_begin, v_out x_end,
+                                unsigned int &rank, solverType< T > &linearSolver ){
+            /*!
+             * Solve a linear system of equations using Eigen. Note this uses a dense solver.
+             *
+             * \f$Ax = b\f$
+             *
+             * \param &A_begin: The starting iterator of the vector form of the \f$A\f$ matrix ( row major )
+             * \param &A_end: The stopping iterator of the vector form of the \f$A\f$ matrix ( row major )
+             * \param &b_begin: The starting iterator of the \f$b\f$ vector
+             * \param &b_end: The stopping iterator of the \f$b\f$ vector
+             * \param nrows: The number of rows of \f$A\f$
+             * \param ncols: The number of columns of \f$A\f$
+             * \param &x_begin: The starting iterator of the solution vector
+             * \param &x_end: The stopping iterator of the solution vector
+             * \param &rank: The rank of \f$A\f$
+             * \param &linearSolver: The linear solver which contains the decomposed
+             *     A matrix ( after the solve ). This is useful for when further
+             *     non-linear solves are required such as in the construction
+             *     of Jacobians of non-linear equaquations which were solved
+             *     using Newton methods.
+             */
+
             //Set up the Eigen maps for A and b
-            Eigen::Map< const Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > Amat( Avec.data( ), nrows, ncols );
-            Eigen::Map< const Eigen::Matrix< T, -1,  1 > > bmat( b.data( ), nrows, 1 );
+            Eigen::Map< const Eigen::Matrix< T, R, C, Eigen::RowMajor > > Amat( &( *A_begin ), nrows, ncols );
+            Eigen::Map< const Eigen::Matrix< T, R, 1 > > bmat( &( *b_begin ), ncols, 1 );
 
             //Set up the Eigen maps for the solution vector
-            std::vector< double > x( nrows );
-            Eigen::Map< Eigen::MatrixXd > xmat( x.data( ), nrows, 1 );
+            Eigen::Map< Eigen::Matrix< T, C, 1 > > xmat( &( *x_begin ), nrows, 1 );
 
             //Perform the decomposition
             linearSolver = solverType< T >( Amat );
@@ -3185,7 +3218,7 @@ namespace tardigradeVectorTools{
             rank = linearSolver.rank( );
 
             xmat = linearSolver.solve( bmat );
-            return x;
+
         }
 
         template<typename T>

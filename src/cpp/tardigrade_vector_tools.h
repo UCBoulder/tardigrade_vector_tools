@@ -488,6 +488,11 @@ namespace tardigradeVectorTools{
         std::vector< double > solveLinearSystem( const std::vector< T > &A, const std::vector< T > &b,
             const unsigned int nrows, const unsigned int ncols, unsigned int &rank, solverType< T > &linearSolver );
 
+        template<class M_in, class v_in, class v_out, typename T, int R=-1, int C=-1>
+        void solveLinearSystem( const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end,
+                                const unsigned int nrows, const unsigned int ncols, v_out x_begin, v_out x_end,
+                                unsigned int &rank, solverType< T > &linearSolver );
+
         template<typename T>
         T determinant(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols);
 
