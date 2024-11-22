@@ -3397,8 +3397,35 @@ namespace tardigradeVectorTools{
 
         }
 
+        template<class M_in, class M_out, typename T, int R, int C>
+        void computeDDetADA(const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                            M_out result_begin, const M_out result_end ){
+            /*!
+             * Compute the derivative of the determinant of a matrix w.r.t. the matrix
+             *
+             * \param &A_begin: The starting iterator of the matrix in vector form.
+             * \param &A_end: The stopping iterator of the matrix in vector form.
+             * \param nrows: The number of rows in A
+             * \param ncols: The number of columns in A
+             * \param &result_begin: The starting iterator of the result in vector form.
+             * \param &result_end: The stopping iterator of the result in vector form.
+             */
+
+            //Set up the Eigen map for A
+            Eigen::Map < const Eigen::Matrix<T, R, C, Eigen::RowMajor> > Amat( &( *A_begin ), nrows, ncols);
+
+            T detA = Amat.determinant();
+
+            //Set up the Eigen map for the inverse
+            Eigen::Map< Eigen::Matrix<T, R, C, Eigen::RowMajor> > ddetAdAmat( &( *result_begin ), ncols, nrows);
+
+            //Compute the derivative
+            ddetAdAmat = detA * Amat.inverse( ).transpose( );
+
+        }
+
         template<typename T>
-        std::vector< double > computeDDetADA(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols){
+        std::vector< T > computeDDetADA(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols){
             /*!
              * Compute the derivative of the determinant of a matrix w.r.t. the matrix
              *
@@ -3407,17 +3434,10 @@ namespace tardigradeVectorTools{
              * \param ncols: The number of columns in A
              */
 
-            //Set up the Eigen map for A
-            Eigen::Map < const Eigen::Matrix<T, -1, -1, Eigen::RowMajor> > Amat(Avec.data(), nrows, ncols);
+            std::vector< T > ddetAdA( nrows * ncols );
 
-            T detA = Amat.determinant();
-
-            //Set up the Eigen map for the inverse
-            std::vector< double > ddetAdA(nrows*ncols);
-            Eigen::Map< Eigen::MatrixXd > ddetAdAmat(ddetAdA.data(), ncols, nrows);
-
-            //Compute the derivative
-            ddetAdAmat = detA * Amat.inverse(); //Note lack of transpose because of how Eigen works
+            computeDDetADA<typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, T, -1, -1 >( std::begin( Avec ),    std::end( Avec ), nrows, ncols,
+                                                                                                                        std::begin( ddetAdA ), std::end( ddetAdA ) );
 
             return ddetAdA;
 
