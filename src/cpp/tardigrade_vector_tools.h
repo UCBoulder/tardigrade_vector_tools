@@ -455,8 +455,9 @@ namespace tardigradeVectorTools{
     void computeMatrixExponentialScalingAndSquaring( const v_in &A_begin, const v_in &A_end, const size_type &dim,
                                                      v_out tempVector1_begin, v_out tempVector1_end,
                                                      v_out tempVector2_begin, v_out tempVector2_end,
-                                                     v_out tempMatrix1_begin, v_out tempMatrix1_end,
-                                                     v_out tempMatrix2_begin, v_out tempMatrix2_end,
+                                                     v_out tempVector3_begin, v_out tempVector3_end,
+                                                     M_out tempMatrix1_begin, M_out tempMatrix1_end,
+                                                     M_out tempMatrix2_begin, M_out tempMatrix2_end,
                                                      v_out expA_begin, v_out expA_end, M_out dExpAdA_begin, M_out dExpAdA_end,
                                                      const unsigned int nmaxi=40, double tola=1e-9, double tolr=1e-9 );
 
