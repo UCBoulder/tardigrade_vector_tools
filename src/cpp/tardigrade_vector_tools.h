@@ -493,6 +493,9 @@ namespace tardigradeVectorTools{
                                 const unsigned int nrows, const unsigned int ncols, v_out x_begin, v_out x_end,
                                 unsigned int &rank, solverType< T > &linearSolver );
 
+        template<class v_in, typename T, int R=-1, int C=-1>
+        T determinant( const v_in &A_begin, const v_in &A_end, const unsigned int nrows, const unsigned int ncols );
+
         template<typename T>
         T determinant(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols);
 

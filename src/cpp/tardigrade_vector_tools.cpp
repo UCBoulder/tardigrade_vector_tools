@@ -3221,6 +3221,23 @@ namespace tardigradeVectorTools{
 
         }
 
+        template<class v_in, typename T, int R, int C>
+        T determinant( const v_in &A_begin, const v_in &A_end, const unsigned int nrows, const unsigned int ncols ){
+            /*!
+             * Compute the determinant of the matrix A
+             *
+             * \param &A_begin: The starting iterator of the vector form of the A matrix (row major)
+             * \param &A_end: The stopping iterator of the vector form of the A matrix (row major)
+             * \param nrows: The number of rows
+             * \param ncols: The number of columns
+             */
+
+            //Set up the Eigen map for A
+            Eigen::Map < const Eigen::Matrix< T, R, C, Eigen::RowMajor > > Amat( &( *A_begin ), nrows, ncols );
+            return Amat.determinant( );
+
+        }
+
         template<typename T>
         T determinant(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols){
             /*!
@@ -3236,9 +3253,8 @@ namespace tardigradeVectorTools{
                 assert(1==0);
             }
 
-            //Set up the Eigen map for A
-            Eigen::Map < const Eigen::Matrix<T, -1, -1, Eigen::RowMajor> > Amat(Avec.data(), nrows, ncols);
-            return Amat.determinant();
+            return determinant<typename std::vector< T >::const_iterator,T,-1,-1>( std::begin( Avec ), std::end( Avec ), nrows, ncols );
+
         }
 
         template<typename T>
