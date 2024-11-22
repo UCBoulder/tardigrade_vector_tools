@@ -499,11 +499,19 @@ namespace tardigradeVectorTools{
         template<typename T>
         T determinant(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols);
 
+        template<class M_in, class M_out, typename T, int R=-1, int C=-1>
+        void inverse( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                      M_out Ainv_begin,    M_out Ainv_end );
+
         template<typename T>
         std::vector< double > inverse(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols);
 
         template<typename T>
         std::vector< std::vector< double > > inverse( const std::vector< std::vector< T > > &A );
+
+        template<class M_in, class M_out>
+        void computeFlatDInvADA( const M_in &invA_begin, const M_in &invA_end, const unsigned int nrows, const unsigned int ncols,
+                                 M_out result_begin, M_out result_end );
 
         template<typename T>
         std::vector< double > computeFlatDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols );

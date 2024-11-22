@@ -3257,6 +3257,31 @@ namespace tardigradeVectorTools{
 
         }
 
+        template<class M_in, class M_out, typename T, int R, int C>
+        void inverse( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                      M_out Ainv_begin,    M_out Ainv_end ){
+            /*!
+             * Compute the inverse of a matrix in row-major format
+             *
+             * \param &A_begin: The starting iterator of the vector form of the A matrix (row major)
+             * \param &A_end: The stopping iterator of the vector form of the A matrix (row major)
+             * \param nrows: The number of rows
+             * \param ncols: The number of columns
+             * \param &Ainv_begin: The starting iterator of the inverse of the A matrix (row major)
+             * \param &Ainv_begin: The stopping iterator of the inverse of the A matrix (row major)
+             */
+
+            //Set up the Eigen map for A
+            Eigen::Map < const Eigen::Matrix<T, R, C, Eigen::RowMajor> > Amat( &( *A_begin ), nrows, ncols);
+
+            //Set up the Eigen map for the inverse
+            Eigen::Map< Eigen::Matrix< T, R, C, Eigen::RowMajor > > Ainv( &( *Ainv_begin ), ncols, nrows);
+
+            //Compute the inverse
+            Ainv = Amat.inverse();
+
+        }
+
         template<typename T>
         std::vector< double > inverse(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols){
             /*!
@@ -3271,15 +3296,10 @@ namespace tardigradeVectorTools{
 
             TARDIGRADE_ERROR_TOOLS_CHECK( nrows == ncols, "Error: The number of rows must equal the number of columns.\n  nrows: " + std::to_string( nrows ) + "\n  ncols: " + std::to_string(ncols) )
 
-            //Set up the Eigen map for A
-            Eigen::Map < const Eigen::Matrix<T, -1, -1, Eigen::RowMajor> > Amat(Avec.data(), nrows, ncols);
+            std::vector< T > AinvVec(nrows*ncols);
 
-            //Set up the Eigen map for the inverse
-            std::vector< double > AinvVec(nrows*ncols);
-            Eigen::Map< Eigen::MatrixXd > Ainv(AinvVec.data(), ncols, nrows);
-
-            //Compute the inverse
-            Ainv = Amat.inverse().transpose(); //Note transpose because of how Eigen works
+            inverse<typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, T, -1, -1 >( std::begin( Avec ), std::end( Avec ), nrows, ncols,
+                                                                                                                 std::begin( AinvVec ), std::end( AinvVec ) );
 
             return AinvVec;
         }
@@ -3320,6 +3340,41 @@ namespace tardigradeVectorTools{
             return tardigradeVectorTools::inflate( computeFlatDInvADA( invA, nrows, ncols ), nrows * ncols, nrows * ncols );
 
         }
+
+        template<class M_in, class M_out>
+        void computeFlatDInvADA( const M_in &invA_begin, const M_in &invA_end, const unsigned int nrows, const unsigned int ncols,
+                                 M_out result_begin, M_out result_end ){
+            /*!
+             * Compute the derivative of the inverse of a matrix w.r.t. the matrix
+             * 
+             * \param &invA_begin: The starting iterator of the vector form of the inverse of the A matrix
+             * \param &invA_end: The starting iterator of the vector form of the inverse of the A matrix
+             * \param nrows: The number of rows
+             * \param ncols: The number of columns
+             * \param &result_begin: The starting iterator of the resulting derivative
+             * \param &result_end: The stopping iterator of the resulting derivative
+             */
+
+            for ( unsigned int i = 0; i < nrows; ++i ){
+
+                for ( unsigned int j = 0; j < ncols; ++j ){
+
+                    for ( unsigned int a = 0; a < nrows; ++a ){
+
+                        for ( unsigned int b = 0; b < ncols; ++b ){
+
+                            *( result_begin + ncols * nrows * ncols * i + nrows * ncols * j + nrows * a + b ) = -( *( invA_begin + ncols * i + a ) ) * ( *( invA_begin + ncols * b + j ) );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
         template<typename T>
         std::vector< double > computeFlatDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols ){
             /*!
@@ -3336,23 +3391,7 @@ namespace tardigradeVectorTools{
 
             std::vector< double > result( nrows * ncols * nrows * ncols, 0 );
 
-            for ( unsigned int i = 0; i < nrows; ++i ){
-
-                for ( unsigned int j = 0; j < ncols; ++j ){
-
-                    for ( unsigned int a = 0; a < nrows; ++a ){
-
-                        for ( unsigned int b = 0; b < ncols; ++b ){
-
-                            result[ ncols * nrows * ncols * i + nrows * ncols * j + nrows * a + b ] = -invA[ ncols * i + a ] * invA[ ncols * b + j ];
-
-                        }
-
-                    }
-
-                }
-
-            }
+            computeFlatDInvADA( std::begin( invA ), std::end( invA ), nrows, ncols, std::begin( result ), std::end( result ) );
 
             return result;
 
