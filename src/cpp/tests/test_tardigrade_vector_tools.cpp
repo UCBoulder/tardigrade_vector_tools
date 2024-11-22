@@ -1279,7 +1279,7 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
     vectorType X = { 1., 2., 3., 4., 5., 6., 7., 8.,  9. };
 
     vectorType R, RJp, RJm;
-    matrixType J, JJ;
+    vectorType J, JJ;
     tardigradeVectorTools::__matrixSqrtResidual( A, 3, X, R, J );
 
     //Check that the Jacobian is consistent with the residual
@@ -1294,7 +1294,7 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
         vectorType gradCol = ( RJp - RJm )/(2*delta[ i ]);
 
         for ( unsigned int j=0; j<A.size( ); j++ ){
-            BOOST_TEST( gradCol[ j ] == J[ j ][ i ] );
+            BOOST_TEST( gradCol[ j ] == J[ 9 * j + i ] );
         }
     }
 

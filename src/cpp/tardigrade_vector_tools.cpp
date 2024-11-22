@@ -3510,7 +3510,7 @@ namespace tardigradeVectorTools{
         template< typename T >
         int __matrixSqrtResidual(const std::vector< T > &A, const unsigned int Arows,
                                  const std::vector< T > &X,
-                                 std::vector< double > &R, std::vector< std::vector< double > > &J){
+                                 std::vector< double > &R, std::vector< double > &J){
             /*!
              * Compute the residual equation for the square root of a matrix.
              * This function is not intended to be accessed by the user.
@@ -3522,33 +3522,32 @@ namespace tardigradeVectorTools{
              * \param &J: The value of the jacobian.
              */
 
-            Eigen::Map < const Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > Amat(A.data(), Arows, Arows);
-            Eigen::Map < const Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > Xmat(X.data(), Arows, Arows);
+            R = std::vector< double >( Arows * Arows, 0 );
 
-            R = std::vector< double >(Arows*Arows, 0);
-            Eigen::Map < Eigen::Matrix< double, -1, -1, Eigen::RowMajor > > Rmat(R.data(), Arows, Arows);
+            J = std::vector< double >( Arows * Arows * Arows * Arows, 0 );
 
-            Eigen::Matrix< double, -1, -1 > temp;
-
-            std::vector< double > eyeVec(Arows*Arows);
-            eye(eyeVec);
-
-            J = std::vector< std::vector< double > >(Arows*Arows, std::vector< double >(Arows*Arows, 0 ) );
-            temp = Xmat;
-            temp *= Xmat;
-            Rmat = Amat - temp;
+            std::copy( std::begin( A ), std::end( A ), std::begin( R ) );
 
             for (unsigned int i=0; i<Arows; ++i){
+
                 for (unsigned int j=0; j<Arows; ++j){
+
                     for (unsigned int k=0; k<Arows; ++k){
-                         for (unsigned int l=0; l<Arows; ++l){
-                             J[Arows*i + j][Arows*k + l] = -eyeVec[Arows*i + k]*X[Arows*l + j]
-                                                           -X[Arows*i + k]*eyeVec[Arows*j + l];
-                         }
+
+                        R[ Arows * i + j ] -= X[ Arows * i + k ] * X[ Arows * k + j ];
+
+                        J[ Arows * Arows * Arows * i + Arows * Arows * j + Arows * i + k ] -= X[ Arows * k + j ];
+
+                        J[ Arows * Arows * Arows * i + Arows * Arows * k + Arows * j + k ] -= X[ Arows * i + j ];
+
                     }
+
                 }
+
             }
+
             return 0;
+
         }
 
         template< typename T >
@@ -3567,13 +3566,40 @@ namespace tardigradeVectorTools{
              * \param maxLS: The maximum number of line search iterations.
              */
 
-            std::vector< std::vector< double > > dAdX;
+            std::vector< double > dAdX;
             return matrixSqrt(A, Arows, dAdX, tolr, tola, maxIter);
         }
 
         template< typename T >
         std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
                                     std::vector< std::vector< double > > &dAdX,
+                                    const double tolr, const double tola, const unsigned int maxIter,
+                                    const unsigned int maxLS){
+            /*!
+             * Solve for the square root of the square matrix A.
+             *
+             * \param &A: The matrix A in row major form.
+             * \param Arows: The number of rows in A.
+             * \param &dAdX: The gradient of A w.r.t. X
+             * \param tolr: The relative tolerance.
+             * \param tola: The absolute tolerance.
+             * \param maxIter: The maximum number of iterations
+             * \param maxLS: The maximum number of line search iterations.
+             */
+
+            std::vector< double > _dAdX;
+
+            std::vector< double > sqrtA = matrixSqrt( A, Arows, _dAdX, tolr, tola, maxIter, maxLS );
+
+            dAdX = inflate( _dAdX, Arows * Arows, Arows * Arows );
+
+            return sqrtA;
+
+        }
+
+        template< typename T >
+        std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
+                                    std::vector< double > &dAdX,
                                     const double tolr, const double tola, const unsigned int maxIter,
                                     const unsigned int maxLS){
             /*!
@@ -3596,7 +3622,7 @@ namespace tardigradeVectorTools{
 
             //Compute the first residual and jacobian
             std::vector< double > R;
-            std::vector< std::vector< double > > J;
+            std::vector< double > J;
 
             __matrixSqrtResidual(A, Arows, X, R, J);
 
@@ -3611,7 +3637,7 @@ namespace tardigradeVectorTools{
             double lambda = 1.;
             std::vector< double > dX(Arows*Arows, 0);
             while ((Rp > tol) && (niter < maxIter)){
-                dX = -solveLinearSystem(J, R, rank);
+                dX = -solveLinearSystem(J, R, Arows * Arows, Arows * Arows, rank);
                 TARDIGRADE_ERROR_TOOLS_CATCH(
                     if (rank < dX.size()){
                         std::cout << "niter: " << niter << "\n";
@@ -3663,6 +3689,7 @@ namespace tardigradeVectorTools{
             dAdX = -J;
 
             return X;
+
         }
 
         template< typename T >

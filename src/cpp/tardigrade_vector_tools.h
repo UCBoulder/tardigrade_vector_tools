@@ -535,10 +535,16 @@ namespace tardigradeVectorTools{
         template< typename T >
         int __matrixSqrtResidual(const std::vector< T > &A, const unsigned int Arows,
                                  const std::vector< T > &X,
-                                 std::vector< double > &R, std::vector< std::vector< double > > &J);
+                                 std::vector< double > &R, std::vector< double > &J);
 
         template< typename T >
         std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
+                                         const double tolr = 1e-9, const double tola = 1e-9, const unsigned int maxIter = 20,
+                                         const unsigned int maxLS = 5);
+
+        template< typename T >
+        std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
+                                         std::vector< double > &dAdX,
                                          const double tolr = 1e-9, const double tola = 1e-9, const unsigned int maxIter = 20,
                                          const unsigned int maxLS = 5);
 
