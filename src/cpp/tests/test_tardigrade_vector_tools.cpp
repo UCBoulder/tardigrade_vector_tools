@@ -1278,9 +1278,13 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
     vectorType A = { 3., 3., 5., 3., 7., 7., 5., 7., 11. };
     vectorType X = { 1., 2., 3., 4., 5., 6., 7., 8.,  9. };
 
-    vectorType R, RJp, RJm;
-    vectorType J, JJ;
-    tardigradeVectorTools::__matrixSqrtResidual( A, 3, X, R, J );
+    vectorType R( 9 ), RJp( 9 ), RJm( 9 );
+    vectorType J( 81 ), JJ( 81 );
+
+    tardigradeVectorTools::__matrixSqrtResidual( std::begin( A ), std::end( A ), 3,
+                                                 std::begin( X ), std::end( X ),
+                                                 std::begin( R ), std::end( R ),
+                                                 std::begin( J ), std::end( J ) );
 
     //Check that the Jacobian is consistent with the residual
     floatType eps = 1e-6;
@@ -1288,8 +1292,11 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
         vectorType delta( X.size( ), 0 );
         delta[ i ] = eps*fabs( X[ i ] ) + eps;
 
-        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X + delta, RJp, JJ );
-        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X - delta, RJm, JJ );
+        vectorType Xp = X + delta;
+        vectorType Xm = X - delta;
+
+        tardigradeVectorTools::__matrixSqrtResidual( std::begin( A ), std::end( A ), 3, std::begin( Xp ), std::end( Xp ), std::begin( RJp ), std::end( RJp ), std::begin( JJ ), std::end( JJ ) );
+        tardigradeVectorTools::__matrixSqrtResidual( std::begin( A ), std::end( A ), 3, std::begin( Xm ), std::end( Xm ), std::begin( RJm ), std::end( RJm ), std::begin( JJ ), std::end( JJ ) );
 
         vectorType gradCol = ( RJp - RJm )/(2*delta[ i ]);
 

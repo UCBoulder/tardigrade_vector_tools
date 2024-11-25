@@ -3507,26 +3507,32 @@ namespace tardigradeVectorTools{
             return C;
         }
 
-        template< typename T >
-        int __matrixSqrtResidual(const std::vector< T > &A, const unsigned int Arows,
-                                 const std::vector< T > &X,
-                                 std::vector< double > &R, std::vector< double > &J){
+        template< class v_in, class v_out, class M_out >
+        int __matrixSqrtResidual( const v_in &A_begin, const v_in &A_end,
+                                  const unsigned int Arows,
+                                  v_out X_begin, v_out X_end,
+                                  v_out R_begin, v_out R_end,
+                                  M_out J_begin, M_out J_end ){
             /*!
              * Compute the residual equation for the square root of a matrix.
              * This function is not intended to be accessed by the user.
              *
-             * \param &A: The matrix A in row major form.
+             * \param &A_begin: The starting iterator of the matrix A in row major form.
+             * \param &A_end: The stopping iterator of the matrix A in row major form.
              * \param Arows: The number of rows in A.
-             * \param &X: The estimate of the square root of A
-             * \param &R: The value of the residual.
-             * \param &J: The value of the jacobian.
+             * \param &X_begin: The starting iterator of the estimate of the square root of A in row major form.
+             * \param &X_end: The stopping iterator of the estimate of the square root of A in row major form.
+             * \param &R_begin: The starting iterator of the residual
+             * \param &R_end: The stopping iterator of the residual
+             * \param &J_begin: The starting iterator of the Jacobian
+             * \param &J_end: The stopping iterator of the Jacobian
              */
 
-            R = std::vector< double >( Arows * Arows, 0 );
+            std::fill( R_begin, R_end, 0 );
 
-            J = std::vector< double >( Arows * Arows * Arows * Arows, 0 );
+            std::fill( J_begin, J_end, 0 );
 
-            std::copy( std::begin( A ), std::end( A ), std::begin( R ) );
+            std::copy( A_begin, A_end, R_begin );
 
             for (unsigned int i=0; i<Arows; ++i){
 
@@ -3534,11 +3540,11 @@ namespace tardigradeVectorTools{
 
                     for (unsigned int k=0; k<Arows; ++k){
 
-                        R[ Arows * i + j ] -= X[ Arows * i + k ] * X[ Arows * k + j ];
+                        *( R_begin + Arows * i + j ) -= ( *( X_begin + Arows * i + k ) ) * ( *( X_begin + Arows * k + j ) );
 
-                        J[ Arows * Arows * Arows * i + Arows * Arows * j + Arows * i + k ] -= X[ Arows * k + j ];
+                        *( J_begin + Arows * Arows * Arows * i + Arows * Arows * j + Arows * i + k ) -= ( *( X_begin + Arows * k + j ) );
 
-                        J[ Arows * Arows * Arows * i + Arows * Arows * k + Arows * j + k ] -= X[ Arows * i + j ];
+                        *( J_begin + Arows * Arows * Arows * i + Arows * Arows * k + Arows * j + k ) -= ( *( X_begin + Arows * i + j ) );
 
                     }
 
@@ -3599,7 +3605,7 @@ namespace tardigradeVectorTools{
 
         template< typename T >
         std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
-                                    std::vector< double > &dAdX,
+                                    std::vector< double > &dSqrtAdX,
                                     const double tolr, const double tola, const unsigned int maxIter,
                                     const unsigned int maxLS){
             /*!
@@ -3607,7 +3613,7 @@ namespace tardigradeVectorTools{
              *
              * \param &A: The matrix A in row major form.
              * \param Arows: The number of rows in A.
-             * \param &dAdX: The gradient of A w.r.t. X
+             * \param &dSqrtAdX: The gradient of A w.r.t. X
              * \param tolr: The relative tolerance.
              * \param tola: The absolute tolerance.
              * \param maxIter: The maximum number of iterations
@@ -3617,59 +3623,112 @@ namespace tardigradeVectorTools{
             TARDIGRADE_ERROR_TOOLS_CHECK( A.size() == Arows * Arows, "A has an incompatible shape")
 
             //Initialize the output
-            std::vector< double > X(Arows*Arows);
-            eye(X);
+            std::vector< T > X(Arows*Arows);
+            std::vector< T > dX(Arows*Arows);
+
+            std::vector< T > R( Arows * Arows );
+            dSqrtAdX = std::vector< T >( Arows * Arows * Arows * Arows );
+
+            const int return_val = matrixSqrt<T, typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, typename std::vector< T >::iterator >(
+                std::cbegin( A ), std::cend( A ), Arows, std::begin( X ), std::end( X ), std::begin( dX ), std::end( dX ), std::begin( R ), std::end( R ),
+                std::begin( dSqrtAdX ), std::end( dSqrtAdX ), tolr, tola, maxIter, maxLS );
+
+            TARDIGRADE_ERROR_TOOLS_CHECK( return_val == 0, "Matrix square root failed with error code " + std::to_string( return_val ) );
+
+            return X;
+
+        }
+
+        template< typename T, class v_in, class v_out, class M_out >
+        int matrixSqrt( const v_in A_begin, const v_in A_end, const unsigned int Arows,
+                         v_out X_begin, v_out X_end, v_out dX_begin, v_out dX_end,
+                         v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
+                         const double tolr, const double tola, const unsigned int maxIter,
+                         const unsigned int maxLS ){
+            /*!
+             * Solve for the square root of the square matrix A
+             * 
+             * Error codes:
+             * - 1: The Jacobian matrix is not full rank
+             * - 2: Failure in line search
+             * - 3: Failure to converge
+             * 
+             * \param &A_begin: The starting iterator of matrix A in row-major form
+             * \param &A_end: The stopping iterator of matrix A in row-major form
+             * \param &X_begin: The starting iterator of unknown vector X
+             * \param &X_end: The stopping iterator of unknown vector X
+             * \param &dX_begin: The starting iterator of the current iteration's change in unknown vector X
+             * \param &dX_end: The stopping iterator of the current iteration's change in unknown vector X
+             * \param &R_begin: The starting iterator of the current residual vector R
+             * \param &R_end: The stopping iterator of the current residual vector R
+             * \param &dSqrtAdX_begin: The starting iterator of the partial derivative of the square root of A w.r.t. A
+             * \param &dSqrtAdX_end: The stopping iterator of the partial derivative of the square root of A w.r.t. A
+             * \param tolr: The relative tolerance (defaults to 1e-9)
+             * \param tola: The absolute tolerance (defaults to 1e-9)
+             * \param maxIter: The maximum number of iterators (defaults to 20)
+             * \param maxLS: The maximum number of line-search operators
+             */
+
+            //Set the initial value of X
+            for ( unsigned int i = 0; i < Arows; i++ ){ *( X_begin + Arows * i + i ) = 1; }
 
             //Compute the first residual and jacobian
-            std::vector< double > R;
-            std::vector< double > J;
+            __matrixSqrtResidual( A_begin, A_end, Arows, X_begin, X_end,
+                                  R_begin, R_end, dSqrtAdX_begin, dSqrtAdX_end );
 
-            __matrixSqrtResidual(A, Arows, X, R, J);
-
-            double Rp = sqrt(dot(R, R));
-            double Rnorm = Rp;
-            double tol = tolr * Rp + tola;
+            T Rp = std::sqrt( std::inner_product( R_begin, R_end, R_begin, T( ) ) );
+            T Rnorm = Rp;
+            T tol = tolr * Rp + tola;
 
             //Begin the Newton-Raphson loop
             unsigned int niter = 0;
             unsigned int rank;
             unsigned int nlsiter = 0;
-            double lambda = 1.;
-            std::vector< double > dX(Arows*Arows, 0);
+
+            constexpr T ratio  = 0.5;
+
+            solverType< T > linearSolver;
+
             while ((Rp > tol) && (niter < maxIter)){
-                dX = -solveLinearSystem(J, R, Arows * Arows, Arows * Arows, rank);
+
+                solveLinearSystem( dSqrtAdX_begin, dSqrtAdX_end, R_begin, R_end, Arows * Arows, Arows * Arows,
+                                   dX_begin, dX_end, rank, linearSolver );
+
+                std::transform( dX_begin, dX_end, dX_begin, std::negate<T>( ) );
+
                 TARDIGRADE_ERROR_TOOLS_CATCH(
-                    if (rank < dX.size()){
-                        std::cout << "niter: " << niter << "\n";
-                        tardigradeVectorTools::print(J);
-                        throw std::invalid_argument("J is rank defficent");
+                    if (rank < ( size_type )( dX_end - dX_begin )){
+                        return 1;
                     }
                 )
 
-                X += dX;
+                std::transform( X_begin, X_end, dX_begin, X_begin, std::plus<T>( ) );
 
-                __matrixSqrtResidual(A, Arows, X, R, J);
+                __matrixSqrtResidual( A_begin, A_end, Arows, X_begin, X_end,
+                                      R_begin, R_end, dSqrtAdX_begin, dSqrtAdX_end );
 
-                Rnorm = sqrt(dot(R, R));
+                Rnorm = std::sqrt( std::inner_product( R_begin, R_end, R_begin, T( ) ) );
 
-                lambda = 1;
                 nlsiter = 0;
-                while ((Rnorm > (1 - 1e-4)*Rp) && (nlsiter < maxLS)){
 
-                    X -= lambda * dX;
-                    lambda *= 0.5;
-                    X += lambda * dX;
+                while ( ( Rnorm > ( 1 - 1e-4 ) * Rp ) && ( nlsiter < maxLS ) ){
 
-                    __matrixSqrtResidual(A, Arows, X, R, J);
-                    Rnorm = sqrt(dot(R, R));
+                    std::transform( dX_begin, dX_end, dX_begin, std::bind( std::multiplies<T>( ), std::placeholders::_1, ratio ) );
+
+                    std::transform( X_begin, X_end, dX_begin, X_begin, std::minus<T>( ) );
+
+                    __matrixSqrtResidual( A_begin, A_end, Arows, X_begin, X_end,
+                                          R_begin, R_end, dSqrtAdX_begin, dSqrtAdX_end );
+
+                    Rnorm = std::sqrt( std::inner_product( R_begin, R_end, R_begin, T( ) ) );
 
                     nlsiter++;
 
                 }
 
                 TARDIGRADE_ERROR_TOOLS_CATCH(
-                    if (Rnorm > (1 - 1e-4)*Rp){
-                        throw std::invalid_argument("Failure in line search");
+                    if ( Rnorm > ( 1 - 1e-4 ) * Rp ){
+                        return 2;
                     }
                 )
 
@@ -3681,14 +3740,14 @@ namespace tardigradeVectorTools{
 
             TARDIGRADE_ERROR_TOOLS_CATCH(
                 if (Rp > tol){
-                    throw std::invalid_argument("Matrix square root did not converge");
+                    return 3;
                 }
             )
 
             //Set the jacobian
-            dAdX = -J;
+            std::transform( dSqrtAdX_begin, dSqrtAdX_end, dSqrtAdX_begin, std::negate<T>( ) );
 
-            return X;
+            return 0;
 
         }
 

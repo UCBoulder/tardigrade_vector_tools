@@ -532,10 +532,12 @@ namespace tardigradeVectorTools{
                                              const unsigned int Brows, const unsigned int Bcols,
                                              const bool Atranspose = false, const bool Btranspose = false);
 
-        template< typename T >
-        int __matrixSqrtResidual(const std::vector< T > &A, const unsigned int Arows,
-                                 const std::vector< T > &X,
-                                 std::vector< double > &R, std::vector< double > &J);
+        template< class v_in, class v_out, class M_out >
+        int __matrixSqrtResidual( const v_in &A_begin, const v_in &A_end,
+                                  const unsigned int Arows,
+                                  v_out X_begin, v_out X_end,
+                                  v_out R_begin, v_out R_end,
+                                  M_out J_begin, M_out J_end );
 
         template< typename T >
         std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
@@ -544,15 +546,22 @@ namespace tardigradeVectorTools{
 
         template< typename T >
         std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
-                                         std::vector< double > &dAdX,
+                                         std::vector< double > &dSqrtAdX,
                                          const double tolr = 1e-9, const double tola = 1e-9, const unsigned int maxIter = 20,
                                          const unsigned int maxLS = 5);
 
         template< typename T >
         std::vector< double > matrixSqrt(const std::vector< T > &A, const unsigned int Arows,
-                                         std::vector< std::vector< double > > &dAdX,
+                                         std::vector< std::vector< double > > &dSqrtAdX,
                                          const double tolr = 1e-9, const double tola = 1e-9, const unsigned int maxIter = 20,
                                          const unsigned int maxLS = 5);
+
+        template< typename T, class v_in, class v_out, class M_out >
+        int matrixSqrt( const v_in A_begin, const v_in A_end, const unsigned int Arows,
+                        v_out X_begin, v_out X_end, v_out dX_begin, v_out dX_end,
+                        v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
+                        const double tolr, const double tola, const unsigned int maxIter,
+                        const unsigned int maxLS );
 
         template< typename T >
         void svd( const std::vector< T > &A, std::vector< std::vector< double > > &U, std::vector< double > &Sigma,
