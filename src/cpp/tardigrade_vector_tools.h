@@ -563,6 +563,10 @@ namespace tardigradeVectorTools{
                         const double tolr, const double tola, const unsigned int maxIter,
                         const unsigned int maxLS );
 
+        template<typename T, class M_in, class M_out, class v_out, int R=-1, int C=-1 >
+        void svd( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                  M_out U_begin, M_out U_end, v_out Sigma_begin, v_out Sigma_end, M_out V_begin, M_out V_end );
+
         template< typename T >
         void svd( const std::vector< T > &A, std::vector< std::vector< double > > &U, std::vector< double > &Sigma,
                   std::vector< std::vector< double > > &V );

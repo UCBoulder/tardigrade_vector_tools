@@ -3751,6 +3751,52 @@ namespace tardigradeVectorTools{
 
         }
 
+        template<typename T, class M_in, class M_out, class v_out, int R, int C >
+        void svd( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                  M_out U_begin, M_out U_end, v_out Sigma_begin, v_out Sigma_end, M_out V_begin, M_out V_end ){
+            /*!
+             * Compute the singular value decomposition of a real valued matrix A where A is of the form
+             * A = U Sigma VT
+             * where VT indicates the transpose of V
+             * 
+             * \param &A_begin: The starting iterator of matrix A in row-major format
+             * \param &A_end: The stopping iterator of matrix A in row-major format
+             * \param nrows: The number of rows in A
+             * \param ncols: The number of columns in A
+             * \param &U_begin: The starting iterator of matrix U in row-major format
+             * \param &U_end: The stopping iterator of matrix U in row-major format
+             * \param &Sigma_begin: The starting iterator of the singular values
+             * \param &Sigma_end: The stopping iterator of the singular values
+             * \param &V_begin: The starting iterator of matrix V in row-major format
+             * \param &V_end: The stopping iterator of matrix V in row-major format
+             */
+
+            TARDIGRADE_ERROR_TOOLS_CHECK( ( size_type )( A_end - A_begin ) == nrows * ncols, "A's size is not consistent with the indicated number of rows and columns" );
+
+            // Construct the Eigen Maps
+            Eigen::Map< const Eigen::Matrix< T, R, C, Eigen::RowMajor > > _A( &( *A_begin ), nrows, ncols );
+
+            Eigen::Map< Eigen::Matrix< T, R, R, Eigen::RowMajor > > _U( &( *U_begin ), nrows, nrows );
+
+            #if R > C
+                Eigen::Map< Eigen::Matrix< T, C, C, Eigen::RowMajor > > _Sigma( &( *Sigma_begin ), ( size_type )( Sigma_end - Sigma_begin ), 1 );
+            #else
+                Eigen::Map< Eigen::Matrix< T, R, R, Eigen::RowMajor > > _Sigma( &( *Sigma_begin ), ( size_type )( Sigma_end - Sigma_begin ), 1 );
+            #endif
+
+            Eigen::Map< Eigen::Matrix< T, C, C, Eigen::RowMajor > > _V( &( *V_begin ), ncols, ncols );
+
+            // Perform the singular value decomposition
+            Eigen::JacobiSVD< Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > _svd( _A, Eigen::ComputeFullU | Eigen::ComputeFullV );
+
+            _U = _svd.matrixU( );
+
+            _Sigma = _svd.singularValues( );
+
+            _V = _svd.matrixV( );
+
+        }
+
         template< typename T >
         void svd( const std::vector< T > &A, const unsigned int nrows, const unsigned int ncols,
                   std::vector< double > &U, std::vector< double > &Sigma,
@@ -3780,23 +3826,9 @@ namespace tardigradeVectorTools{
             V.clear( );
             V.resize( ncols * ncols );
 
-            // Construct the Eigen Maps
-            Eigen::Map< const Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > _A( A.data(), nrows, ncols );
-
-            Eigen::Map< Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > _U( U.data(), nrows, nrows );
-
-            Eigen::Map< Eigen::Matrix< T, -1,  -1, Eigen::RowMajor > > _Sigma( Sigma.data(), Sigma.size( ), 1 );
-
-            Eigen::Map< Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > _V( V.data(), ncols, ncols );
-
-            // Perform the singular value decomposition
-            Eigen::JacobiSVD< Eigen::Matrix< T, -1, -1, Eigen::RowMajor > > _svd( _A, Eigen::ComputeFullU | Eigen::ComputeFullV );
-
-            _U = _svd.matrixU( );
-
-            _Sigma = _svd.singularValues( );
-
-            _V = _svd.matrixV( );
+            svd<T, typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, typename std::vector< T >::iterator>(
+                std::cbegin( A ), std::cend( A ), nrows, ncols, std::begin( U ), std::end( U ), std::begin( Sigma ), std::end( Sigma ),
+                std::begin( V ), std::end( V ) );
 
             return;
 
