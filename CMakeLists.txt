@@ -6,6 +6,11 @@ project(tardigrade_vector_tools VERSION 0.2.0)
 set(CPP_SRC_PATH "src/cpp")
 set(CMAKE_SRC_PATH "src/cmake")
 
+set(ADDITIONAL_HEADER_ONLY_LIBRARIES "tardigrade_interp_ndCartesian")
+foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
+    add_library(${package} INTERFACE "${CPP_SRC_PATH}/${package}.cpp" "${CPP_SRC_PATH}/${package}.h")
+endforeach(package)
+
 # Add the cmake folder to locate project CMake module(s)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
 
@@ -38,7 +43,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lrt -O3 -DNDEBUG")
 endif()
 
 # Enable CTest
@@ -66,11 +71,14 @@ foreach(package ${upstream_packages})
     else()
         # Find related, but external, projects using FetchContent and building locally
         message(WARNING "Did not find an installed ${package} package. Attempting local build with FetchContent.")
-        # TODO: Decide how to handle main/dev build differences. bash env variables for GIT TAG?
+        if(NOT DEFINED ${package_upper}_FETCHCONTENT_VERSION)
+            set(${package_upper}_FETCHCONTENT_VERSION "origin/dev")
+        endif()
+        message("${package_upper} is being built with version ${${package_upper}_FETCHCONTENT_VERSION}")
         FetchContent_Declare(
             ${package}
             GIT_REPOSITORY https://github.com/UCBoulder/${package}.git
-            GIT_TAG        origin/dev
+            GIT_TAG        ${${package_upper}_FETCHCONTENT_VERSION}
         )
         FetchContent_MakeAvailable(${package})
     endif()
