@@ -3830,8 +3830,6 @@ namespace tardigradeVectorTools{
 
         }
 
-//        template< typename T, class v_in, class v_out, class M_out >
-//        void polar_decomposition(
         template< typename T >
         void polar_decomposition( const std::vector< T > &A, const unsigned int nrows, const unsigned int ncols,
                                   std::vector< double > &R, std::vector< double > &U, const bool left ){
