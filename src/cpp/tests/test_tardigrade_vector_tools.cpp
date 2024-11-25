@@ -259,6 +259,11 @@ BOOST_AUTO_TEST_CASE( test_computeMean, * boost::unit_test::tolerance( DEFAULT_T
     result = tardigradeVectorTools::computeMean( A );
     BOOST_TEST( result == answer, CHECK_PER_ELEMENT );
 
+    vectorType A_flat = tardigradeVectorTools::appendVectors( A );
+    result = vectorType( 4, 0. );
+    tardigradeVectorTools::computeRowMajorMean<floatType>( std::begin( A_flat ), std::end( A_flat ), std::begin( result ), std::end( result ) );
+    BOOST_TEST( result == answer, CHECK_PER_ELEMENT );
+
 }
 
 BOOST_AUTO_TEST_CASE( test_cross, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
@@ -319,13 +324,29 @@ BOOST_AUTO_TEST_CASE( test_dot, * boost::unit_test::tolerance( DEFAULT_TEST_TOLE
 
     BOOST_TEST( d == d_answer_1, CHECK_PER_ELEMENT );
 
+    vectorType flat_A = tardigradeVectorTools::appendVectors( A );
+
+    d = vectorType( 3, 0. );
+
+    tardigradeVectorTools::rowMajorDot<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( a ), std::end( a ), std::begin( d ), std::end( d ) );
+
+    BOOST_TEST( d == d_answer_1, CHECK_PER_ELEMENT );
+
     matrixType B = { { 10, 11, 12 },
                      { 13, 14, 15 },
                      { 16, 17, 18 } };
 
+    vectorType flat_B = tardigradeVectorTools::appendVectors( B );
+
     matrixType C = tardigradeVectorTools::dot( A, B );
 
+    vectorType flat_C( 9, 0 );
+
     BOOST_TEST( tardigradeVectorTools::appendVectors( C ) == C_answer_1, CHECK_PER_ELEMENT );
+
+    tardigradeVectorTools::rowMajorDot<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( flat_B ), std::end( flat_B ), 3, 3, std::begin( flat_C ), std::end( flat_C ) );
+
+    BOOST_TEST( flat_C == C_answer_1, CHECK_PER_ELEMENT );
 
 }
 
@@ -346,6 +367,16 @@ BOOST_AUTO_TEST_CASE( test_dotT, * boost::unit_test::tolerance( DEFAULT_TEST_TOL
                           266, 338 };
 
     BOOST_TEST( tardigradeVectorTools::appendVectors( tardigradeVectorTools::dotT( A, B ) ) == answer, CHECK_PER_ELEMENT );
+
+    vectorType flat_A = tardigradeVectorTools::appendVectors( A );
+
+    vectorType flat_B = tardigradeVectorTools::appendVectors( B );
+
+    vectorType flat_C( 6, 0 );
+
+    tardigradeVectorTools::rowMajorDotT<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( flat_B ), std::end( flat_B ), 3, 2, std::begin( flat_C ), std::end( flat_C ) );
+
+    BOOST_TEST( flat_C == answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -374,6 +405,22 @@ BOOST_AUTO_TEST_CASE( test_Tdot, * boost::unit_test::tolerance( DEFAULT_TEST_TOL
 
     BOOST_TEST( tardigradeVectorTools::Tdot( A, b ) == vectorAnswer, CHECK_PER_ELEMENT );
 
+    vectorType flat_A = tardigradeVectorTools::appendVectors( A );
+
+    vectorType flat_B = tardigradeVectorTools::appendVectors( B );
+
+    vectorType result( 3, 0 );
+
+    tardigradeVectorTools::rowMajorTdot<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( b ), std::end( b ), std::begin( result ), std::end( result ) );
+
+    BOOST_TEST( result == vectorAnswer, CHECK_PER_ELEMENT );
+
+    vectorType flat_C( 6, 0 );
+
+    tardigradeVectorTools::rowMajorTDot<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( flat_B ), std::end( flat_B ), 3, 2, std::begin( flat_C ), std::end( flat_C ) );
+
+    BOOST_TEST( flat_C == matrixAnswer, CHECK_PER_ELEMENT );
+
 }
 
 BOOST_AUTO_TEST_CASE( test_TdotT, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
@@ -393,6 +440,16 @@ BOOST_AUTO_TEST_CASE( test_TdotT, * boost::unit_test::tolerance( DEFAULT_TEST_TO
                           204, 258 };
 
     BOOST_TEST( tardigradeVectorTools::appendVectors( tardigradeVectorTools::TdotT( A, B ) ) == answer, CHECK_PER_ELEMENT );
+
+    vectorType flat_A = tardigradeVectorTools::appendVectors( A );
+
+    vectorType flat_B = tardigradeVectorTools::appendVectors( B );
+
+    vectorType flat_C( 6 );
+
+    tardigradeVectorTools::rowMajorTdotT<floatType>( std::begin( flat_A ), std::end( flat_A ), std::begin( flat_B ), std::end( flat_B ), 3, 2, std::begin( flat_C ), std::end( flat_C ) );
+
+    BOOST_TEST( flat_C == answer, CHECK_PER_ELEMENT );
 
 }
 
@@ -530,6 +587,11 @@ BOOST_AUTO_TEST_CASE( test_unitVector, * boost::unit_test::tolerance( DEFAULT_TE
         vector_double = std::vector< double >( vector_int[ i ].begin( ), vector_int[ i ].end( ) );
         answer = tardigradeVectorTools::unitVector( vector_double );
         BOOST_TEST( answer == expected[ i ], boost::test_tools::per_element( ) );
+
+        std::vector< double > unit_in_place = { ( double )vector_int[ i ][ 0 ], ( double )vector_int[ i ][ 1 ], ( double )vector_int[ i ][ 2 ] };
+        tardigradeVectorTools::unitVector<double>( std::begin( unit_in_place ), std::end( unit_in_place ) );
+        BOOST_TEST( unit_in_place == expected[ i ], boost::test_tools::per_element( ) );
+
     }
 }
 
@@ -1047,6 +1109,12 @@ BOOST_AUTO_TEST_CASE( test_dyadic, * boost::unit_test::tolerance( DEFAULT_TEST_T
 
     BOOST_TEST( tardigradeVectorTools::appendVectors( A ) == answer, CHECK_PER_ELEMENT );
 
+    vectorType flat_A( 9, 0 );
+
+    tardigradeVectorTools::rowMajorDyadic<floatType>( std::begin( v1 ), std::end( v1 ), std::begin( v2 ), std::end( v2 ), std::begin( flat_A ), std::end( flat_A ) );
+
+    BOOST_TEST( flat_A == answer, CHECK_PER_ELEMENT );
+
 }
 
 BOOST_AUTO_TEST_CASE( test_eye, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){
@@ -1210,9 +1278,13 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
     vectorType A = { 3., 3., 5., 3., 7., 7., 5., 7., 11. };
     vectorType X = { 1., 2., 3., 4., 5., 6., 7., 8.,  9. };
 
-    vectorType R, RJp, RJm;
-    matrixType J, JJ;
-    tardigradeVectorTools::__matrixSqrtResidual( A, 3, X, R, J );
+    vectorType R( 9 ), RJp( 9 ), RJm( 9 );
+    vectorType J( 81 ), JJ( 81 );
+
+    tardigradeVectorTools::__matrixSqrtResidual( std::begin( A ), std::end( A ), 3,
+                                                 std::begin( X ), std::end( X ),
+                                                 std::begin( R ), std::end( R ),
+                                                 std::begin( J ), std::end( J ) );
 
     //Check that the Jacobian is consistent with the residual
     floatType eps = 1e-6;
@@ -1220,13 +1292,16 @@ BOOST_AUTO_TEST_CASE( test_matrixSqrtResidual, * boost::unit_test::tolerance( DE
         vectorType delta( X.size( ), 0 );
         delta[ i ] = eps*fabs( X[ i ] ) + eps;
 
-        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X + delta, RJp, JJ );
-        tardigradeVectorTools::__matrixSqrtResidual( A, 3, X - delta, RJm, JJ );
+        vectorType Xp = X + delta;
+        vectorType Xm = X - delta;
+
+        tardigradeVectorTools::__matrixSqrtResidual( std::begin( A ), std::end( A ), 3, std::begin( Xp ), std::end( Xp ), std::begin( RJp ), std::end( RJp ), std::begin( JJ ), std::end( JJ ) );
+        tardigradeVectorTools::__matrixSqrtResidual( std::begin( A ), std::end( A ), 3, std::begin( Xm ), std::end( Xm ), std::begin( RJm ), std::end( RJm ), std::begin( JJ ), std::end( JJ ) );
 
         vectorType gradCol = ( RJp - RJm )/(2*delta[ i ]);
 
         for ( unsigned int j=0; j<A.size( ); j++ ){
-            BOOST_TEST( gradCol[ j ] == J[ j ][ i ] );
+            BOOST_TEST( gradCol[ j ] == J[ 9 * j + i ] );
         }
     }
 
