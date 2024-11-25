@@ -499,7 +499,7 @@ namespace tardigradeVectorTools{
         template<typename T>
         T determinant(const std::vector< T > &Avec, const unsigned int nrows, const unsigned int ncols);
 
-        template<class M_in, class M_out, typename T, int R=-1, int C=-1>
+        template<typename T, class M_in, class M_out, int R=-1, int C=-1>
         void inverse( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
                       M_out Ainv_begin,    M_out Ainv_end );
 
@@ -560,8 +560,8 @@ namespace tardigradeVectorTools{
         int matrixSqrt( const v_in A_begin, const v_in A_end, const unsigned int Arows,
                         v_out X_begin, v_out X_end, v_out dX_begin, v_out dX_end,
                         v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
-                        const double tolr, const double tola, const unsigned int maxIter,
-                        const unsigned int maxLS );
+                        const double tolr=1e-9, const double tola=1e-9, const unsigned int maxIter=20,
+                        const unsigned int maxLS=5 );
 
         template<typename T, class M_in, class M_out, class v_out, int R=-1, int C=-1 >
         void svd( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
@@ -570,6 +570,11 @@ namespace tardigradeVectorTools{
         template< typename T >
         void svd( const std::vector< T > &A, std::vector< std::vector< double > > &U, std::vector< double > &Sigma,
                   std::vector< std::vector< double > > &V );
+
+        template< typename T, class v_in, class v_out, class M_out, int R=-1, int C=-1 >
+        void polar_decomposition( const v_in &A_begin, const v_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                                  v_out Usqrd_begin, v_out Usqrd_end, v_out tempVec1_begin, v_out tempVec1_end, v_out tempVec2_begin, v_out tempVec2_end,
+                                  M_out dUdUsqrd_begin, M_out dUdUsqrd_end, v_out R_begin, v_out R_end, v_out U_begin, v_out U_end, const bool left );
 
         template< typename T >
         void polar_decomposition( const std::vector< T > &A, const unsigned int nrows, const unsigned int ncols,

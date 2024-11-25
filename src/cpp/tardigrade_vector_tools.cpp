@@ -2965,9 +2965,6 @@ namespace tardigradeVectorTools{
             std::fill( tempVector1_begin, tempVector1_end, 0 );
 
             std::fill( tempMatrix1_begin, tempMatrix1_end, 0 );
-//            std::vector< T > expAi( dim * dim, 0 );
-//
-//            std::vector< T > dExpAidA( dim * dim * dim * dim, 0 );
 
             for ( unsigned int j = 0; j < dim; ++j ){
 
@@ -2976,7 +2973,6 @@ namespace tardigradeVectorTools{
                     for ( unsigned int l = 0; l < dim; ++l ){
 
                         *( tempVector1_begin + dim * j + l ) += ( *( expA_begin + dim * j + k ) ) * ( *( tempVector3_begin + dim * k + l ) );
-//                        expAi[ dim * j + l ] += expA[ dim * j + k ] * expAoverm[ dim * k + l ];
 
                         for ( unsigned int ab = 0; ab < dim * dim; ++ab ){
 
@@ -3257,7 +3253,7 @@ namespace tardigradeVectorTools{
 
         }
 
-        template<class M_in, class M_out, typename T, int R, int C>
+        template<typename T, class M_in, class M_out, int R, int C>
         void inverse( const M_in &A_begin, const M_in &A_end, const unsigned int nrows, const unsigned int ncols,
                       M_out Ainv_begin,    M_out Ainv_end ){
             /*!
@@ -3298,7 +3294,7 @@ namespace tardigradeVectorTools{
 
             std::vector< T > AinvVec(nrows*ncols);
 
-            inverse<typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, T, -1, -1 >( std::begin( Avec ), std::end( Avec ), nrows, ncols,
+            inverse<T, typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, -1, -1 >( std::begin( Avec ), std::end( Avec ), nrows, ncols,
                                                                                                                  std::begin( AinvVec ), std::end( AinvVec ) );
 
             return AinvVec;
@@ -3641,10 +3637,10 @@ namespace tardigradeVectorTools{
 
         template< typename T, class v_in, class v_out, class M_out >
         int matrixSqrt( const v_in A_begin, const v_in A_end, const unsigned int Arows,
-                         v_out X_begin, v_out X_end, v_out dX_begin, v_out dX_end,
-                         v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
-                         const double tolr, const double tola, const unsigned int maxIter,
-                         const unsigned int maxLS ){
+                        v_out X_begin, v_out X_end, v_out dX_begin, v_out dX_end,
+                        v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
+                        const double tolr, const double tola, const unsigned int maxIter,
+                        const unsigned int maxLS ){
             /*!
              * Solve for the square root of the square matrix A
              * 
@@ -3670,7 +3666,7 @@ namespace tardigradeVectorTools{
              */
 
             //Set the initial value of X
-            for ( unsigned int i = 0; i < Arows; i++ ){ *( X_begin + Arows * i + i ) = 1; }
+            for ( unsigned int i = 0; i < Arows; ++i ){ *( X_begin + Arows * i + i ) = 1; }
 
             //Compute the first residual and jacobian
             __matrixSqrtResidual( A_begin, A_end, Arows, X_begin, X_end,
@@ -3834,6 +3830,8 @@ namespace tardigradeVectorTools{
 
         }
 
+//        template< typename T, class v_in, class v_out, class M_out >
+//        void polar_decomposition(
         template< typename T >
         void polar_decomposition( const std::vector< T > &A, const unsigned int nrows, const unsigned int ncols,
                                   std::vector< double > &R, std::vector< double > &U, const bool left ){
@@ -3858,39 +3856,135 @@ namespace tardigradeVectorTools{
             // Compute Usqrd
             std::vector< double > Usqrd;
             unsigned int Urows;
+            if ( left ){
+                Usqrd = std::vector< double >( nrows * nrows, 0 );
+                Urows = nrows;
+            }
+            else{
+                Usqrd = std::vector< double > ( ncols * ncols, 0 );
+                Urows = ncols;
+            }
 
+            U = std::vector< double >( Urows * Urows );
+            R = std::vector< double >( Urows * Urows );
+            std::vector< double > tempVec1( Urows * Urows );
+            std::vector< double > tempVec2( Urows * Urows );
+            std::vector< double > dUdUsqrd( Urows * Urows * Urows * Urows, 0 );
+
+            polar_decomposition<T>( std::cbegin( A ), std::cend( A ), nrows, ncols,
+                                    std::begin( Usqrd ), std::end( Usqrd ),
+                                    std::begin( tempVec1 ), std::end( tempVec1 ),
+                                    std::begin( tempVec2 ), std::end( tempVec2 ),
+                                    std::begin( dUdUsqrd ), std::end( dUdUsqrd ),
+                                    std::begin( R ),        std::end( R ),
+                                    std::begin( U ),        std::end( U ),
+                                    left );
+
+        }
+
+        template< typename T, class v_in, class v_out, class M_out, int R, int C >
+        void polar_decomposition( const v_in &A_begin, const v_in &A_end, const unsigned int nrows, const unsigned int ncols,
+                                  v_out Usqrd_begin, v_out Usqrd_end, v_out tempVec1_begin, v_out tempVec1_end, v_out tempVec2_begin, v_out tempVec2_end,
+                                  M_out dUdUsqrd_begin, M_out dUdUsqrd_end, v_out R_begin, v_out R_end, v_out U_begin, v_out U_end, const bool left ){                                  
+            /*!
+             * Perform the polar decomposition of the matrix \f$A\f$. If left is false the decomposition will be:
+             *
+             * \f$A = R U\f$
+             *
+             * If left is true the decomposition will be:
+             *
+             * \f$A = U R\f$
+             *
+             * /param &A_begin: The starting iterator of the matrix to be decomposed
+             * /param &A_end: The stopping iterator of the matrix to be decomposed
+             * /param &nrows: The number of rows in A
+             * /param &ncols: The number of columns in A
+             * /param &Usqrd_begin: The starting iterator of the square of the matrix to be decomposed
+             * /param &Usqrd_end: The stopping iterator of the square of the matrix to be decomposed
+             * /param &tempVec1_begin: The starting iterator of a temporary vector the same size as A
+             * /param &tempVec1_end: The stopping iterator of a temporary vector the same size as A
+             * /param &tempVec2_begin: The starting iterator of a temporary vector the same size as A
+             * /param &tempVec2_end: The stopping iterator of a temporary vector the same size as A
+             * \param &dUdUsqrd_begin: The starting iterator of the derivative of U w.r.t. U squared
+             * \param &dUdUsqrd_end: The stopping iterator of the derivative of U w.r.t. U squared
+             * /param &R_begin: The starting iterator of the rotation tensor
+             * /param &R_end: The stopping iterator of the rotation tensor
+             * /param &U_begin: The starting iterator of the stretch tensor. Left or right stretch is determined by the parameter `left`
+             * /param &U_end: The stopping iterator of the stretch tensor. Left or right stretch is determined by the parameter `left`
+             * /param &left: The flag indicating of the right decomposition (\f$A = RU\f$) or the left decomposition
+             *     (\f$A = UR\f$) is to be performed.
+             */
+
+            unsigned int Urows;
+            if ( left ){
+                Urows = nrows;
+            }
+            else{
+                Urows = ncols;
+            }
+
+            std::fill( Usqrd_begin, Usqrd_end, 0 );
             if ( left ){
 
-                Usqrd = tardigradeVectorTools::matrixMultiply( A, A, nrows, ncols, ncols, nrows, 0, 1 );
-                Urows = nrows;
+                for ( unsigned int i = 0; i < nrows; ++i ){
+                    for ( unsigned int j = 0; j < nrows; ++j ){
+                        for ( unsigned int k = 0; k < nrows; ++k ){
+                            *( Usqrd_begin + ncols * i + j ) += ( *( A_begin + ncols * i + k ) ) * ( *( A_begin + ncols * j + k ) );
+                        }
+                    }
+                }
 
             }
             else{
 
-                Usqrd = tardigradeVectorTools::matrixMultiply( A, A, ncols, nrows, nrows, ncols, 1, 0 );
-                Urows = ncols;
+                for ( unsigned int k = 0; k < nrows; ++k ){
+                    for ( unsigned int i = 0; i < nrows; ++i ){
+                        for ( unsigned int j = 0; j < nrows; ++j ){
+                            *( Usqrd_begin + ncols * i + j ) += ( *( A_begin + ncols * k + i ) ) * ( *( A_begin + ncols * k + j ) );
+                        }
+                    }
+                }
 
             }
 
             // Perform the matrix square root of Usqrd
-            U = matrixSqrt( Usqrd, Urows );
+            const int return_val = matrixSqrt<T, typename std::vector< T >::const_iterator, typename std::vector< T >::iterator, typename std::vector< T >::iterator>(
+                Usqrd_begin, Usqrd_end, Urows, U_begin, U_end, tempVec1_begin, tempVec1_end,
+                tempVec2_begin, tempVec2_end, dUdUsqrd_begin, dUdUsqrd_end );
+
+            TARDIGRADE_ERROR_TOOLS_CHECK( return_val == 0, "Return value from matrix square root is " + std::to_string( return_val ) );
 
             // Compute the rotation matrix
-            std::vector< double > Uinv = tardigradeVectorTools::inverse( U, nrows, ncols );
+            inverse<T, v_in, v_out, R, C>( U_begin, U_end, nrows, ncols, tempVec1_begin, tempVec1_end );
+
+            std::fill( R_begin, R_end, 0 );
 
             if ( left ){
 
-                R = tardigradeVectorTools::matrixMultiply( Uinv, A, nrows, nrows, nrows, ncols, 0, 0 );
+                for ( unsigned int i = 0; i < Urows; ++i ){
+                    for ( unsigned int k = 0; k < Urows; ++k ){
+                        for ( unsigned int j = 0; j < ncols; ++j ){
+                            *( R_begin + Urows * i + j ) += ( *( tempVec1_begin + Urows * i + k ) ) * ( *( A_begin + ncols * k + j ) );
+                        }
+                    }
+                }
 
             }
             else{
 
-                R = tardigradeVectorTools::matrixMultiply( A, Uinv, nrows, ncols, ncols, ncols, 0, 0 );
+                for ( unsigned int i = 0; i < Urows; ++i ){
+                    for ( unsigned int k = 0; k < Urows; ++k ){
+                        for ( unsigned int j = 0; j < ncols; ++j ){
+                            *( R_begin + Urows * i + j ) += ( *( A_begin + Urows * i + k ) ) * ( *( tempVec1_begin + ncols * k + j ) );
+                        }
+                    }
+                }
 
             }
 
             return;
-        }
+
+        } 
 
     #endif
 }
