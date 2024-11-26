@@ -3371,6 +3371,37 @@ namespace tardigradeVectorTools{
 
         }
 
+        template<int nrows, int ncols, class M_in, class M_out>
+        void computeFlatDInvADA( const M_in &invA_begin, const M_in &invA_end, M_out result_begin, M_out result_end ){
+            /*!
+             * Compute the derivative of the inverse of a matrix w.r.t. the matrix
+             * 
+             * \param &invA_begin: The starting iterator of the vector form of the inverse of the A matrix
+             * \param &invA_end: The starting iterator of the vector form of the inverse of the A matrix
+             * \param &result_begin: The starting iterator of the resulting derivative
+             * \param &result_end: The stopping iterator of the resulting derivative
+             */
+
+            for ( unsigned int i = 0; i < nrows; ++i ){
+
+                for ( unsigned int j = 0; j < ncols; ++j ){
+
+                    for ( unsigned int a = 0; a < nrows; ++a ){
+
+                        for ( unsigned int b = 0; b < ncols; ++b ){
+
+                            *( result_begin + ncols * nrows * ncols * i + nrows * ncols * j + nrows * a + b ) = -( *( invA_begin + ncols * i + a ) ) * ( *( invA_begin + ncols * b + j ) );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
         template<typename T>
         std::vector< double > computeFlatDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols ){
             /*!
