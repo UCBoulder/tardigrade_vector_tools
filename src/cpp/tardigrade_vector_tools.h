@@ -513,6 +513,9 @@ namespace tardigradeVectorTools{
         void computeFlatDInvADA( const M_in &invA_begin, const M_in &invA_end, const unsigned int nrows, const unsigned int ncols,
                                  M_out result_begin, M_out result_end );
 
+        template<int nrows, int ncols, class M_in, class M_out>
+        void computeFlatDInvADA( const M_in &invA_begin, const M_in &invA_end, M_out result_begin, M_out result_end );
+
         template<typename T>
         std::vector< double > computeFlatDInvADA( const std::vector< T > &invA, const unsigned int nrows, const unsigned int ncols );
 
