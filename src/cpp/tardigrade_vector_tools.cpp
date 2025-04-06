@@ -1505,7 +1505,7 @@ namespace tardigradeVectorTools{
          * \param &M_end: The stopping iterator for the matrix
          */
 
-        const size_type bound = std::min( ( size_type )( M_end - M_begin ), ( size_type )( std::end( *M_begin ) - std::begin( *M_end ) ) );
+        const size_type bound = std::min( ( size_type )( M_end - M_begin ), ( size_type )( std::end( *M_begin ) - std::begin( *M_begin ) ) );
 
         for ( unsigned int row = 0; row < bound; ++row ){
 
