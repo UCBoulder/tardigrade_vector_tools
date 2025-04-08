@@ -11,6 +11,9 @@ foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
     add_library(${package} INTERFACE "${CPP_SRC_PATH}/${package}.cpp" "${CPP_SRC_PATH}/${package}.h")
 endforeach(package)
 
+# Add a flag for if a full build of all tardigrade repositories should be performed
+set(TARDIGRADE_FULL_BUILD OFF CACHE BOOL "Flag for whether a full build of Tardigrade should be performed (i.e., all repos pulled from git and built)")
+
 # Add the cmake folder to locate project CMake module(s)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
 
@@ -65,7 +68,11 @@ include(FetchContent)
 set(upstream_packages "tardigrade_error_tools")
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
-    find_package(${package} ${upstream_required} CONFIG)
+    if(TARDIGRADE_FULL_BUILD)
+        message("Not attempting to find ${package}")
+    else()
+        find_package(${package} ${upstream_required} CONFIG)
+    endif()
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
     else()
