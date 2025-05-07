@@ -2,11 +2,17 @@ boost>=1.59
 breathe>=4.30.0
 cmake>=3.18
 compilers
+cython
 doxygen
 eigen>=3.3.7
-tardigrade_error_tools>=0.7
-# TODO: Remove mamba after tracing conda issue: https://re-git.lanl.gov/aea/material-models/tardigrade_vector_tools/-/issues/12
+tardigrade_error_tools>=0.9.7
 mamba
+pip
+pytest
+pytest-cov
+pytest-xdist
+python-build
+python
 setuptools_scm>=6.2
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
