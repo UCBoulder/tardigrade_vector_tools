@@ -1512,6 +1512,11 @@ BOOST_AUTO_TEST_CASE( test_computeDinvAdA, * boost::unit_test::tolerance( DEFAUL
 
     BOOST_TEST( tardigradeVectorTools::appendVectors( gradient ) == tardigradeVectorTools::appendVectors( tardigradeVectorTools::computeDInvADA( invA, 3, 3 ) ), CHECK_PER_ELEMENT );
 
+    vectorType dInvAdA( 81, 0 );
+    tardigradeVectorTools::computeFlatDInvADA<3,3>( std::cbegin( invA ), std::cend( invA ), std::begin( dInvAdA ), std::end( dInvAdA ) );
+
+    BOOST_TEST( tardigradeVectorTools::appendVectors( gradient ) == dInvAdA, CHECK_PER_ELEMENT );
+
 }
 
 BOOST_AUTO_TEST_CASE( test_computeMatrixExponential, * boost::unit_test::tolerance( DEFAULT_TEST_TOLERANCE ) ){

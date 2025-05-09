@@ -11,6 +11,9 @@ foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
     add_library(${package} INTERFACE "${CPP_SRC_PATH}/${package}.cpp" "${CPP_SRC_PATH}/${package}.h")
 endforeach(package)
 
+# Add a flag for if a full build of all tardigrade repositories should be performed
+set(TARDIGRADE_FULL_BUILD OFF CACHE BOOL "Flag for whether a full build of Tardigrade should be performed (i.e., all repos pulled from git and built)")
+
 # Add the cmake folder to locate project CMake module(s)
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/${CMAKE_SRC_PATH}" ${CMAKE_MODULE_PATH})
 
@@ -59,13 +62,33 @@ endif()
 
 # Set build type checks
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower)
+set(upstream_required "")
+set(not_conda_test "true")
+set(project_link_string ${PROJECT_NAME})
+if(cmake_build_type_lower STREQUAL "release")
+    set(upstream_required "REQUIRED")
+elseif(cmake_build_type_lower STREQUAL "conda-test")
+    set(upstream_required "REQUIRED")
+    set(not_conda_test "false")
+    # Find the installed project library
+    find_file(installed_linked_library
+              "lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+              PATHS "$ENV{CONDA_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+              NO_CACHE
+              REQUIRED)
+    set(project_link_string ${installed_linked_library})
+endif()
 
 # Find related, but external, projects in installed environment
 include(FetchContent)
 set(upstream_packages "tardigrade_error_tools")
 foreach(package ${upstream_packages})
     string(TOUPPER "${package}" package_upper)
-    find_package(${package} ${upstream_required} CONFIG)
+    if(TARDIGRADE_FULL_BUILD)
+        message("Not attempting to find ${package}")
+    else()
+        find_package(${package} ${upstream_required} CONFIG)
+    endif()
     if(${package}_FOUND)
         message(STATUS "Found ${package}: ${${package}_DIR}")
     else()

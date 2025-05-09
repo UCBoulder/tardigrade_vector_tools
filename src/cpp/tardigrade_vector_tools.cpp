@@ -1505,7 +1505,7 @@ namespace tardigradeVectorTools{
          * \param &M_end: The stopping iterator for the matrix
          */
 
-        const size_type bound = std::min( ( size_type )( M_end - M_begin ), ( size_type )( std::end( *M_begin ) - std::begin( *M_end ) ) );
+        const size_type bound = std::min( ( size_type )( M_end - M_begin ), ( size_type )( std::end( *M_begin ) - std::begin( *M_begin ) ) );
 
         for ( unsigned int row = 0; row < bound; ++row ){
 
@@ -3347,6 +3347,37 @@ namespace tardigradeVectorTools{
              * \param &invA_end: The starting iterator of the vector form of the inverse of the A matrix
              * \param nrows: The number of rows
              * \param ncols: The number of columns
+             * \param &result_begin: The starting iterator of the resulting derivative
+             * \param &result_end: The stopping iterator of the resulting derivative
+             */
+
+            for ( unsigned int i = 0; i < nrows; ++i ){
+
+                for ( unsigned int j = 0; j < ncols; ++j ){
+
+                    for ( unsigned int a = 0; a < nrows; ++a ){
+
+                        for ( unsigned int b = 0; b < ncols; ++b ){
+
+                            *( result_begin + ncols * nrows * ncols * i + nrows * ncols * j + nrows * a + b ) = -( *( invA_begin + ncols * i + a ) ) * ( *( invA_begin + ncols * b + j ) );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        template<int nrows, int ncols, class M_in, class M_out>
+        void computeFlatDInvADA( const M_in &invA_begin, const M_in &invA_end, M_out result_begin, M_out result_end ){
+            /*!
+             * Compute the derivative of the inverse of a matrix w.r.t. the matrix
+             * 
+             * \param &invA_begin: The starting iterator of the vector form of the inverse of the A matrix
+             * \param &invA_end: The starting iterator of the vector form of the inverse of the A matrix
              * \param &result_begin: The starting iterator of the resulting derivative
              * \param &result_end: The stopping iterator of the resulting derivative
              */
