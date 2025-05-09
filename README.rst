@@ -25,13 +25,12 @@ not need to be used explicitly in the user's code.
 Information
 ===========
 
-* Documentation: https://aea.re-pages.lanl.gov/material-models/tardigrade_vector_tools
-* Wiki: https://re-git.lanl.gov/aea/material-models/tardigrade_vector_tools/-/wikis/home
+TODO
 
 Developers
 ==========
 
-* Nathan Miller nathanm@lanl.gov
+* Nathan Miller Nathan.A.Miller@colorado.edu
 * Kyle Brindley kbrindley@lanl.gov
 
 ************
