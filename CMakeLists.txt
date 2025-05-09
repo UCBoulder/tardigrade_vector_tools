@@ -62,6 +62,22 @@ endif()
 
 # Set build type checks
 string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower)
+set(upstream_required "")
+set(not_conda_test "true")
+set(project_link_string ${PROJECT_NAME})
+if(cmake_build_type_lower STREQUAL "release")
+    set(upstream_required "REQUIRED")
+elseif(cmake_build_type_lower STREQUAL "conda-test")
+    set(upstream_required "REQUIRED")
+    set(not_conda_test "false")
+    # Find the installed project library
+    find_file(installed_linked_library
+              "lib${PROJECT_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}"
+              PATHS "$ENV{CONDA_PREFIX}/${CMAKE_INSTALL_LIBDIR}"
+              NO_CACHE
+              REQUIRED)
+    set(project_link_string ${installed_linked_library})
+endif()
 
 # Find related, but external, projects in installed environment
 include(FetchContent)
