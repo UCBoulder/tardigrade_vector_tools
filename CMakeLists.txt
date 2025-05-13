@@ -6,11 +6,6 @@ project(tardigrade_vector_tools VERSION 0.2.0)
 set(CPP_SRC_PATH "src/cpp")
 set(CMAKE_SRC_PATH "src/cmake")
 
-set(ADDITIONAL_HEADER_ONLY_LIBRARIES "tardigrade_interp_ndCartesian")
-foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
-    add_library(${package} INTERFACE "${CPP_SRC_PATH}/${package}.cpp" "${CPP_SRC_PATH}/${package}.h")
-endforeach(package)
-
 # Add a flag for if a full build of all tardigrade repositories should be performed
 set(TARDIGRADE_FULL_BUILD OFF CACHE BOOL "Flag for whether a full build of Tardigrade should be performed (i.e., all repos pulled from git and built)")
 
@@ -22,6 +17,13 @@ string(TOLOWER "${CMAKE_BUILD_TYPE}" cmake_build_type_lower)
 set(not_conda_test "true")
 if(cmake_build_type_lower STREQUAL "conda-test")
     set(not_conda_test "false")
+endif()
+
+if(${not_conda_test} STREQUAL "true")
+    set(ADDITIONAL_HEADER_ONLY_LIBRARIES "tardigrade_interp_ndCartesian")
+    foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
+        add_library(${package} INTERFACE "${CPP_SRC_PATH}/${package}.cpp" "${CPP_SRC_PATH}/${package}.h")
+    endforeach(package)
 endif()
 
 # Get version number from Git
