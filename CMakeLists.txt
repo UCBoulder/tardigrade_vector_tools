@@ -8,7 +8,7 @@ set(CMAKE_SRC_PATH "src/cmake")
 
 set(ADDITIONAL_HEADER_ONLY_LIBRARIES "tardigrade_interp_ndCartesian")
 foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
-    add_library(${package} INTERFACE "${PROJECT_SOURCE_DIR}/${CPP_SRC_PATH}/${package}.cpp" "${PROJECT_SOURCE_DIR}/${CPP_SRC_PATH}/${package}.h")
+    add_library(${package} INTERFACE "${CPP_SRC_PATH}/${package}.cpp" "${CPP_SRC_PATH}/${package}.h")
 endforeach(package)
 
 # Add a flag for if a full build of all tardigrade repositories should be performed
