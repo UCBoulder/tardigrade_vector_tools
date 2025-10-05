@@ -193,6 +193,9 @@ namespace tardigradeVectorTools{
     template<typename T>
     T inner(const std::vector< std::vector< T > > &A, const std::vector< std::vector< T > > &B);
 
+    template<unsigned int rows, unsigned int cols, typename T, class M_in>
+    void rowMajorTrace(const M_in &A_begin, const M_in &A_end, T &v);
+
     template<typename T, class M_in>
     void rowMajorTrace(const M_in &A_begin, const M_in &A_end, const size_type rows, T &v);
 

@@ -501,6 +501,13 @@ BOOST_AUTO_TEST_CASE( test_trace, * boost::unit_test::tolerance( DEFAULT_TEST_TO
 
     BOOST_TEST( tardigradeVectorTools::fuzzyEquals<floatType>( c, 3. ) );
 
+    c = 0;
+    tardigradeVectorTools::rowMajorTrace<3,3>(
+        std::begin( a ), std::end( a ), c
+    );
+
+    BOOST_TEST( c == 3. );
+
     //TODO: Refactor with boost or pytest
     vectorType b = { 1., 0., 0.,
                      0., 1., 0.,
@@ -508,6 +515,13 @@ BOOST_AUTO_TEST_CASE( test_trace, * boost::unit_test::tolerance( DEFAULT_TEST_TO
                      0., 0., 1. };
 
     BOOST_CHECK_THROW( tardigradeVectorTools::trace( b, c ), std::runtime_error );
+
+    c = 0;
+    tardigradeVectorTools::rowMajorTrace<4,3>(
+        std::begin( b ), std::end( b ), c
+    );
+
+    BOOST_TEST( c == 2. );
 
     c = 0.;
     c = tardigradeVectorTools::trace( a );

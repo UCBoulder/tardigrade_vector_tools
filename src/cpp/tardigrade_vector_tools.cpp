@@ -1189,6 +1189,33 @@ namespace tardigradeVectorTools{
         return result;
     }
 
+    template<unsigned int rows, unsigned int cols, typename T, class M_in>
+    void rowMajorTrace(const M_in &A_begin, const M_in &A_end, T &v){
+        /*!
+         * Compute the trace of a matrix ( \f$A\f$ ) in row major format:
+         *
+         * \f$v = A_{ii}\f$
+         * 
+         * If \f$A\f$ is non-square it will sum the values on the diagonal
+         *
+         * \param &A_begin: The starting iterator of the matrix in row major format ( \f$A\f$ )
+         * \param &A_end: The stopping iterator of the matrix in row major format ( \f$A\f$ )
+         * \param &rows: The number of rows in the matrix
+         * \param &v: The scalar output quantity ( \f$v\f$ )
+         */
+
+        constexpr unsigned int bound = std::min( rows, cols );
+
+        v = 0;
+
+        for ( unsigned int i = 0; i < bound; ++i ){
+
+            v += *( A_begin + cols * i + i );
+
+        }
+
+    }
+
     template<typename T, class M_in>
     void rowMajorTrace(const M_in &A_begin, const M_in &A_end, const size_type rows, T &v){
         /*!
