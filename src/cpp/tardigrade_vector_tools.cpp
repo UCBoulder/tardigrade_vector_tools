@@ -1204,6 +1204,11 @@ namespace tardigradeVectorTools{
          * \param &v: The scalar output quantity ( \f$v\f$ )
          */
 
+        TARDIGRADE_ERROR_TOOLS_CHECK(
+            ( unsigned int )( A_end - A_begin ),
+            "The dimension of the matrix is " + std::to_string( ( unsigned int )( A_end - A_begin ) ) + " but should be " + std::to_string( rows * cols )
+        )
+
         constexpr unsigned int bound = std::min( rows, cols );
 
         v = 0;
