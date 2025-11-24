@@ -37,44 +37,11 @@ Developers
 Dependencies
 ************
 
-Executables
-===========
-
-* `CMake`_  >= 3.14
-* `Doxygen`_ >= 1.8.5
-* `LaTeX`_ >= 2017
-
-Python Modules (for documentation)
-==================================
-
-For convenience, the minimal Python environment requirements for the documentation build are included in
-``configuration_files/environment.yaml``. This file was created from the `pipreqs`_ command line tool and Sphinx
-configuration inspection, e.g. the extension packages.
+The developer dependencies are found in ``environment.txt``.
 
 .. code-block:: bash
 
-   $ pwd
-   path/to/tardigrade_vector_tools/
-   $ pipreqs --use-local --print --no-pin .
-
-A minimal anaconda environment for building the documentation can be created
-from an existing anaconda installation with the following commands.
-
-.. code-block:: bash
-
-   $ conda create --file environment.txt
-
-You can learn more about Anaconda Python environment creation and management in the `Anaconda Documentation`_.
-
-C++ Libraries
-=============
-
-> **NOTE: Non-admin installations for Eigen and Boost are no longer required.** This project is built and deployed
-> against C++ libraries managed in Conda. See the Conda environment file and README discussion for non-admin environment
-> management.
-
-* `Eigen`_ >= 3.3.7
-* `BOOST`_ >= 1.53.0
+   $ conda create --name tardigrade_vector_tools-dev --file environment.txt
 
 **************************
 Building the documentation
@@ -85,107 +52,68 @@ Building the documentation
    **API Health Note**: The Sphinx API docs are a work-in-progress. The doxygen
    API is much more useful
 
-Build on sstelmo
-================
+.. code-block:: bash
 
-1) Activate the correct python environment
+   $ pwd
+   /path/to/tardigrade_vector_tools
+   $ cmake -S . -B build
+   $ cmake --build build --target Doxygen Sphinx
 
-   .. code-block:: bash
+*****************
+Build the library
+*****************
 
-     $ module use /projects/aea_compute/modulefiles
-     $ module load tardigrade_vector_tools-env
+Vector tools is always header only. There is nothing to build.
 
-2) Create the build directory and move there
+****************
+Test the library
+****************
 
-   .. code-block:: bash
+.. code-block:: back
 
-     $ pwd
-     /path/to/tardigrade_vector_tools/
-     $ mkdir build/
-     $ cd build/
-
-3) Run cmake configuration
-
-   .. code-block:: bash
-
-      $ pwd
-      /path/to/tardigrade_vector_tools/build/
-      $ cmake ..
-
-4) Display target options
-
-   .. code-block:: bash
-
-      $ pwd
-      /path/to/cpp_stub/build
-      $ cmake --build . --target help
-
-4) Build various portions of the project
-
-       Most of the project will re-build only as necessary after source updates. Some portions of the documentation
-       require a ``cmake --build . --target clean`` after documentation source file updates to force a re-build.
-
-   .. code-block:: bash
-
-      $ pwd
-      /path/to/cpp_stub/build
-
-      # Build everything (either or)
-      $ cmake --build .
-      $ cmake --build . --target all
-
-5) Sphinx HTML Documentation builds to:
-
-   .. code-block:: bash
-
-      tardigrade_vector_tools/build/docs/sphinx/html/index.html
-
-6) Display docs
-
-   .. code-block:: bash
-
-      $ pwd
-      /path/to/tardigrade_vector_tools/build/
-      $ firefox docs/sphinx/html/index.html &
-
-7) While the Sphinx API is still a WIP, try the doxygen API
-
-   .. code-block:: bash
-
-     $ pwd
-     /path/to/tardigrade_vector_tools/build/
-     $ firefox docs/doxygen/html/index.html &
-
----
+   $ pwd
+   /path/to/tardigrade_vector_tools
+   $ cmake -S . -B build
+   $ cmake --build build --target test_tardigrade_vector_tools
+   $ ctest --test-dir build
 
 *******************
 Install the library
 *******************
 
-Build the entire before performing the installation.
+Build the entire project before performing the installation.
 
 4) Build the entire project
 
    .. code-block:: bash
 
       $ pwd
-      /path/to/cpp_stub/build
-      $ cmake --build .
+      /path/to/tardigrade_vector_tools
+      $ cmake -S . -B build
+      $ cmake --build build --target all
 
 5) Install the library
 
    .. code-block:: bash
 
       $ pwd
-      /path/to/cpp_stub/build
-      $ cmake --install . --prefix path/to/root/install
+      /path/to/tardigrade_vector_tools
+      $ cmake --install build --prefix path/to/root/install
 
       # Example local user (non-admin) Linux install
-      $ cmake --install . --prefix /home/$USER/.local
+      $ cmake --install build --prefix /home/$USER/.local
 
       # Example install to conda environment
       $ conda activate my_env
-      $ cmake --install . --prefix ${CONDA_PREFIX}
+      $ cmake --install build --prefix ${CONDA_PREFIX}
+
+***********************
+Build the Conda package
+***********************
+
+.. code-block:: bash
+
+   $ VERSION=$(python -m setuptools_scm) conda mambabuild recipe --no-anaconda-upload -c conda-forge --output-folder conda-bld
 
 ***********************
 Contribution Guidelines
