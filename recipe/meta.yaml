@@ -55,8 +55,8 @@ test:
   commands:
     - set -x
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=conda-test -DCMAKE_INSTALL_LIBDIR=lib
-    - cmake --build build --target test_tardigrade_vector_tools
-    - ctest --test-dir build -R test_tardigrade_vector_tools
+    - cmake --build build --target test_tardigrade_vector_tools test_tardigrade_interp_ndCartesian
+    - ctest --test-dir build -R 'test_'
 
 about:
   home: https://github.com/UCBoulder/tardigrade_vector_tools
