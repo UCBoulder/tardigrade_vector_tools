@@ -36,6 +36,7 @@ requirements:
     - libboost-python-devel >=1.82
     - doxygen
   run:
+    - eigen >=3.3.7
     - tardigrade_error_tools >=0.7
 
 test:
