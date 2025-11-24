@@ -1,5 +1,5 @@
 #===================================================================================================== PROJECT SETUP ===
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.30)
 project(tardigrade_vector_tools LANGUAGES CXX)
 
 # Set common project paths relative to project root directory
