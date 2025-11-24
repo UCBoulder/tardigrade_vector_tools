@@ -17,8 +17,6 @@ build:
     # Build and install c++ libraries
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_LIBDIR=lib
     - cmake --install build --prefix ${PREFIX}
-  ignore_run_exports:
-    - python_abi
   skip: true  # [win]
 
 requirements:
@@ -26,6 +24,7 @@ requirements:
     - {{ compiler('cxx') }}
     - make
     - cmake >=3.30
+    - tardigrade_error_tools >=0.7
   host:
     - breathe >=4.3.0
     - sphinx >=3.0.4
@@ -36,7 +35,6 @@ requirements:
     - eigen >=3.3.7
     - libboost-python-devel >=1.82
     - doxygen
-    - tardigrade_error_tools >=0.7
   run:
     - tardigrade_error_tools >=0.7
 
@@ -52,11 +50,12 @@ test:
     - CMakeLists.txt
     - src/cpp/tests/CMakeLists.txt
     - src/cpp/tests/test_tardigrade_vector_tools.cpp
+    - src/cpp/tests/test_tardigrade_interp_ndCartesian.cpp
   commands:
     - set -x
     - cmake -S . -B build -DCMAKE_BUILD_TYPE=conda-test -DCMAKE_INSTALL_LIBDIR=lib
-    - cmake --build build --target test_tardigrade_vector_tools test_tardigrade_interp_ndCartesian
-    - ctest --test-dir build -R 'test_'
+    - cmake --build build --verbose --parallel 4
+    - ctest --test-dir build --output-on-failure -R 'test_' --parallel 4
 
 about:
   home: https://github.com/UCBoulder/tardigrade_vector_tools
