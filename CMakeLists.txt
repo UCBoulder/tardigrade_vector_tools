@@ -1,6 +1,6 @@
 #===================================================================================================== PROJECT SETUP ===
-cmake_minimum_required(VERSION 3.14)
-project(tardigrade_vector_tools VERSION 0.2.0)
+cmake_minimum_required(VERSION 3.30)
+project(tardigrade_vector_tools LANGUAGES CXX)
 
 # Set common project paths relative to project root directory
 set(CPP_SRC_PATH "src/cpp")
@@ -41,7 +41,7 @@ if(${not_conda_test} STREQUAL "true")
     if(${${PROJECT_NAME}_VERSION} STREQUAL "")
         set(${PROJECT_NAME}_VERSION 0.0.0)
     endif()
-    project(${PROJECT_NAME} VERSION ${${PROJECT_NAME}_VERSION})
+    project(${PROJECT_NAME} VERSION ${${PROJECT_NAME}_VERSION} LANGUAGES CXX)
 endif()
 
 # Add installation directory variables
@@ -117,7 +117,7 @@ endif()
 # Only add tests and documentation for current project builds. Protects downstream project builds.
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # Find Boost. Required for tests
-    find_package(Boost 1.53.0 REQUIRED COMPONENTS unit_test_framework)
+    find_package(Boost 1.82.0 REQUIRED)
     # Add c++ tests and docs
     add_subdirectory("${CPP_SRC_PATH}/tests")
     if(${not_conda_test} STREQUAL "true")
