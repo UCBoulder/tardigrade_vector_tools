@@ -21,23 +21,26 @@ build:
 
 requirements:
   build:
+    - python
     - {{ compiler('cxx') }}
     - make
     - cmake >=3.30
     - tardigrade_error_tools >=0.7
-  host:
     - breathe >=4.3.0
+    - doxygen
+    - libboost-python-devel >=1.82
+    - setuptools >=62
+    - setuptools_scm >=6.2
     - sphinx >=3.0.4
     - sphinx_rtd_theme >=0.4.3
     - sphinxcontrib-bibtex
-    - setuptools >=77
-    - setuptools_scm >=8
+    - tardigrade_error_tools >=0.9.7
+  host:
     - eigen >=3.3.7
-    - libboost-python-devel >=1.82
-    - doxygen
+    - tardigrade_error_tools >=0.9.7
   run:
     - eigen >=3.3.7
-    - tardigrade_error_tools >=0.7
+    - tardigrade_error_tools >=0.9.7
 
 test:
   requires:
