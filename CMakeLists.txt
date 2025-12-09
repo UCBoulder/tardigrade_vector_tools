@@ -29,8 +29,8 @@ endif()
 # Get version number from Git
 set(VERSION_UPDATE_FROM_GIT True)
 if(${not_conda_test} STREQUAL "true")
-    if (DEFINED ENV{PREFIX})
-        set(Python_ROOT_DIR "$ENV{PREFIX}/bin")
+    if (DEFINED ENV{BUILD_PREFIX})
+        set(Python_ROOT_DIR "$ENV{BUILD_PREFIX}/bin")
     endif()
     set(Python_FIND_STRATEGY LOCATION)
     find_package(Python COMPONENTS Interpreter REQUIRED)
@@ -101,6 +101,8 @@ foreach(package ${upstream_packages})
             ${package}
             GIT_REPOSITORY https://github.com/UCBoulder/${package}.git
             GIT_TAG        ${${package_upper}_FETCHCONTENT_VERSION}
+            SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/${package}-src
+            BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/${package}-src/build
         )
         FetchContent_MakeAvailable(${package})
     endif()
