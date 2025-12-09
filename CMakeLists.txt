@@ -101,6 +101,8 @@ foreach(package ${upstream_packages})
             ${package}
             GIT_REPOSITORY https://github.com/UCBoulder/${package}.git
             GIT_TAG        ${${package_upper}_FETCHCONTENT_VERSION}
+            SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/${package}-src
+            BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/_deps/${package}-src/build
         )
         FetchContent_MakeAvailable(${package})
     endif()
