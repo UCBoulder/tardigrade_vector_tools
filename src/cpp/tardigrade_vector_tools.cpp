@@ -774,10 +774,10 @@ namespace tardigradeVectorTools{
          * \param &A_end: The stopping iterator of the first matrix
          * \param &B_begin: The starting iterator of the second matrix
          * \param &B_end: The stopping iterator of the second matrix
-         * \param &C_begin: The starting iterator of the result matrix
          * \param &rows: The number of rows in A
          * \param &cols: The number of columns in B
-         * \param &B_end: The stopping iterator of the result matrix
+         * \param &C_begin: The starting iterator of the result matrix
+         * \param &C_end: The stopping iterator of the result matrix
          */
 
         const size_type inner = ( size_type )( A_end - A_begin ) / rows;
@@ -835,7 +835,7 @@ namespace tardigradeVectorTools{
          * \param &B_begin: The starting iterator of the second matrix
          * \param &B_end: The stopping iterator of the second matrix
          * \param &C_begin: The starting iterator of the result matrix
-         * \param &B_end: The stopping iterator of the result matrix
+         * \param &C_end: The stopping iterator of the result matrix
          */
 
         const size_type rows = ( size_type )( A_end - A_begin );
@@ -1200,7 +1200,6 @@ namespace tardigradeVectorTools{
          *
          * \param &A_begin: The starting iterator of the matrix in row major format ( \f$A\f$ )
          * \param &A_end: The stopping iterator of the matrix in row major format ( \f$A\f$ )
-         * \param &rows: The number of rows in the matrix
          * \param &v: The scalar output quantity ( \f$v\f$ )
          */
 
@@ -1258,7 +1257,8 @@ namespace tardigradeVectorTools{
          * 
          * If \f$A\f$ is non-square it will sum the values on the diagonal
          *
-         * \param &A: The matrix
+         * \param &A_begin: The starting iterator of the matrix
+         * \param &A_end: The stopping iterator of the matrix
          * \param &v: The scalar output quantity
          */
 
@@ -1388,8 +1388,6 @@ namespace tardigradeVectorTools{
          *
          * \param &v_begin: The starting iterator of the vector
          * \param &v_end:   The stopping iterator of the vector
-         * \param &unit_begin: The starting iterator of the unit vector
-         * \param &unit_end:   The stopping iterator of the unit vector
          */
 
         T norm = l2norm<T>(v_begin, v_end);
@@ -1983,7 +1981,7 @@ namespace tardigradeVectorTools{
     template<typename T>
     void verifyLength( const std::vector< T > &verifyVector, const unsigned int &expectedLength,
                        std::string message ){
-        /*
+        /*!
          * Raise a ``std::length_error`` exception if the provided vector doesn't match the expected length.
          *
          * \param &verifyVector: The vector to check for length
@@ -2001,7 +1999,7 @@ namespace tardigradeVectorTools{
     void verifyLength( const std::vector< T > &verifyVectorOne,
                        const std::vector< T > &verifyVectorTwo,
                        std::string message ){
-        /*
+        /*!
          * Raise a ``std::length_error`` exception if the provided vectors don't have matching lengths.
          *
          * \param &verifyVectorOne: The vector to check for length
@@ -2020,7 +2018,7 @@ namespace tardigradeVectorTools{
     void verifyLength( const std::vector< std::vector< T > > &verifyVectorOne,
                        const std::vector< std::vector< T > > &verifyVectorTwo,
                        std::string message ){
-        /*
+        /*!
          * Raise a ``std::length_error`` exception if the provided vectors don't have matching sizes.
          *
          * \param &verifyVectorOne: The vector to check for length
@@ -2170,8 +2168,8 @@ namespace tardigradeVectorTools{
         /*!
          * Append a matrix into a row-major vector.
          *
-         * \param &A_begin: The starting iterator of the matrix to be appended
-         * \param &A_end: The stopping iterator of the matrix to be appended
+         * \param &M_begin: The starting iterator of the matrix to be appended
+         * \param &M_end: The stopping iterator of the matrix to be appended
          * \param &v_begin: The starting iterator of the resulting vector
          * \param &v_end: The stopping iterator of the resulting vector
          */
@@ -2383,7 +2381,7 @@ namespace tardigradeVectorTools{
          * Used as:
          *
          * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
-         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}\f$ or \f$v' = Rv\f$
          * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
          *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
          *
@@ -2416,7 +2414,7 @@ namespace tardigradeVectorTools{
          * Used as:
          *
          * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
-         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}\f$ or \f$v' = Rv\f$
          * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
          *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
          *
@@ -2464,9 +2462,9 @@ namespace tardigradeVectorTools{
          * Used as:
          *
          * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
-         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         *   coordinate system* as \f$ v'_{i} = R_{ij} v_{j}\f$ or \f$v' = Rv \f$
          * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
-         *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
+         *   \f$ v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v \f$
          *
          * \param &bungeEulerAngles: Vector containing three Bunge-Euler angles in radians
          * \param &directionCosines: Matrix containing the 3x3 rotation matrix
@@ -2500,9 +2498,9 @@ namespace tardigradeVectorTools{
          * Used as:
          *
          * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
-         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         *   coordinate system* as \f$ v'_{i} = R_{ij} v_{j} \f$ or \f$ v' = Rv \f$
          * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
-         *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
+         *   \f$ v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v \f$
          *
          * \param &bungeEulerAngles_begin: Starting iterator of the vector containing three Bunge-Euler angles in radians
          * \param &bungeEulerAngles_end: Stopping iterator of the vector containing three Bunge-Euler angles in radians
@@ -2584,7 +2582,7 @@ namespace tardigradeVectorTools{
          * Used as:
          *
          * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
-         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}\f$ or \f$v' = Rv\f$
          * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
          *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
          *
@@ -2634,7 +2632,7 @@ namespace tardigradeVectorTools{
          * Used as:
          *
          * * Rotate a vector *defined in a fixed coordinate system* to a new, rotated vector *in the same fixed
-         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}f\$ or \f$v' = Rv\f$
+         *   coordinate system* as \f$v'_{i} = R_{ij} v_{j}\f$ or \f$v' = Rv\f$
          * * Define a *fixed vector* in a new coordinate system by rotating the old coordinate system as
          *   \f$v'_{j} = R_{ji} v_{j}\f$ or \f$v' = R^{T}v\f$
          *

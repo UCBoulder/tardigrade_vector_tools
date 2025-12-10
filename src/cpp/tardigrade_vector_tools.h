@@ -103,7 +103,7 @@ namespace tardigradeVectorTools{
     template<typename T, class M_in, class v_out>
     void computeRowMajorMean(const M_in &A_begin, const M_in &A_end, v_out v_begin, v_out v_end);
 
-    template<class M_in, class v_out>
+    template<typename T, class M_in, class v_out>
     void computeMean(const M_in &A_begin, const M_in &A_end, v_out v_begin, v_out v_end);
 
     template<typename T>
@@ -204,9 +204,6 @@ namespace tardigradeVectorTools{
 
     template<typename T>
     T trace(const std::vector< T > &A);
-
-    template<typename T, class M_in>
-    void trace(const M_in &A_begin, const M_in &A_end, const size_type &rows, T &v);
 
     template<typename T>
     int trace(const std::vector< std::vector< T > > &A, T &v);
@@ -348,16 +345,13 @@ namespace tardigradeVectorTools{
         std::vector< T > &subv);
 
     template<class v_in, class v_out>
-    void getRow( const v_in &A_begin, const v_in &A_end, const unsigned int cols, const unsigned int row, v_out row_begin, v_out row_end );
+    void getRow( const v_in &A_begin, const v_in &A_end, const unsigned int cols, const unsigned int row, v_out row_begin );
 
     template <typename T>
     std::vector< T > getRow( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int row );
 
     template<class v_in, class v_out>
     void getCol( const v_in &A_begin, const v_in &A_end, const unsigned int col, v_out col_begin, v_out col_end );
-
-    template<class v_in, class v_out>
-    void getCol( const v_in &A_begin, const v_in &A_end, const unsigned int cols, const unsigned int col, v_out row_begin, v_out row_end );
 
     template <typename T>
     std::vector< T > getCol( const std::vector< T > &A, const unsigned int rows, const unsigned int cols, const unsigned int col );
