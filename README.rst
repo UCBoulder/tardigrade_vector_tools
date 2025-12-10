@@ -1,3 +1,5 @@
+.. targets-start-do-not-remove
+
 .. _`CMake`: https://cmake.org/cmake/help/v3.14/
 .. _`Doxygen`: https://www.doxygen.nl/manual/docblocks.html
 .. _`LaTeX`: https://www.latex-project.org/help/documentation/
@@ -8,10 +10,13 @@
 .. _`Sphinx`: https://www.sphinx-doc.org/en/master/
 .. _`Sphinx style guide`: https://documentation-style-guide-sphinx.readthedocs.io/en/latest/style-guide.html
 .. _`PEP-8`: https://www.python.org/dev/peps/pep-0008/
+.. _`gersemi`: https://github.com/BlankSpruce/gersemi
 
-#############
+.. targets-end-do-not-remove
+
+#######################
 tardigrade_vector_tools
-#############
+#######################
 
 *******************
 Project Description
@@ -69,7 +74,7 @@ Vector tools is always header only. There is nothing to build.
 Test the library
 ****************
 
-.. code-block:: back
+.. code-block:: bash
 
    $ pwd
    /path/to/tardigrade_vector_tools
@@ -156,6 +161,16 @@ styles in this Sphinx style guide`_.
 
 Style Guide
 ===========
+
+This project uses the `gersemi`_ CMake linter. The CI style guide check runs the following command
+
+.. code-block:
+   $ gersemi CMakeLists.txt src/ docs/ --check
+and any automatic fixes may be reviewed and then applied by developers with the following commands
+
+.. code-block:
+   $ gersemi CMakeLists.txt src/ docs/ --diff
+   $ gersemi CMakeLists.txt src/ docs/ --in-place
 
 This project does not yet have a full style guide. Generally, wherever a style can't be inferred from surrounding code
 this project falls back to `PEP-8`_ -like styles. There are two notable exceptions to the notional PEP-8 fall back:
