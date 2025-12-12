@@ -1,6 +1,5 @@
 boa
 breathe>=4.30.0
-clang-tools
 cmake>=3.30
 compilers
 cython
@@ -15,7 +14,9 @@ pytest-cov
 pytest-xdist
 python
 python-build  # required to build tardigrade_error_tools from source
-setuptools_scm>=6.2
+setuptools >=77
+setuptools_scm>=8
+clang-tools
 sphinx>=3.0.4
 sphinx_rtd_theme>=0.4.3
 sphinxcontrib-bibtex
