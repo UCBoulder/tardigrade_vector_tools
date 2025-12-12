@@ -195,4 +195,3 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     )
     set_target_properties(cpp-format PROPERTIES EXCLUDE_FROM_ALL TRUE)
 endif()
-
