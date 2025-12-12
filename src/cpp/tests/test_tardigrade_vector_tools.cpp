@@ -507,7 +507,6 @@ BOOST_AUTO_TEST_CASE(test_inner, *boost::unit_test::tolerance(DEFAULT_TEST_TOLER
     tardigradeVectorTools::inner(Avec, Bvec, result);
     BOOST_TEST(result == expected);
 
-    result = 0.;
     result = tardigradeVectorTools::inner(Avec, Bvec);
     BOOST_TEST(result == expected);
 
@@ -516,7 +515,6 @@ BOOST_AUTO_TEST_CASE(test_inner, *boost::unit_test::tolerance(DEFAULT_TEST_TOLER
     tardigradeVectorTools::inner(A, B, result);
     BOOST_TEST(result == expected);
 
-    result = 0.;
     result = tardigradeVectorTools::inner(A, B);
     BOOST_TEST(result == expected);
 }
@@ -548,7 +546,6 @@ BOOST_AUTO_TEST_CASE(test_trace, *boost::unit_test::tolerance(DEFAULT_TEST_TOLER
 
     BOOST_TEST(c == 2.);
 
-    c = 0.;
     c = tardigradeVectorTools::trace(a);
     BOOST_TEST(c == 3.);
 
@@ -562,7 +559,6 @@ BOOST_AUTO_TEST_CASE(test_trace, *boost::unit_test::tolerance(DEFAULT_TEST_TOLER
     tardigradeVectorTools::trace(A, c);
     BOOST_TEST(c == 3.);
 
-    c = 0.;
     c = tardigradeVectorTools::trace(A);
     BOOST_TEST(c == 3.);
 }
