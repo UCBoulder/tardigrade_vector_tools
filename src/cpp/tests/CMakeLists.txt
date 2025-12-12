@@ -14,6 +14,11 @@ if(NOT cmake_build_type_lower STREQUAL "release")
     )
 endif()
 
+get_target_property(target_sources ${TEST_NAME} SOURCES)
+foreach(source ${target_sources})
+    set_property(GLOBAL APPEND PROPERTY CLANG_FORMAT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
+endforeach(source)
+
 foreach(support_module ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
     set(TEST_NAME "test_${support_module}")
     add_executable(${TEST_NAME} "${TEST_NAME}.cpp")
@@ -30,4 +35,9 @@ foreach(support_module ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
                 ${tardigrade_error_tools_SOURCE_DIR}/${CPP_SRC_PATH}
         )
     endif()
+
+    get_target_property(target_sources ${TEST_NAME} SOURCES)
+    foreach(source ${target_sources})
+        set_property(GLOBAL APPEND PROPERTY CLANG_FORMAT_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
+    endforeach(source)
 endforeach(support_module)
