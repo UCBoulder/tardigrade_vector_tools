@@ -25,6 +25,7 @@ requirements:
     - {{ compiler('cxx') }}
     - make
     - cmake >=3.30
+    - clang-tools
     - breathe >=4.3.0
     - doxygen
     - libboost-python-devel >=1.82
