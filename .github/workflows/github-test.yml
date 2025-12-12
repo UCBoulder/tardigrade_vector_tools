@@ -44,14 +44,14 @@ jobs:
       - name: Configure
         shell: bash -el {0}
         run: cmake -S . -B build -DTARDIGRADE_HEADER_ONLY=${{ matrix.header_only }} -DTARDIGRADE_ERROR_TOOLS_OPT=${{ matrix.tardigrade_opt }} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-#      - clang-tidy Lint
-#        if: ${{ matrix.os == 'ubuntu-latest'}}
-#        shell: bash -el {0}
-#        run: run-clang-tidy -config-file=.clang-tidy -header-filter=*.h -p build
-#      - name clang-format Lint
-#        if: ${{ matrix.os == 'ubuntu-latest' && matrix.tardigrade_opt == 'OFF' && matrix.header_only == 'ON' }}
-#        shell: bash -el {0}
-#        run: cmake --build build --target cpp-format-check
+      - name: clang-tidy Lint
+        if: ${{ matrix.os == 'ubuntu-latest'}}
+        shell: bash -el {0}
+        run: run-clang-tidy -config-file=.clang-tidy -header-filter=*.h -p build
+      - name: clang-format Lint
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.tardigrade_opt == 'OFF' && matrix.header_only == 'ON' }}
+        shell: bash -el {0}
+        run: cmake --build build --target cpp-format-check
       - name: Build
         shell: bash -el {0}
         run: cmake --build build --target all
