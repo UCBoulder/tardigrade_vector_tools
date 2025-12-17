@@ -425,7 +425,7 @@ namespace tardigradeVectorTools {
                         v_out dDirectionCosinesdGamma_end);
 
     template <typename T>
-    int rotationMatrix(const std::vector<T> &bungeEulerAngles, std::vector<T> &rotationMatrix);
+    int rotationMatrix(const std::vector<T> &bungeEulerAngles, std::vector<T> &directionCosines);
 
     template <typename T>
     int rotationMatrix(const std::vector<T> &bungeEulerAngles, std::vector<std::vector<T> > &directionCosines);
