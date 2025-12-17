@@ -124,7 +124,7 @@ namespace tardigradeVectorTools {
     std::vector<T> cross(const std::vector<T> &a, const std::vector<T> &b);
 
     template <typename T>
-    int dot(const std::vector<T> &a, const std::vector<T> &b, T &c);
+    int dot(const std::vector<T> &a, const std::vector<T> &b, T &v);
 
     template <typename T>
     T dot(const std::vector<T> &a, const std::vector<T> &b);
