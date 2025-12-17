@@ -3441,25 +3441,25 @@ namespace tardigradeVectorTools {
 
     template <typename T>
     std::vector<double> matrixSqrt(const std::vector<T> &A, const unsigned int Arows,
-                                   std::vector<std::vector<double>> &dAdX, const double tolr, const double tola,
+                                   std::vector<std::vector<double>> &dSqrtAdX, const double tolr, const double tola,
                                    const unsigned int maxIter, const unsigned int maxLS) {
         /*!
          * Solve for the square root of the square matrix A.
          *
          * \param &A: The matrix A in row major form.
          * \param Arows: The number of rows in A.
-         * \param &dAdX: The gradient of A w.r.t. X
+         * \param &dSqrtAdX: The gradient of square root of A w.r.t. X
          * \param tolr: The relative tolerance.
          * \param tola: The absolute tolerance.
          * \param maxIter: The maximum number of iterations
          * \param maxLS: The maximum number of line search iterations.
          */
 
-        std::vector<double> _dAdX;
+        std::vector<double> _dSqrtAdX;
 
-        std::vector<double> sqrtA = matrixSqrt(A, Arows, _dAdX, tolr, tola, maxIter, maxLS);
+        std::vector<double> sqrtA = matrixSqrt(A, Arows, _dSqrtAdX, tolr, tola, maxIter, maxLS);
 
-        dAdX = inflate(_dAdX, Arows * Arows, Arows * Arows);
+        dSqrtAdX = inflate(_dSqrtAdX, Arows * Arows, Arows * Arows);
 
         return sqrtA;
     }

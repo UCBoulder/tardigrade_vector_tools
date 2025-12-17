@@ -124,7 +124,7 @@ namespace tardigradeVectorTools {
     std::vector<T> cross(const std::vector<T> &a, const std::vector<T> &b);
 
     template <typename T>
-    int dot(const std::vector<T> &a, const std::vector<T> &b, T &c);
+    int dot(const std::vector<T> &a, const std::vector<T> &b, T &v);
 
     template <typename T>
     T dot(const std::vector<T> &a, const std::vector<T> &b);
@@ -425,7 +425,7 @@ namespace tardigradeVectorTools {
                         v_out dDirectionCosinesdGamma_end);
 
     template <typename T>
-    int rotationMatrix(const std::vector<T> &bungeEulerAngles, std::vector<T> &rotationMatrix);
+    int rotationMatrix(const std::vector<T> &bungeEulerAngles, std::vector<T> &directionCosines);
 
     template <typename T>
     int rotationMatrix(const std::vector<T> &bungeEulerAngles, std::vector<std::vector<T> > &directionCosines);
