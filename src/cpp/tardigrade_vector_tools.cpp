@@ -19,8 +19,8 @@ std::vector<T> &operator+=(std::vector<T> &lhs, const std::vector<T> &rhs) {
      * \param &rhs: The right-hand side vector
      */
 
-    const unsigned int lhs_size = lhs.size();
-    const unsigned int rhs_size = rhs.size();
+    TARDIGRADE_ERROR_TOOLS_EVAL(const unsigned int lhs_size = lhs.size();)
+    TARDIGRADE_ERROR_TOOLS_EVAL(const unsigned int rhs_size = rhs.size();)
 
     TARDIGRADE_ERROR_TOOLS_CHECK(lhs_size == rhs_size, "vectors must be the same size to add")
 
@@ -216,8 +216,8 @@ std::vector<std::vector<T>> &operator+=(std::vector<std::vector<T>> &lhs, const 
      * \param &rhs: The right-hand side matrix
      */
 
-    const unsigned int lhs_size = lhs.size();
-    const unsigned int rhs_size = rhs.size();
+    TARDIGRADE_ERROR_TOOLS_EVAL(const unsigned int lhs_size = lhs.size();)
+    TARDIGRADE_ERROR_TOOLS_EVAL(const unsigned int rhs_size = rhs.size();)
 
     TARDIGRADE_ERROR_TOOLS_CHECK(lhs_size == rhs_size, "matrices must have the same numbers of rows to add")
 
@@ -261,7 +261,7 @@ std::vector<std::vector<T>> &operator-=(std::vector<std::vector<T>> &lhs, const 
      */
 
     const unsigned int lhs_size = lhs.size();
-    const unsigned int rhs_size = rhs.size();
+    TARDIGRADE_ERROR_TOOLS_EVAL(const unsigned int rhs_size = rhs.size();)
 
     TARDIGRADE_ERROR_TOOLS_CHECK(lhs_size == rhs_size, "matrices must have the same numbers of rows to add")
 
@@ -438,7 +438,7 @@ namespace tardigradeVectorTools {
          * \param &v: The resulting mean
          */
 
-        const unsigned int A_size = A.size();
+        TARDIGRADE_ERROR_TOOLS_EVAL(const unsigned int A_size = A.size();)
 
         TARDIGRADE_ERROR_TOOLS_CHECK(A_size != 0, "Matrix must have a size greater than zero");
 
@@ -689,7 +689,7 @@ namespace tardigradeVectorTools {
          * \param &b: The vector
          */
 
-        const size_type size = A.size();
+        TARDIGRADE_ERROR_TOOLS_EVAL(const size_type size = A.size();)
 
         TARDIGRADE_ERROR_TOOLS_CHECK(size != 0, "A has no rows")
 
@@ -936,7 +936,7 @@ namespace tardigradeVectorTools {
          * \param &B: The second matrix
          */
 
-        size_type Arows = A.size();
+        TARDIGRADE_ERROR_TOOLS_EVAL(size_type Arows = A.size();)
 
         TARDIGRADE_ERROR_TOOLS_CHECK(Arows != 0, "A has no rows")
 
@@ -1082,8 +1082,8 @@ namespace tardigradeVectorTools {
          */
 
         // Get the size and perform error handling
-        unsigned int Arows = A.size();
-        unsigned int Acols = A[0].size();
+        TARDIGRADE_ERROR_TOOLS_EVAL(unsigned int Arows = A.size();)
+        TARDIGRADE_ERROR_TOOLS_EVAL(unsigned int Acols = A[0].size();)
         TARDIGRADE_ERROR_TOOLS_CHECK(Arows == B.size() && Acols == B[0].size(),
                                      "Matrices must have the same dimensions to add.")
 
@@ -3489,12 +3489,20 @@ namespace tardigradeVectorTools {
         std::vector<T> R(Arows * Arows);
         dSqrtAdX = std::vector<T>(Arows * Arows * Arows * Arows);
 
+#ifdef TARDIGRADE_ERROR_TOOLS_OPT
+        matrixSqrt<T, typename std::vector<T>::const_iterator, typename std::vector<T>::iterator,
+                   typename std::vector<T>::iterator>(std::cbegin(A), std::cend(A), Arows, std::begin(X), std::end(X),
+                                                      std::begin(dX), std::end(dX), std::begin(R), std::end(R),
+                                                      std::begin(dSqrtAdX), std::end(dSqrtAdX), tolr, tola, maxIter,
+                                                      maxLS);
+#else
         const int return_val =
             matrixSqrt<T, typename std::vector<T>::const_iterator, typename std::vector<T>::iterator,
                        typename std::vector<T>::iterator>(std::cbegin(A), std::cend(A), Arows, std::begin(X),
                                                           std::end(X), std::begin(dX), std::end(dX), std::begin(R),
                                                           std::end(R), std::begin(dSqrtAdX), std::end(dSqrtAdX), tolr,
                                                           tola, maxIter, maxLS);
+#endif
 
         TARDIGRADE_ERROR_TOOLS_CHECK(return_val == 0,
                                      "Matrix square root failed with error code " + std::to_string(return_val));
@@ -3787,11 +3795,18 @@ namespace tardigradeVectorTools {
         }
 
         // Perform the matrix square root of Usqrd
+#ifdef TARDIGRADE_ERROR_TOOLS_OPT
+        matrixSqrt<T, typename std::vector<T>::const_iterator, typename std::vector<T>::iterator,
+                   typename std::vector<T>::iterator>(Usqrd_begin, Usqrd_end, Urows, U_begin, U_end, tempVec1_begin,
+                                                      tempVec1_end, tempVec2_begin, tempVec2_end, dUdUsqrd_begin,
+                                                      dUdUsqrd_end);
+#else
         const int return_val =
             matrixSqrt<T, typename std::vector<T>::const_iterator, typename std::vector<T>::iterator,
                        typename std::vector<T>::iterator>(Usqrd_begin, Usqrd_end, Urows, U_begin, U_end, tempVec1_begin,
                                                           tempVec1_end, tempVec2_begin, tempVec2_end, dUdUsqrd_begin,
                                                           dUdUsqrd_end);
+#endif
 
         TARDIGRADE_ERROR_TOOLS_CHECK(return_val == 0,
                                      "Return value from matrix square root is " + std::to_string(return_val));
