@@ -23,6 +23,11 @@ if(cmake_build_type_lower STREQUAL "conda-test")
     set(not_conda_test "false")
 endif()
 
+if(${TARDIGRADE_ERROR_TOOLS_OPT})
+    add_compile_definitions(TARDIGRADE_ERROR_TOOLS_OPT)
+    message(WARNING "BUILDING OPTIMIZED ERROR TOOLS. NO ERRORS WILL BE CAUGHT")
+endif()
+
 set(ADDITIONAL_HEADER_ONLY_LIBRARIES "tardigrade_interp_ndCartesian")
 if(${not_conda_test} STREQUAL "true")
     foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})

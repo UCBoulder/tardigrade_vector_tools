@@ -539,7 +539,9 @@ BOOST_AUTO_TEST_CASE(test_trace, *boost::unit_test::tolerance(DEFAULT_TEST_TOLER
     // TODO: Refactor with boost or pytest
     vectorType b = {1., 0., 0., 0., 1., 0., 0., 1., 0., 0., 0., 1.};
 
+#ifndef TARDIGRADE_ERROR_TOOLS_OPT
     BOOST_CHECK_THROW(tardigradeVectorTools::trace(b, c), std::runtime_error);
+#endif
 
     c = 0;
     tardigradeVectorTools::rowMajorTrace<4, 3>(std::begin(b), std::end(b), c);
@@ -698,11 +700,19 @@ BOOST_AUTO_TEST_CASE(test_equals, *boost::unit_test::tolerance(DEFAULT_TEST_TOLE
 BOOST_AUTO_TEST_CASE(test_verifyLength, *boost::unit_test::tolerance(DEFAULT_TEST_TOLERANCE)) {
     std::vector<double> testVectorDouble = {1.};
     BOOST_CHECK_NO_THROW(tardigradeVectorTools::verifyLength(testVectorDouble, 1));
+#ifdef TARDIGRADE_ERROR_TOOLS_OPT
+    BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testVectorDouble, 2), std::length_error);
+#else
     BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testVectorDouble, 2), std::runtime_error);
+#endif
 
     std::vector<int> testVectorInt = {1};
     BOOST_CHECK_NO_THROW(tardigradeVectorTools::verifyLength(testVectorInt, 1));
+#ifdef TARDIGRADE_ERROR_TOOLS_OPT
+    BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testVectorInt, 2), std::length_error);
+#else
     BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testVectorInt, 2), std::runtime_error);
+#endif
 
     std::vector<std::vector<double> > testNestedVectorDouble             = {{1.}, {2.}};
     std::vector<std::vector<double> > testNestedVectorDoubleLonger       = {{1.}, {2.}, {3.}};
@@ -713,10 +723,17 @@ BOOST_AUTO_TEST_CASE(test_verifyLength, *boost::unit_test::tolerance(DEFAULT_TES
     BOOST_CHECK_NO_THROW(tardigradeVectorTools::verifyLength(testNestedVectorDouble, testNestedVectorDouble));
     BOOST_CHECK_NO_THROW(tardigradeVectorTools::verifyLength(testNestedVectorDoubleLongerRagged,
                                                              testNestedVectorDoubleLongerRagged));
+#ifdef TARDIGRADE_ERROR_TOOLS_OPT
+    BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorDouble, testNestedVectorDoubleLonger),
+                      std::length_error);
+    BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorDouble, testNestedVectorDoubleLongerRagged),
+                      std::length_error);
+#else
     BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorDouble, testNestedVectorDoubleLonger),
                       std::runtime_error);
     BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorDouble, testNestedVectorDoubleLongerRagged),
                       std::runtime_error);
+#endif
 
     std::vector<std::vector<int> > testNestedVectorInt             = {{1}, {2}};
     std::vector<std::vector<int> > testNestedVectorIntLonger       = {{1}, {2}, {3}};
@@ -727,10 +744,17 @@ BOOST_AUTO_TEST_CASE(test_verifyLength, *boost::unit_test::tolerance(DEFAULT_TES
     BOOST_CHECK_NO_THROW(tardigradeVectorTools::verifyLength(testNestedVectorInt, testNestedVectorInt));
     BOOST_CHECK_NO_THROW(tardigradeVectorTools::verifyLength(testNestedVectorIntLongerRagged,
                                                              testNestedVectorIntLongerRagged));
+#ifdef TARDIGRADE_ERROR_TOOLS_OPT
+    BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorInt, testNestedVectorIntLonger),
+                      std::length_error);
+    BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorInt, testNestedVectorIntLongerRagged),
+                      std::length_error);
+#else
     BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorInt, testNestedVectorIntLonger),
                       std::runtime_error);
     BOOST_CHECK_THROW(tardigradeVectorTools::verifyLength(testNestedVectorInt, testNestedVectorIntLongerRagged),
                       std::runtime_error);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_getValuesByIndex, *boost::unit_test::tolerance(DEFAULT_TEST_TOLERANCE)) {
