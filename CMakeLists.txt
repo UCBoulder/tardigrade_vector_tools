@@ -87,6 +87,8 @@ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 if(EIGEN3_FOUND)
     message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
+else()
+    message(FATAL_ERROR "Eigen3 not found")
 endif()
 
 # Set build type checks
