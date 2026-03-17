@@ -37,11 +37,11 @@ requirements:
     - sphinx_rtd_theme >=0.4.3
     - sphinxcontrib-bibtex
   host:
-    - eigen >=5
+    - eigen >=3.3.7
     - eigen-abi-devel
     - tardigrade_error_tools >=0.9.7
   run:
-    - eigen >=5
+    - eigen >=3.3.7
 
 test:
   requires:
