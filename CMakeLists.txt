@@ -23,6 +23,11 @@ if(cmake_build_type_lower STREQUAL "conda-test")
     set(not_conda_test "false")
 endif()
 
+if(${TARDIGRADE_ERROR_TOOLS_OPT})
+    add_compile_definitions(TARDIGRADE_ERROR_TOOLS_OPT)
+    message(WARNING "BUILDING OPTIMIZED ERROR TOOLS. NO ERRORS WILL BE CAUGHT")
+endif()
+
 set(ADDITIONAL_HEADER_ONLY_LIBRARIES "tardigrade_interp_ndCartesian")
 if(${not_conda_test} STREQUAL "true")
     foreach(package ${ADDITIONAL_HEADER_ONLY_LIBRARIES})
@@ -78,10 +83,12 @@ set_property(GLOBAL PROPERTY CLANG_FORMAT_SOURCE_FILES)
 #=============================================================================================== ADD PROJECT TARGETS ===
 
 # Find eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
+find_package(Eigen3 3.3...5 NO_MODULE)
 if(EIGEN3_FOUND)
-    message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
+    message(STATUS "Found Eigen3 (less than version 5): ${EIGEN3_INCLUDE_DIR}")
+else()
+    find_package(Eigen3 5 REQUIRED NO_MODULE)
+    message(STATUS "Found Eigen3 (version 5): ${EIGEN3_INCLUDE_DIR}")
 endif()
 
 # Set build type checks
