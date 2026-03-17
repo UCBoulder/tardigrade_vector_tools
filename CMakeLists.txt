@@ -83,7 +83,7 @@ set_property(GLOBAL PROPERTY CLANG_FORMAT_SOURCE_FILES)
 #=============================================================================================== ADD PROJECT TARGETS ===
 
 # Find eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 5 REQUIRED NO_MODULE)
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 if(EIGEN3_FOUND)
     message(STATUS "Found Eigen3: ${EIGEN3_INCLUDE_DIR}")
