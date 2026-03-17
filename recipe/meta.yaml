@@ -38,6 +38,7 @@ requirements:
     - sphinxcontrib-bibtex
   host:
     - eigen >=3.3.7
+    - eigen-abi-devel
     - tardigrade_error_tools >=0.9.7
   run:
     - eigen >=3.3.7
