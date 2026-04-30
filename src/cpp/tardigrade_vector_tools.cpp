@@ -3560,8 +3560,8 @@ namespace tardigradeVectorTools {
         solverType<T, R, C> linearSolver;
 
         while ((Rp > tol) && (niter < maxIter)) {
-            solveLinearSystem<M_out,v_out,v_out,T,R,C>(dSqrtAdX_begin, dSqrtAdX_end, R_begin, R_end, Arows * Arows, Arows * Arows, dX_begin,
-                              dX_end, rank, linearSolver);
+            solveLinearSystem<M_out, v_out, v_out, T, R, C>(dSqrtAdX_begin, dSqrtAdX_end, R_begin, R_end, Arows * Arows,
+                                                            Arows * Arows, dX_begin, dX_end, rank, linearSolver);
 
             std::transform(dX_begin, dX_end, dX_begin, std::negate<T>());
 
