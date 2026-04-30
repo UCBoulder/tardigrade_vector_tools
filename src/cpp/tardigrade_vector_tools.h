@@ -492,9 +492,9 @@ namespace tardigradeVectorTools {
 // Utilities which require Eigen
 #ifdef USE_EIGEN
     // Eigen specific type definitions
-    template <typename T>
+    template <typename T, int R = -1, int C = -1>
     using solverType =
-        Eigen::ColPivHouseholderQR<Eigen::Matrix<T, -1, -1, Eigen::RowMajor> >;  //! Define the matrix solver
+        Eigen::ColPivHouseholderQR<Eigen::Matrix<T, R, C, Eigen::RowMajor> >;  //! Define the matrix solver
 
     template <typename T>
     std::vector<double> solveLinearSystem(const std::vector<std::vector<T> > &A, const std::vector<T> &b,
@@ -515,7 +515,7 @@ namespace tardigradeVectorTools {
     template <class M_in, class v_in, class v_out, typename T, int R = -1, int C = -1>
     void solveLinearSystem(const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end,
                            const unsigned int nrows, const unsigned int ncols, v_out x_begin, v_out x_end,
-                           unsigned int &rank, solverType<T> &linearSolver);
+                           unsigned int &rank, solverType<T, R, C> &linearSolver);
 
     template <class v_in, typename T, int R = -1, int C = -1>
     T determinant(const v_in &A_begin, const v_in &A_end, const unsigned int nrows, const unsigned int ncols);
@@ -580,7 +580,7 @@ namespace tardigradeVectorTools {
                                    const double tola = 1e-9, const unsigned int maxIter = 20,
                                    const unsigned int maxLS = 5);
 
-    template <typename T, class v_in, class v_out, class M_out>
+    template <typename T, class v_in, class v_out, class M_out, int R = -1, int C = -1>
     int matrixSqrt(const v_in A_begin, const v_in A_end, const unsigned int Arows, v_out X_begin, v_out X_end,
                    v_out dX_begin, v_out dX_end, v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
                    const double tolr = 1e-9, const double tola = 1e-9, const unsigned int maxIter = 20,

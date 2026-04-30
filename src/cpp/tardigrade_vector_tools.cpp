@@ -3039,7 +3039,7 @@ namespace tardigradeVectorTools {
     template <class M_in, class v_in, class v_out, typename T, int R, int C>
     void solveLinearSystem(const M_in &A_begin, const M_in &A_end, const v_in &b_begin, const v_in &b_end,
                            const unsigned int nrows, const unsigned int ncols, v_out x_begin, v_out x_end,
-                           unsigned int &rank, solverType<T> &linearSolver) {
+                           unsigned int &rank, solverType<T, R, C> &linearSolver) {
         /*!
          * Solve a linear system of equations using Eigen. Note this uses a dense solver.
          *
@@ -3069,7 +3069,7 @@ namespace tardigradeVectorTools {
         Eigen::Map<Eigen::Matrix<T, C, 1>> xmat(&(*x_begin), nrows, 1);
 
         // Perform the decomposition
-        linearSolver = solverType<T>(Amat);
+        linearSolver = solverType<T, R, C>(Amat);
 
         rank = linearSolver.rank();
 
@@ -3510,7 +3510,7 @@ namespace tardigradeVectorTools {
         return X;
     }
 
-    template <typename T, class v_in, class v_out, class M_out>
+    template <typename T, class v_in, class v_out, class M_out, int R, int C>
     int matrixSqrt(const v_in A_begin, const v_in A_end, const unsigned int Arows, v_out X_begin, v_out X_end,
                    v_out dX_begin, v_out dX_end, v_out R_begin, v_out R_end, M_out dSqrtAdX_begin, M_out dSqrtAdX_end,
                    const double tolr, const double tola, const unsigned int maxIter, const unsigned int maxLS) {
@@ -3557,10 +3557,10 @@ namespace tardigradeVectorTools {
 
         constexpr T ratio = 0.5;
 
-        solverType<T> linearSolver;
+        solverType<T, R, C> linearSolver;
 
         while ((Rp > tol) && (niter < maxIter)) {
-            solveLinearSystem(dSqrtAdX_begin, dSqrtAdX_end, R_begin, R_end, Arows * Arows, Arows * Arows, dX_begin,
+            solveLinearSystem<M_out,v_out,v_out,T,R,C>(dSqrtAdX_begin, dSqrtAdX_end, R_begin, R_end, Arows * Arows, Arows * Arows, dX_begin,
                               dX_end, rank, linearSolver);
 
             std::transform(dX_begin, dX_end, dX_begin, std::negate<T>());
